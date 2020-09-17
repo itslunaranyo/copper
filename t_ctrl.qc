@@ -151,7 +151,7 @@ void() target_state_use =
 		self.state = self.state + 1;
 		if (self.state > mx) self.state = 0;
 	}
-	bprint3("state is now ",ftos(self.state),"\n");
+	//bprint3("state is now ",ftos(self.state),"\n");
 }
 
 /*QUAKED target_state (.5 .0 .5) (-8 -8 -8) (8 8 8) RELAY INVERSE 
