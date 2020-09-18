@@ -196,7 +196,7 @@ void(vector tgt) trap_lightning_effect =
 void() trap_lightning_fire =
 {
 	vector tgt, org, nudge;
-	entity last;
+	entity last, oself;
 	float i = 0;
 	
 	if (!self.enemy)	// might already be activator
@@ -221,6 +221,15 @@ void() trap_lightning_fire =
 	self.enemy = world;	
 	nudge = normalize(tgt - self.origin) * 8;
 	
+	if ( !(self.spawnflags & SF_LSHOOT_ONESHOT) || self.strength == 3)
+	{
+		if (time >= self.nextmovesound)
+		{
+			sound (self, CHAN_VOICE, "misc/power.wav", self.volume, ATTN_NORM);
+			self.nextmovesound = time + 1.2;
+		}
+	}
+	
 	if (self.strength == 1)
 	{
 		// do 10 dmg every think
@@ -230,6 +239,7 @@ void() trap_lightning_fire =
 		{
 			T_Damage(trace_ent, self, self, 10);
 			particle (trace_endpos + nudge, nudge * -8, 225, 40);
+			sound (trace_ent, CHAN_BODY, "weapons/lhit.wav", 1, ATTN_NORM);
 		}
 	}
 	else
@@ -267,9 +277,39 @@ void() trap_lightning_fire =
 					}
 					else
 					{
-						// TODO: handle chthons and shubs intelligently
-						T_Damage (trace_ent, self, self, trace_ent.health + min(trace_ent.armorvalue, trace_ent.health / trace_ent.armortype) + 50);
+						// handle chthons and shubs intelligently
+						if (trace_ent.classname == "monster_boss" || trace_ent.classname == "monster_oldone")
+						{
+							if (self.count == 10)	// first tic only so we don't melt the boss
+							{
+								if (trace_ent.classname == "monster_boss")
+								{
+									T_Damage (trace_ent, self, self, 1000);
+								}
+								else if (trace_ent.classname == "monster_oldone")
+								{
+									bprint4(ftos(self.count)," ", ftos(self.strength), " zapping shub with a thing\n");
+									T_Damage (trace_ent, self, self, 10001);	// auto-trigger one pain warble
+								}
+							}
+						}
+						else
+						{
+							T_Damage (trace_ent, self, self, trace_ent.health + min(trace_ent.armorvalue, trace_ent.health / trace_ent.armortype) + 50);
+						}
 					}
+					sound (trace_ent, CHAN_BODY, "weapons/lhit.wav", 1, ATTN_NORM);
+				}
+				else if (trace_ent.classname == "monster_boss" && self.strength == 3 && self.count == 10)
+				{
+					last = trace_ent;
+					// get non-takedamage cthons too
+					bprint4(ftos(self.count)," ", ftos(self.strength), " zapping cthon with a thing\n");
+					oself = self;
+					self = trace_ent;
+					self.health = self.health - 1;
+					boss_pain(activator, 1);
+					self = oself;
 				}
 				
 			} while (i < 8 && trace_ent != world);
@@ -294,6 +334,7 @@ void() trap_lightning_proxy =
 	if (self.buddy.spawnflags & SF_LSHOOT_TRACKME)
 		self.buddy.enemy = self.enemy;
 	SUB_CallAsSelf(trap_lightning_fire, self.buddy);
+	sound(self, CHAN_WEAPON, "weapons/lstart.wav", self.volume, ATTN_NORM);
 	remove(self);
 }
 
@@ -321,19 +362,23 @@ void() trap_lightning_use =
 		}
 		if (self.spawnflags & SF_LSHOOT_TRACKME)
 			self.enemy = activator;
-		
+			
+		sound(self, CHAN_WEAPON, "weapons/lstart.wav", self.volume, ATTN_NORM);
 		trap_lightning_fire();
 		return;
 	}
 
 	// is a toggle zapper
 	self.state = !self.state;
+	self.nextmovesound = 0;
 	if (self.state)
 	{
+		sound(self, CHAN_WEAPON, "weapons/lstart.wav", self.volume, ATTN_NORM);
 		trap_lightning_fire();
 	}
 	else
 	{
+		sound (self, CHAN_VOICE, "misc/null.wav", 1, ATTN_NORM);	// stop zap noise
 		self.nextthink = 0;
 	}
 }
@@ -383,6 +428,13 @@ void() trap_lightning =
 	}
 	
 	self.strength = min(3, max(1, self.strength));
+
+	precache_sound ("weapons/lstart.wav");
+	precache_sound ("misc/power.wav");
+	precache_sound ("weapons/lhit.wav");
+	
+	self.volume = zeroconvertdefault(self.volume, 1);
+	
 	self.state = 0;
 	self.count = 0;
 	self.use = trap_lightning_use;
