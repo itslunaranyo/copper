@@ -296,6 +296,7 @@ void() boss_awake =
 	{
 		self.takedamage = DAMAGE_YES;
 		self.health = zeroconvertdefault(self.health, 1000);
+		self.max_health = self.health;
 	}
 	else
 	{
