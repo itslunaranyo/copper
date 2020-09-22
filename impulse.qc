@@ -257,6 +257,9 @@ void() ImpulseCommands =
 		if(!deathmatch && !coop)
 			Cheat_Genocide();
 		break;
+	case 200:
+		dev_remaining_monsters();
+		break;
 	case 215:
 		Cheat_Undying();
 		break;

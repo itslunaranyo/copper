@@ -192,6 +192,29 @@ void() dev_enemychain =
 }
 
 
+void() dev_remaining_monsters
+{
+	entity mon = world;
+	bprint("Remaining monsters and spawners:\n");
+	do {
+		mon = nextent(mon);
+		if (mon.flags & FL_MONSTER)
+		{
+			if (mon.health <= 0 || mon.deadflag) continue;
+			bprint4(mon.classname, " at ", vtos(mon.origin), "\n");
+		}
+		else if (mon.customflags & CFL_SPAWNER)
+		{
+			if (mon.count <= 0) continue;
+			bprint4(mon.classname, " at ", vtos(mon.origin), " (spawner: ");
+			bprint_int(mon.count);
+			bprint3(" remaining, named '", mon.targetname ,"')\n");
+		}
+	} while (mon != world);
+	bprint("end of list.\n----------\n");
+}
+
+
 // for when i light a map at 1am and then play it again the next afternoon
 void() dev_i_cant_see =
 {
