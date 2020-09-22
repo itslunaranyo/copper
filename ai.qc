@@ -660,15 +660,14 @@ float() FindTarget =
 
 	r = range(client);
 	
-	// tarbabies have all-around vision when idle because they are amorphous blobs
 	if (r == RANGE_NEAR)
 	{
-		if (client.show_hostile < time && (!infront(client) && self.classname != "monster_tarbaby"))
+		if (client.show_hostile < time && !infront(client))
 			return FALSE;
 	}
 	else if (r == RANGE_MID || r == RANGE_FAR)
 	{
-		if ( /* client.show_hostile < time || */ (!infront(client) && self.classname != "monster_tarbaby"))
+		if ( !infront(client) )
 			return FALSE;
 	}
 	
