@@ -195,7 +195,7 @@ void() ShalHome =
 		// took ^^ this one out, because it made voreballs even more effective at going
 		// around corners, which meant that high skill players had a nice new dodge move
 		// but average players who tried to fight the vore the old cautious way were punished
-		// || self.enemy.invisible_finished > time			// if target is invis
+		// || has_invis(self.enemy)			// if target is invis
 		// 1.1: took ^^ this one out too, because projectiles auto-miss the player when
 		// invisible now so they might as well always move the same
 		|| pointcontents(self.origin) < CONTENT_SOLID ) // if voreball is underwater

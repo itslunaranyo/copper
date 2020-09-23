@@ -134,7 +134,7 @@ void() knight_attack =
 	// decide if now is a good swing time
 	len = vlen(self.enemy.origin+self.enemy.view_ofs - (self.origin+self.view_ofs));
 	
-	if (len < 80 || ( self.enemy.invisible_finished > time && random() > 0.5 ))
+	if (len < 80 || ( has_invis(self.enemy) && random() > 0.5 ))
 		knight_atk1 ();
 	else
 		knight_runatk1 ();

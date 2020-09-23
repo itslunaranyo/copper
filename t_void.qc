@@ -174,7 +174,6 @@ void() void_func_touch =
 // --------------------------------
 void() void_fall_hitbottom =
 {
-
 	self.enemy.takedamage = DAMAGE_YES;	// need this first for salvation damage check
 	if (void_salvation(self.owner.owner, self.enemy))
 		return;
@@ -183,7 +182,7 @@ void() void_fall_hitbottom =
 	self.enemy.flags = not(self.enemy.flags, FL_GODMODE);
 	
 	// a pent will not save you from THE LEVEL DESIGNER
-	if (self.enemy.items & IT_INVULNERABILITY || self.enemy.invincible_finished > time)
+	if (has_invuln(self.enemy))
 	{
 		self.enemy.items = self.enemy.items - (self.enemy.items & IT_INVULNERABILITY);
 		self.enemy.invincible_finished = 0;

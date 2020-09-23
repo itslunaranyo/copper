@@ -768,7 +768,7 @@ void() PlayerHealthTick =
 	}
 	else
 	{
-		if (self.dmg > 0 && (self.waterlevel < WL_EYES || self.radsuit_finished > time) )
+		if (self.dmg > 0 && (self.waterlevel < WL_EYES || has_biosuit(self) ) )
 		{
 			// recover damage taken from drowning
 			//T_Heal(self, self.dmg, 0);
@@ -1078,7 +1078,7 @@ void() WaterMove =
 	{	// do damage
 		if (self.dmgtime < time)
 		{
-			if (self.radsuit_finished > time)
+			if (has_biosuit(self))
 				self.dmgtime = time + 1;
 			else
 				self.dmgtime = time + 0.2;
@@ -1087,7 +1087,7 @@ void() WaterMove =
 			{
 				self.deathtype = "lava";
 				// biosuit protects from lava if it's 16u deep or less
-				if (!(self.radsuit_finished > time && pointcontents(self.origin - '0 0 7') != CONTENT_LAVA))
+				if (!(has_biosuit(self) && pointcontents(self.origin - '0 0 7') != CONTENT_LAVA))
 					T_Damage (self, world, world, 10 * self.waterlevel);
 				self.deathtype = string_null;
 			}

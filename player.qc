@@ -266,7 +266,6 @@ void() PainSound = {
 
 	if (self.health < 0)
 		return;
-
 	if (damage_attacker.classname == "teledeath")
 	{
 		sound (self, CHAN_VOICE, "player/teledth1.wav", 1, ATTN_NONE);
@@ -274,7 +273,7 @@ void() PainSound = {
 	}
 
 	// water pain sounds
-	if (self.watertype == CONTENT_WATER && self.waterlevel >= 3 && (self.items & IT_SUIT == 0))
+	if (self.watertype == CONTENT_WATER && self.waterlevel >= 3 && !has_biosuit(self))
 	{
 		DeathBubbles(1);
 		if (random() > 0.5)
@@ -352,7 +351,7 @@ void(entity attacker, float damage) player_pain =
 	if (self.weaponframe)
 		return;
 
-	if (self.invisible_finished > time)
+	if (has_invis(self))
 		return;		// eyes don't have pain frames
 
 	if (self.weapon == IT_AXE )
@@ -397,7 +396,7 @@ void() DeathSound =
 local float		rs;
 
 	// water death sounds
-	if (self.waterlevel >= 3 && (self.items & IT_SUIT == 0))
+	if (self.waterlevel >= 3 && !has_biosuit(self))
 	{
 		if (self.watertype == CONTENT_WATER || self.watertype == CONTENT_SLIME)
 		{

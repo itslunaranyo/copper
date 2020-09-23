@@ -97,7 +97,7 @@ void() tbaby_run25	=[	$run25,		tbaby_run1	] {ai_run(1);}
 
 float(entity e) tar_visible =
 {
-	return (visible(e) && e.invisible_finished < time);
+	return (visible(e) && !has_invis(e));
 }
 
 void() Tar_Forget =
@@ -235,7 +235,7 @@ void(entity attacker, float damage) tbaby_pain =
 	self.rad_time = time + 60;
 	
 	// shooting a tbaby while invisible triggers one spastic leap
-	if (attacker.invisible_finished > time && self.pain_finished < time)
+	if (has_invis(attacker) && self.pain_finished < time)
 	{
 		self.pain_finished = time + 1;
 		self.cnt = 4;
@@ -273,7 +273,7 @@ float() tbaby_check_attack =
 	
 	// spawns don't launch an attack if the player is invisible, or else
 	// they'd time out after five leaps and then just start again
-	if (self.enemy.invisible_finished > time) return FALSE;
+	if (has_invis(self.enemy)) return FALSE;
 	
 	if (time < self.attack_finished) return FALSE;
 	if (enemy_range >= RANGE_FAR) return FALSE;

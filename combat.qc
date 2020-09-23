@@ -257,7 +257,7 @@ float ArmorSave(entity targ, float damage)
 	if (!damage) return 0;
 	if (!targ.takedamage)
 		return 0;
-	if (targ.flags & FL_GODMODE || targ.invincible_finished >= time)
+	if (targ.flags & FL_GODMODE || has_invuln(targ) )
 		return 0;
 
 	float save, savefrac;
@@ -389,7 +389,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_DamageApply
 	// used by buttons and triggers to set activator for target firing
 	damage_attacker = attacker;
 
-	if (attacker.super_damage_finished > time)
+	if (has_quad(attacker))
 	{
 		damage = damage * 4;
 		
@@ -428,7 +428,7 @@ void(entity targ, entity inflictor, entity attacker, float damage) T_DamageApply
 	
 	// check for artifacts
 	
-	if (targ.invincible_finished >= time)
+	if (has_invuln(targ))
 	{
 		if (targ.invincible_sound < time)
 		{

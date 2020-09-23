@@ -299,7 +299,7 @@ float() OgreCheckAttack =
 	
 	// randomly attack with the chainsaw if enemy has the ring of shadows
 	// TODO: friendly chainsaw fire to start infights
-	if (self.enemy.invisible_finished > time)
+	if (has_invis(self.enemy))
 	{
 		if (random() < 0.2)
 		{

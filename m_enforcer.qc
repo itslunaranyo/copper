@@ -50,7 +50,7 @@ float() enforcer_clear_attack =
 {
 	vector spot1, spot2;
 
-	if (self.enemy.invisible_finished > time) return TRUE;	// blast away
+	if (has_invis(self.enemy)) return TRUE;	// blast away
 
 	spot1 = enforcer_muzzle_org();
 	spot2 = enemy_vispos() + self.enemy.view_ofs;
@@ -171,7 +171,7 @@ void()	enf_atk9	=[	$attack9,	enf_atk10	] {ai_face();
 	if (angledif(self.ideal_yaw, self.angles_y) > 80)	// player got behind us
 		return;
 	
-	if (self.enemy.invisible_finished > time && random() > 0.80)
+	if (has_invis(self.enemy) && random() > 0.80)
 	{
 		ai_attack_finished(0.25 + random()); // randomly break volley if player is being sneaky
 		return;

@@ -50,7 +50,7 @@ float()	WizardCheckAttack =
 	}
 	
 	// see if any entities are in the way of the shot
-	if (self.enemy.invisible_finished < time)	// but not if we can't see him
+	if (!has_invis(self.enemy))	// but not if we can't see him
 	{
 		// see if any entities are in the way of the shot
 		spot1 = self.origin + self.view_ofs;

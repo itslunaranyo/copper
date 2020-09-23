@@ -235,7 +235,11 @@ void() CastLightning =
 	makevectors(self.angles);
 	
 	// shamblers look weird when their lightning jumps around seeking the player
-	if (self.enemy.invisible_finished < time)
+	if (has_invis(self.enemy))
+	{
+		dir = v_forward;
+	}
+	else
 	{
 		ai_face();
 		dir = enemy_vispos() + '0 0 16' - org;
@@ -247,10 +251,6 @@ void() CastLightning =
 			dir_y = v_forward_y;
 			dir = normalize(dir);
 		}
-	}
-	else
-	{
-		dir = v_forward;
 	}
 
 	traceline2(org, self.origin + dir * SHAM_LIGHTNING_RANGE, self, TRACE_NOMONSTERS);
@@ -364,7 +364,7 @@ float() ShamCheckAttack =
 		return FALSE;
 	
 	// randomly melee if enemy has the ring of shadows
-	if (self.enemy.invisible_finished > time)
+	if (has_invis(self.enemy))
 	{
 		if (random() < 0.1)
 		{

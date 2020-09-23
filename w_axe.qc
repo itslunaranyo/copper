@@ -107,7 +107,7 @@ void() W_FireAxe =
 			}
 			
 			// do knockback with a quad
-			if (self.super_damage_finished > time)
+			if (has_quad(self))
 			{
 				if ((trace_ent.movetype == MOVETYPE_STEP || trace_ent.movetype == MOVETYPE_WALK) && 
 					// don't swat bosses or other non-standard-sized enemies around

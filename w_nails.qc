@@ -84,7 +84,7 @@ void() W_FirePerforator =
 	
 	self.attack_finished = time + 0.09;
 	
-	if (self.super_damage_finished > time)
+	if (has_quad(self))
 	{
 		// here's a silly thing:
 		// one vanilla SNG nail does 18 dmg, 72 with quad, enough to gib zombies and grunts.

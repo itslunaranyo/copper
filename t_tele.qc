@@ -123,7 +123,7 @@ void(entity client) teleport_exit_limbo =
 	self.attack_finished = time + 0.1;	// don't shoot on the first frame
 	client.dest = VEC_ORIGIN;
 
-	if (client.invisible_finished > time)
+	if (has_invis(client))
 	{
 		client.modelindex = modelindex_eyes;
 		client.model = "progs/eyes.mdl";
@@ -376,7 +376,7 @@ void() tdeath_touch =
 // frag anyone who teleports in on top of an invincible player
 	if (other.classname == "player")
 	{
-		if (other.invincible_finished > time)
+		if (has_invuln(other))
 			self.classname = "teledeath2";
 		if (self.owner.classname != "player")
 		{	// other monsters explode themselves

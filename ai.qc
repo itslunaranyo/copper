@@ -127,7 +127,7 @@ can be confused by a ring of shadows and fire in wrong directions
 vector() enemy_vispos =
 {
 	// dogs can still smell the player
-	if (self.enemy.invisible_finished < time || self.classname == "monster_dog" )
+	if (!has_invis(self.enemy) || self.classname == "monster_dog" )
 		return self.enemy.origin;
 	
 	vector dir, visOrg;
@@ -219,7 +219,7 @@ vector(vector source, float misvel, float degree) LeadTarget =
 	
 	vel = enemy_vispos() - source;
 	// don't lead if you can't see the target
-	if (self.enemy.invisible_finished > time)
+	if (has_invis(self.enemy))
 		return vel;
 	
 	evel = self.enemy.velocity;
@@ -275,9 +275,9 @@ float(entity targ) enemy_priority =
 	p = r * d;
 	if (!visible(targ))
 		p *= 0.5;	// no LOS
-	if (targ.items & IT_INVISIBILITY)
+	if (has_invis(targ))
 		p *= 0.25;	// under the radar
-	if (targ.items & IT_QUAD)
+	if (has_quad(targ))
 		p *= 4;		// way over the radar
 	/*	
 	bprint(targ.netname);
@@ -363,7 +363,7 @@ float() CheckClearAttack =
 	if (self.enemy.customflags & (CFL_PLUNGE|CFL_LIMBO) || self.enemy.deadflag == DEAD_SPECTATING)
 		return FALSE;
 		
-	if (self.enemy.invisible_finished > time)
+	if (has_invis(self.enemy))
 		return TRUE;
 	
 	spot1 = self.origin + self.view_ofs;
@@ -465,7 +465,7 @@ float() CheckAttack =
 
 	// always melee immediately when close enough
 	if ((enemy_range == RANGE_MELEE  && z_overlap(self.enemy)) || 
-		(self.enemy.invisible_finished > time && random() < 0.1) )	// wave arms randomly now and then if target is invisible
+		(has_invis(self.enemy) && random() < 0.1) )	// wave arms randomly now and then if target is invisible
 	{
 		if (self.th_melee)
 		{
@@ -674,7 +674,7 @@ float() FindTarget =
 	// the only two things that alert monsters when invisible besides damage:
 	// - firing a weapon
 	// - bumping into a dog
-	if (client.items & IT_INVISIBILITY)
+	if (has_invis(client))
 	{
 		if (self.classname == "monster_dog" && client.classname == "player")
 		{

@@ -323,7 +323,7 @@ void() monster_use =
 		return;
 	if (self.enemy)
 		return;
-	if (activator.items & IT_INVISIBILITY)
+	if (has_invis(activator))
 		return;
 	if (activator.flags & FL_NOTARGET)
 		return;

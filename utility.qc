@@ -191,6 +191,13 @@ float(float in) bprint_int =
 
 //============================================================================
 
+float(entity who) has_invis = { return !!(who.items & IT_INVISIBILITY || who.invisible_finished > time); }
+float(entity who) has_quad = { return !!(who.items & IT_QUAD || who.super_damage_finished > time); }
+float(entity who) has_invuln = { return !!(who.items & IT_INVULNERABILITY || who.invincible_finished > time); }
+float(entity who) has_biosuit = { return !!(who.items & IT_SUIT || who.radsuit_finished > time); }
+
+//============================================================================
+
 // findradius only works on solid entities, because apparently it's only for explosions
 entity(vector point, float rad, .string fld, string match) findradiusplus =
 {

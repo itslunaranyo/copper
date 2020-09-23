@@ -61,12 +61,12 @@ SuperDamageSound
 */
 void() SuperDamageSound =
 {
-	if (self.super_damage_finished > time)
-		if (self.super_sound < time)
-		{
-			self.super_sound = time + 1;
-			sound (self, CHAN_BODY, "items/damage3.wav", 1, ATTN_NORM);
-		}
+	if (!has_quad(self)) return;
+	if (self.super_sound < time)
+	{
+		self.super_sound = time + 1;
+		sound (self, CHAN_BODY, "items/damage3.wav", 1, ATTN_NORM);
+	}
 }
 
 void() W_SetIdleWeaponFrame =
@@ -164,7 +164,7 @@ void(float new) W_BetterWeapon =
 	{
 		// don't switch to explosive weapons with quad
 		// 1.12: don't switch to explosives when invisible either, since you can't see the stupid viewmodel
-		if ( (self.super_damage_finished > time || self.invisible_finished > time) && 
+		if ( (has_quad(self) || has_invis(self)) &&
 			(new == IT_ROCKET_LAUNCHER || new == IT_GRENADE_LAUNCHER))
 			return;
 		// don't switch to a lightning gun when standing in water
