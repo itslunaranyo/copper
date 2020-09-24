@@ -1560,7 +1560,8 @@ void() ClientDisconnect =
 	// since they aren't *really* leaving
 
 	clients -= 1;
-	clientsAlive -= 1;
+	if (self.health > 0)
+		clientsAlive -= 1;
 	
 	// don't leave with keys
 	TransferKeys();
