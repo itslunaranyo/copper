@@ -561,7 +561,7 @@ void() monster_demon_spawn =
 	self.classname = "monster_demon1";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/demon.mdl");
 

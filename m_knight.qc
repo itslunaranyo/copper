@@ -241,7 +241,7 @@ void() monster_knight_spawn =
 	self.classname = "monster_knight";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/knight.mdl");
 

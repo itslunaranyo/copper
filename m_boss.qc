@@ -287,7 +287,7 @@ void() boss_awake =
 	self.classname = "monster_boss";	// map hack back compat
 	
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 	
 	setmodel (self, "progs/boss.mdl");
 	setsize (self, '-128 -128 -24', '128 128 256');

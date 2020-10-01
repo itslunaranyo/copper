@@ -392,7 +392,7 @@ void() monster_hell_knight_spawn =
 	self.classname = "monster_hell_knight";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/hknight.mdl");
 

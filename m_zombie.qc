@@ -545,7 +545,7 @@ void() monster_zombie_spawn =
 	self.type = "zombie";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/zombie.mdl");
 

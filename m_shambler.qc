@@ -421,7 +421,7 @@ void() monster_shambler_spawn =
 	self.classname = "monster_shambler";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 	setmodel (self, "progs/shambler.mdl");
 
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);

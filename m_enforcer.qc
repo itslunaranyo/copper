@@ -327,7 +327,7 @@ void() monster_enforcer_spawn =
 	self.classname = "monster_enforcer";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/enforcer.mdl");
 

@@ -296,7 +296,7 @@ void() monster_shalrath_spawn =
 	self.classname = "monster_shalrath";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 	
 	setmodel (self, "progs/shalrath.mdl");
 	setsize (self, VEC_HULL2_MIN, VEC_HULL2_MAX);

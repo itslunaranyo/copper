@@ -348,7 +348,7 @@ void() monster_dog_spawn =
 	self.classname = "monster_dog";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/dog.mdl");
 

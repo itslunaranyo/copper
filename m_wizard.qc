@@ -312,7 +312,7 @@ void() monster_wizard_spawn =
 	self.classname = "monster_wizard";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/wizard.mdl");
 

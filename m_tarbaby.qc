@@ -306,7 +306,7 @@ void() monster_tarbaby_spawn =
 	self.classname = "monster_tarbaby";
 	
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/tarbaby.mdl");
 

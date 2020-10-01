@@ -480,7 +480,7 @@ void() monster_ogre_spawn =
 	self.type = "ogre";
 	
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/ogre.mdl");
 

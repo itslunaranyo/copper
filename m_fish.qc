@@ -260,7 +260,7 @@ void() monster_fish_spawn =
 	self.classname = "monster_fish";
 		
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 
 	setmodel (self, "progs/fish.mdl");
 

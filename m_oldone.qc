@@ -393,7 +393,7 @@ void() monster_oldone =
 	precache_sound ("misc/null.wav");
 
 	self.solid = SOLID_SLIDEBOX;
-	self.movetype = MOVETYPE_STEP;
+	//self.movetype = MOVETYPE_STEP;
 	self.type = "boss";
 	
 	setmodel (self, "progs/oldone.mdl");

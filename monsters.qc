@@ -234,6 +234,12 @@ entity( void() spawnthink ) mon_spawner_use =
 	float pause;
 	
 	mon = spawn();
+	
+	// hack for QSS lerpmodels problems: force entity to move clientside for 
+	//	at least one frame before spawning to flush old lerp position
+	mon.movetype = MOVETYPE_TOSS;
+	mon.oldorigin = self.origin;
+	
 	setorigin(mon, self.origin);
 	mon.angles = self.angles;
 	
@@ -385,6 +391,9 @@ Common monster starts
 
 void() monster_start =
 {
+	// 
+	if (self.oldorigin == VEC_ORIGIN)
+		self.oldorigin = self.origin;
 
 	// moved from mon_spawner_use because it was too early to catch the monster's mins and maxs
 	spawn_tdeath(self.origin, self);
@@ -402,13 +411,6 @@ void() monster_start =
 	// - we don't use 'time + 0.15' because this could be running on a late spawn. a constant
 	//    1.15 will always be when we want at map start but in the past upon late spawn.
 
-	// why there's no such thing as magic:
-	// 0.15 seconds is long enough for monsters to fall 8 units, causing subtle bugs all over
-	//    (like the ogre platform above the nailgun in dm456sp getting stuck because the ogre's 
-	//    feet are sunk into it)
-	self.movetype = MOVETYPE_NONE;
-	// so we freeze them in place now and set their movetype in Xmonster_start_go instead
-	
 	if (self.type == string_null)
 		self.type = self.classname;
 	
@@ -420,7 +422,11 @@ void() monster_start_go =
 {
 	local entity pathgoal;
 	self.takedamage = DAMAGE_AIM;
-
+	
+	// fix monsters being stuck in floor because of QSS fix
+	if (self.oldorigin != VEC_ORIGIN)
+		setorigin(self,self.oldorigin);
+	
 	self.ideal_yaw = self.angles * '0 1 0';
 	self.use = monster_use;
 	self.flags = self.flags | FL_MONSTER;
@@ -477,7 +483,7 @@ void() monster_start_go =
 
 	// spread think times so they don't all happen at same time
 	// add tiny minimum in case random() ever returns exactly 0 (rare but possible)
-	self.nextthink = time + random()*0.1 + 0.01;
+	self.nextthink = time + random()*0.1 + 0.05;
 
 }
 
