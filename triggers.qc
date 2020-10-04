@@ -1101,7 +1101,7 @@ void() trigger_monsterjump_touch =
 		
 		if (self.exclude == other.classname) return;	// always exclude this classname
 	}
-	if (self.spawnflags & SPAWN_MJUMP_ONLYBELOW && (other.enemy.absmin_z > (other.absmin_z + 16))) return;
+	if (self.spawnflags & SPAWN_MJUMP_ONLYBELOW && (other.enemy.absmin_z > (other.absmin_z - 16))) return;
 	if (self.spawnflags & SPAWN_MJUMP_ONLYFRONT)
 	{
 		dir = other.enemy.origin - other.origin;
