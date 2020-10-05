@@ -391,7 +391,6 @@ Common monster starts
 
 void() monster_start =
 {
-	// 
 	if (self.oldorigin == VEC_ORIGIN)
 		self.oldorigin = self.origin;
 
@@ -422,10 +421,6 @@ void() monster_start_go =
 {
 	local entity pathgoal;
 	self.takedamage = DAMAGE_AIM;
-	
-	// fix monsters being stuck in floor because of QSS fix
-	if (self.oldorigin != VEC_ORIGIN)
-		setorigin(self,self.oldorigin);
 	
 	self.ideal_yaw = self.angles * '0 1 0';
 	self.use = monster_use;
@@ -496,6 +491,10 @@ Walkmonster starts
 void() walkmonster_start_go =
 {
 	self.movetype = MOVETYPE_STEP;
+	// fix monsters being stuck in floor because of QSS fix
+	if (self.oldorigin != VEC_ORIGIN)
+		setorigin(self,self.oldorigin);
+	
 	if (self.movedir == '0 0 0' && !(self.spawnflags & SPAWN_TRIGGERED) )	// always put telespawned monsters where the mapper wants
 	{
 		self.origin_z = self.origin_z + 1;	// raise off floor a bit
