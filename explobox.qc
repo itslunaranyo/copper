@@ -218,7 +218,7 @@ Build your own exploding box!
 
 Keyvalues:
 "health"	defaults to 18
-"dmg"		damage to explode with, defaults to 150
+"dmg"		damage to explode with, defaults to 150 if unset. -1 will force 0.
 "target"	fires targets when it explodes
 "targetname"	will explode when triggered
 "wait"		will respawn after 'wait' seconds
