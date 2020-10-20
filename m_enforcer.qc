@@ -372,7 +372,8 @@ Keys:
 void() monster_enforcer =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch || cvar("nomonsters") != 0)
+	if (nomonster()) return;
+	if (deathmatch)
 	{
 		remove(self);
 		return;

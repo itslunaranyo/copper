@@ -339,7 +339,8 @@ Keys:
 void() monster_army =
 {	
 	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch || cvar("nomonsters") != 0)
+	if (nomonster()) return;
+	if (deathmatch)
 	{
 		remove(self);
 		return;

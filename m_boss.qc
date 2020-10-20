@@ -89,7 +89,15 @@ void() boss_idle29	=[	$walk29, boss_idle30 ] {ai_face();}
 void() boss_idle30	=[	$walk30, boss_idle31 ] {ai_face();}
 void() boss_idle31	=[	$walk31, boss_idle1 ] {ai_face();}
 
-void() boss_missile1	=[	$attack1, boss_missile2 ] {ai_face();if (random() < 0.66) ReprioritizeEnemy();}
+void() boss_missile1	=[	$attack1, boss_missile2 ] {
+	if (self.state)
+	{
+		boss_idle1();
+		return;
+	}
+	ai_face();
+	if (random() < 0.66) ReprioritizeEnemy();
+}
 void() boss_missile2	=[	$attack2, boss_missile3 ] {ai_face();}
 void() boss_missile3	=[	$attack3, boss_missile4 ] {ai_face();}
 void() boss_missile4	=[	$attack4, boss_missile5 ] {ai_face();}
@@ -327,7 +335,7 @@ void() boss_awake =
 Chthon. requires event_lightning to kill but that's the oldest quake mapping tutorial on the internet, you can find it
 
 SPAWNFLAGS
-"Shootable" if you can't find the tutorial and just want a chthon you can blast. health defaults to 1000.
+"Shootable" if you can't find the tutorial and just want a chthon you can blast. 'health' defaults to 1000.
 */
 /*FGD
 @PointClass base(Angle, Appearflags, Target, Targetname, Deathtype) size(-128 -128 -24, 128 128 256) color(0 0 220) model({ "path": ":progs/boss.mdl" }) = monster_boss : "Chthon" [
@@ -341,7 +349,7 @@ SPAWNFLAGS
 void() monster_boss =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch || cvar("nomonsters") != 0)
+	if (deathmatch)
 	{
 		remove(self);
 		return;
@@ -370,6 +378,8 @@ void() monster_boss =
 	self.use = boss_awake;
 	self.th_pain = boss_pain;
 	self.th_die = boss_death1;
+	if (cvar("nomonsters") != 0)
+		self.state = -1;
 }
 
 //===========================================================================

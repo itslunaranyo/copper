@@ -610,7 +610,8 @@ Keys:
 void() monster_demon1 =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch || cvar("nomonsters") != 0)
+	if (nomonster()) return;
+	if (deathmatch)
 	{
 		remove(self);
 		return;

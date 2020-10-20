@@ -378,7 +378,7 @@ if the map is end.bsp, the finale cutscene will trigger, otherwise shub will jus
 void() monster_oldone =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch || cvar("nomonsters") != 0)
+	if (deathmatch)
 	{
 		remove(self);
 		return;

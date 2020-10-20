@@ -344,7 +344,8 @@ Keys:
 void() monster_shalrath =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch || cvar("nomonsters") != 0)
+	if (nomonster()) return;
+	if (deathmatch)
 	{
 		remove(self);
 		return;
