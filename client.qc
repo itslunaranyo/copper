@@ -1027,17 +1027,20 @@ void() WaterMove =
 	
 	if (self.waterlevel < WL_EYES)	// view is above water
 	{
-		if (time > self.air_finished ||
-			time > self.air_finished - 10 && self.dmg)
+		if (time > 1)	// QSS-only hack for gasping after every level transition
 		{
-			sound (self, CHAN_VOICE, "player/gasp2.wav", 1, ATTN_NORM);
-			self.healthtime = time + 0.5;
-		}
-		else if (time > self.air_finished - 9)
-		{
-			sound (self, CHAN_VOICE, "player/gasp1.wav", 1, ATTN_NORM);
-		}
-			
+			if (time > self.air_finished ||
+				time > self.air_finished - 10 && self.dmg)
+			{
+				sound (self, CHAN_VOICE, "player/gasp2.wav", 1, ATTN_NORM);
+				self.healthtime = time + 0.5;
+			}
+			else if (time > self.air_finished - 9)
+			{
+				dprint5("blep @ ", ftos(time),": ", ftos(self.air_finished),"\n");
+				sound (self, CHAN_VOICE, "player/gasp1.wav", 1, ATTN_NORM);
+			}
+		}		
 		// pentagram protects you from drowning, but if you spend enough time underwater,
 		// you're instantly out of air when it ends
 		self.air_finished = max(self.invincible_finished, time + 12);
