@@ -153,6 +153,7 @@ void() door_use =
 		self.owner.message = string_null;	
 		self.enemy.message = string_null;
 	}
+	self.takedamage = DAMAGE_NO;	// wil be reset upon return
 	SUB_CallAsSelf(door_fire,self.owner);
 }
 
@@ -178,7 +179,6 @@ void() door_killed =
 	oself = self;
 	self = self.owner;
 	self.health = self.max_health;
-	self.takedamage = DAMAGE_NO;	// wil be reset upon return
 	door_use ();
 	self = oself;
 }
