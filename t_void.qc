@@ -88,7 +88,8 @@ void(entity e) void_unplunge =
 float(entity me, entity o) void_salvation =
 {
 	// if this func_void targets a teledest, it's only for light punishment
-	if (!me.buddy)
+	entity spot = void_find_teleport(me);
+	if (!spot)
 		return FALSE;
 	
 	// light punishment is still lethal, proceed with the display
@@ -102,11 +103,11 @@ float(entity me, entity o) void_salvation =
 	if (me.dmg > 0)
 	{
 		T_Damage(o, me, me, me.dmg);
-		teleport(o, me.buddy, TRUE, TRUE);	
+		teleport(o, spot, TRUE, TRUE);	
 		sound (o, CHAN_VOICE, "player/land2.wav", 1, ATTN_NORM);
 	}
 	else
-		teleport(o, me.buddy, TRUE, TRUE);	
+		teleport(o, spot, TRUE, TRUE);	
 	return TRUE;
 }
 
@@ -336,20 +337,57 @@ void() void_trigger_touch =
 }
 
 
-void() void_find_teleports =
+entity(entity me) void_find_teleport =
 {
-	if (self.target == string_null)
-		return;
-
+	if (me.target == string_null &&
+		me.target2 == string_null &&
+		me.target3 == string_null &&
+		me.target4 == string_null)
+		return world;
+	bprint("in void find teleport\n");
 	entity head;
 	head = world;
 	while (1)
 	{
-		head = find(head, targetname, self.target);
-		if (!head) return;
-		if (head.classname == "info_teleport_destination")
-			self.buddy = head;
+		head = find(head, targetname, me.target);
+		if (!head)
+			break;
+		bprint3("trying a ", head.classname, "\n");
+		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
+			return head;
 	}
+	head = world;
+	while (1)
+	{
+		head = find(head, targetname, me.target2);
+		if (!head)
+			break;
+		bprint3("trying a ", head.classname, "\n");
+		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
+			return head;
+	}
+	head = world;
+	while (1)
+	{
+		head = find(head, targetname, me.target3);
+		if (!head)
+			break;
+		bprint3("trying a ", head.classname, "\n");
+		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
+			return head;
+	}
+	head = world;
+	while (1)
+	{
+		head = find(head, targetname, me.target4);
+		if (!head)
+			break;
+		bprint3("trying a ", head.classname, "\n");
+		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
+			return head;
+	}
+	bprint("all fails\n");
+	return world;
 }
 
 
@@ -413,8 +451,8 @@ void() func_void =
 	self.delay = zeroconvertdefault(self.delay,3);	// time to spend "falling" after touching plunge trigger	
 	
 	// wait for other things to spawn
-	self.think = void_find_teleports;
-	self.nextthink = time + 0.1;
+	//self.think = void_find_teleports;
+	//self.nextthink = time + 0.1;
 	self.dmg = zeroconvertdefault(self.dmg, 60);
 	
 	// create another solid entity with the same bounds with solid_trigger as a catch on the way down
@@ -422,7 +460,7 @@ void() func_void =
 	trig.movetype = MOVETYPE_NONE;
 	trig.solid = SOLID_TRIGGER;
 	trig.owner = self;
-	trig.buddy = self.buddy;
+	//trig.buddy = self.buddy;
 	trig.touch = void_trigger_touch;
 	trig.height = self.height - 32;
 	trig.wait = self.delay;	// if trigger has 'delay' field it adds a delay to its own usetargets
@@ -430,6 +468,7 @@ void() func_void =
 	trig.fadecolor = self.fadecolor;
 	
 	SUB_CopyTargets(trig);
+	trig.targetname = self.targetname;
 
 	offset = VEC_UP * self.height;
 	
