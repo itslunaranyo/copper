@@ -581,9 +581,7 @@ void() target_secret_check =
 	w = find(world, target, self.targetname);
 	if (w)
 	{
-		if (w.type == "ammo" || 
-		//	( w.type == "armor" && w.classname != "item_armorpatch") || 
-			( w.type == "health" && !(w.spawnflags & 2)) )
+		if (w.type == "ammo" || w.type == "armor" || ( w.type == "health" && !(w.spawnflags & 2)) )
 			objerror("target_secret targeted by something the player might not be able to grab\n");
 	}
 }

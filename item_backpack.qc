@@ -49,7 +49,7 @@ void() BackpackTouch =
 	other.ammo_rockets = other.ammo_rockets + self.ammo_rockets;
 	other.ammo_cells = other.ammo_cells + self.ammo_cells;
 	bound_ammo(other);
-	armor_give(other, self.armorvalue, FALSE);	
+	armor_give(other, self.armorvalue, 0, FALSE);	
 	
 	sprint (other, "You got ");
 

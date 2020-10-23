@@ -142,41 +142,43 @@ void() item_health =
 
 ARMOR
 
+armorvalue = hit point quantity
+armortype = 0-1 protection rate
+
 ===============================================================================
 */
+
+float ARMORTYPE_GREEN = 0.3;
+float ARMORTYPE_YELLOW = 0.5;
+float ARMORTYPE_RED = 0.7;
 
 /*
 ============
 armor_set_type
 
-coverage proportional to quantity, not derived from last armor grabbed
+coverage derived from last armor grabbed, but drops off to a lower tier below 100 * type
 ============
 */
 void(entity e) armor_set_type =
 {
 	if (e.classname != "player")
 		return;
-		
+	
 	e.items = not(e.items, (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3));
 	if (!e.armorvalue)
+	{
+		e.armortype = 0.0;
 		return;
+	}
 	
-	// change HUD icon based on protection strength
-	if (e.armorvalue <= 100)
+	if (e.armortype == ARMORTYPE_GREEN)
 		e.items |= IT_ARMOR1;
-	else if (e.armorvalue <= 150)
+	else if (e.armortype == ARMORTYPE_YELLOW)
 		e.items |= IT_ARMOR2;
-	else
+	else if (e.armortype == ARMORTYPE_RED)
 		e.items |= IT_ARMOR3;
 	
 	e.armorvalue = min(e.armorvalue, 500);
-
-	// armor never worth less than 25%, absorbs a theoretical 100% of damage at 250 armor points
-	e.armortype = 0.05 + e.armorvalue / 250;
-	e.armortype = clamp(e.armortype, 0.25, 1.0);
-	// this yields 25% up to 50 armor, 45% at 100 armor, 65% at 150, and 85% at 200
-	// armors thus start out a little stronger than their vanilla counterparts (30/60/80%) before weakening with loss
-	// the green armor gets the biggest buff from this ramp but that's okay
 }
 
 
@@ -185,41 +187,36 @@ void(entity e) armor_set_type =
 armor_give
 ============
 */
-float(entity e, float amt, float merge) armor_give =
+float(entity e, float amt, float atype, float replace) armor_give =
 {
-/*
-	if (e.armorvalue <= 0)
+	if (!amt)
+		return FALSE;
+	if (replace)
 	{
-		// default to green armor if there isn't some already
-		e.armortype = 0.3;
-		e.items = not(e.items, (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3)) + IT_ARMOR1;
-	}*/
-	if (merge)
-	{
-		// dumb magic formula for merging armor quake2 style
-		/*
-		float l, s;
-		
-		if (e.armorvalue < amt)
-		{
-			l = amt;
-			s = e.armorvalue;
-		}
-		else
-		{
-			s = amt;
-			l = e.armorvalue;
-		}
-		
-		amt = l + max(0,(8 * s - l)) / 10;	
-		amt = floor(5 * ceil(amt / 5));	// round up to multiple of 5 so new armor still feels nice and crisp
-		*/
 		if (e.armorvalue >= amt)
 			return FALSE;
+		if (atype < e.armortype)
+			return FALSE;
+		// quake's original armor comparison test weighted both amounts by their protection
+		// strength with a straight multiply (a.type * a.amt > e.type * e.amt) to determine 
+		// which was "worth" more. with the current values, those breakeven points fall on
+		// 42, 60, and 107, so we round those off to make it easier for players to notice
+		// and learn the pickup cutoffs
+		if (atype == ARMORTYPE_GREEN && e.armortype == ARMORTYPE_RED && e.armorvalue < 40)
+			return FALSE;
+		if (atype == ARMORTYPE_GREEN && e.armortype == ARMORTYPE_YELLOW && e.armorvalue < 60)
+			return FALSE;
+		if (atype == ARMORTYPE_YELLOW && e.armortype == ARMORTYPE_RED && e.armorvalue < 100)
+			return FALSE;
 		e.armorvalue = amt;
+		e.armortype = atype;
 	}
 	else
+	{
+		if (e.armortype == 0)
+			e.armortype = ARMORTYPE_GREEN;
 		e.armorvalue += amt;
+	}
 	
 	armor_set_type(e);
 	return TRUE;
@@ -233,37 +230,9 @@ armor_touch
 */
 void() armor_touch =
 {
-	//float	getamt, atype, bit;
 	if (!CheckValidTouch()) return;
 	
-/*
-	float	value;
-	// amounts are reduced, but armor always stacks with existing armor
-	if (self.classname == "item_armor1")
-	{
-		//atype = 0.3;
-		value = 100;
-		//bit = IT_ARMOR1;
-		//value = 80;
-	}
-	else if (self.classname == "item_armor2")
-	{
-		//atype = 0.6;
-		value = 150;
-		//bit = IT_ARMOR2;
-		//value = 120;
-	}
-	else //if (self.classname == "item_armorInv")
-	{
-		//atype = 0.8;
-		value = 200;
-		//bit = IT_ARMOR3;
-		//value = 160;
-	}
-	*/
-	//other.armortype = atype;	// old way
-	//other.items = not(other.items, (IT_ARMOR1 | IT_ARMOR2 | IT_ARMOR3)) + bit;
-	if (!armor_give(other, self.strength, TRUE))
+	if (!armor_give(other, self.armortype, self.armorvalue, TRUE))
 		return;
 
 	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
@@ -274,6 +243,7 @@ void() armor_touch =
 }
 
 // ===============================================================================
+
 /*
 ============
 StartArmor
@@ -284,8 +254,14 @@ void(float skn, float amt) StartArmor =
 	if (!SUB_ShouldSpawn()) return;
 
 	self.skin = skn;
-	self.strength = amt;
-	
+	self.armortype = amt;
+	if (skn == 2)
+		self.armorvalue = ARMORTYPE_RED;
+	else if (skn == 1)
+		self.armorvalue = ARMORTYPE_YELLOW;
+	else
+		self.armorvalue = ARMORTYPE_GREEN;
+
 	self.touch = armor_touch;
 	self.type = "armor";
 	precache_model ("progs/armor.mdl");
@@ -297,7 +273,6 @@ void(float skn, float amt) StartArmor =
 	setsize (self, '-16 -16 0', '16 16 56');
 	StartItem ();
 }
-
 
 
 /*QUAKED item_armor1 (0 .5 .5) (-16 -16 0) (16 16 32) ? ? SUSPENDED

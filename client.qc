@@ -62,7 +62,7 @@ void() SetChangeParms =
 	parm6 = self.ammo_rockets;
 	parm7 = self.ammo_cells;
 	parm8 = self.weapon;
-	//parm9 = self.armortype;
+	parm9 = self.armortype;
 
 }
 
@@ -123,7 +123,7 @@ void() DecodeLevelParms =
 	self.ammo_rockets = parm6;
 	self.ammo_cells = parm7;
 	self.weapon = parm8;
-	//self.armortype = parm9;
+	self.armortype = parm9;
 	
 	armor_set_type(self);
 }

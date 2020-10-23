@@ -492,7 +492,7 @@ void(entity e) target_items_giveinv_min =
 		T_Heal(e, (self.health - e.health), TRUE);
 		
 	if (zeroconvert(self.armorvalue) > e.armorvalue)
-		armor_give(e, zeroconvert(self.armorvalue) - e.armorvalue, FALSE);
+		armor_give(e, zeroconvert(self.armorvalue) - e.armorvalue, 0, FALSE);
 
 	if (self.ammo_shells) e.ammo_shells =	max(e.ammo_shells,	zeroconvert(self.ammo_shells));
 	if (self.ammo_nails) e.ammo_nails =		max(e.ammo_nails,	zeroconvert(self.ammo_nails));
@@ -512,7 +512,7 @@ void(entity e) target_items_giveinv =
 			T_Heal(e, self.health, TRUE);
 			
 		if (self.armorvalue)
-			armor_give(e, zeroconvert(self.armorvalue), FALSE);
+			armor_give(e, zeroconvert(self.armorvalue), 0, FALSE);
 
 	#ifdef LUNSP2
 		if (mapname != "start" && serverflags & SVFL_AXECHALLENGE)
