@@ -568,10 +568,19 @@ void() SightSound =
 
 void() FoundTarget =
 {
-	if (!enemy_alive())
+	while(!enemy_alive())
 	{
-		self.enemy = world;
-		return FALSE;
+		if (self.oldenemy)
+		{
+			self.enemy = self.oldenemy;
+			self.oldenemy = world;
+		}
+		else
+		{
+			self.enemy = world;
+			self.th_stand();
+			return;
+		}
 	}
 	
 	if (self.enemy.classname == "player")
