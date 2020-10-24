@@ -187,29 +187,33 @@ void(entity e) armor_set_type =
 armor_give
 ============
 */
-float(entity e, float amt, float atype, float replace) armor_give =
+float(entity e, float amt, float absorb, float replace) armor_give =
 {
 	if (!amt)
 		return FALSE;
 	if (replace)
 	{
-		if (e.armorvalue >= amt)
-			return FALSE;
-		if (atype < e.armortype)
-			return FALSE;
-		// quake's original armor comparison test weighted both amounts by their protection
-		// strength with a straight multiply (a.type * a.amt > e.type * e.amt) to determine 
-		// which was "worth" more. with the current values, those breakeven points fall on
-		// 42, 60, and 107, so we round those off to make it easier for players to notice
-		// and learn the pickup cutoffs
-		if (atype == ARMORTYPE_GREEN && e.armortype == ARMORTYPE_RED && e.armorvalue < 40)
-			return FALSE;
-		if (atype == ARMORTYPE_GREEN && e.armortype == ARMORTYPE_YELLOW && e.armorvalue < 60)
-			return FALSE;
-		if (atype == ARMORTYPE_YELLOW && e.armortype == ARMORTYPE_RED && e.armorvalue < 100)
-			return FALSE;
+		if (absorb < e.armortype)
+		{
+			// quake's original armor comparison test weighted both amounts by their protection
+			// strength with a straight multiply (a.type * a.amt > e.type * e.amt) to determine 
+			// which was "worth" more. with the current values, those breakeven points fall on
+			// 42, 60, and 107, so we round those off to make it easier for players to notice
+			// and learn the pickup cutoffs
+			if (absorb == ARMORTYPE_GREEN && e.armortype == ARMORTYPE_RED && e.armorvalue > 40)
+				return FALSE;
+			if (absorb == ARMORTYPE_GREEN && e.armortype == ARMORTYPE_YELLOW && e.armorvalue > 60)
+				return FALSE;
+			if (absorb == ARMORTYPE_YELLOW && e.armortype == ARMORTYPE_RED && e.armorvalue > 100)
+				return FALSE;
+		}
+		else
+		{
+			if (amt <= e.armorvalue)
+				return FALSE;
+		}
 		e.armorvalue = amt;
-		e.armortype = atype;
+		e.armortype = absorb;
 	}
 	else
 	{
@@ -232,7 +236,7 @@ void() armor_touch =
 {
 	if (!CheckValidTouch()) return;
 	
-	if (!armor_give(other, self.armortype, self.armorvalue, TRUE))
+	if (!armor_give(other, self.armorvalue, self.armortype, TRUE))
 		return;
 
 	sound(other, CHAN_ITEM, "items/armor1.wav", 1, ATTN_NORM);
@@ -254,13 +258,13 @@ void(float skn, float amt) StartArmor =
 	if (!SUB_ShouldSpawn()) return;
 
 	self.skin = skn;
-	self.armortype = amt;
+	self.armorvalue = amt;
 	if (skn == 2)
-		self.armorvalue = ARMORTYPE_RED;
+		self.armortype = ARMORTYPE_RED;
 	else if (skn == 1)
-		self.armorvalue = ARMORTYPE_YELLOW;
+		self.armortype = ARMORTYPE_YELLOW;
 	else
-		self.armorvalue = ARMORTYPE_GREEN;
+		self.armortype = ARMORTYPE_GREEN;
 
 	self.touch = armor_touch;
 	self.type = "armor";
