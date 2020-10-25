@@ -471,6 +471,12 @@ float SPAWN_TGTITEMS_MIN = 16;
 	ammo_cells(integer) : "Cells" : 0
 	health(integer) : "Health" : 0
 	armorvalue(integer) : "Armor" : 0
+	armortype(choices) : "Armor Strength" = [
+		0.0 : "Ignore"
+		0.3 : "Green (30%)"
+		0.5 : "Yellow (50%)"
+		0.7 : "Red (70%)"
+	]
 ]
 */
 void(entity e) target_items_setweapon =
@@ -490,9 +496,10 @@ void(entity e) target_items_giveinv_min =
 {
 	if (self.health && self.health > e.health)
 		T_Heal(e, (self.health - e.health), TRUE);
-		
-	if (zeroconvert(self.armorvalue) > e.armorvalue)
-		armor_give(e, zeroconvert(self.armorvalue) - e.armorvalue, 0, FALSE);
+	
+	float arm = zeroconvert(self.armorvalue);
+	if (arm > e.armorvalue)
+		armor_give(e, arm, self.armortype, TRUE);
 
 	if (self.ammo_shells) e.ammo_shells =	max(e.ammo_shells,	zeroconvert(self.ammo_shells));
 	if (self.ammo_nails) e.ammo_nails =		max(e.ammo_nails,	zeroconvert(self.ammo_nails));
@@ -512,7 +519,7 @@ void(entity e) target_items_giveinv =
 			T_Heal(e, self.health, TRUE);
 			
 		if (self.armorvalue)
-			armor_give(e, zeroconvert(self.armorvalue), 0, FALSE);
+			armor_give(e, zeroconvert(self.armorvalue), self.armortype, FALSE);
 
 	#ifdef LUNSP2
 		if (mapname != "start" && serverflags & SVFL_AXECHALLENGE)
@@ -559,6 +566,7 @@ float(entity e) target_items_testinv =
 {
 	if (self.health > 0 && self.health > e.health) return FALSE;
 	if (self.armorvalue && self.armorvalue > e.armorvalue) return FALSE;
+	if (self.armortype && self.armortype > e.armortype) return FALSE;
 
 	if (self.svflags)
 	{
@@ -685,8 +693,27 @@ void(entity e) target_items_setinv =
 	if (self.armorvalue)
 	{
 		e.armorvalue = zeroconvert(self.armorvalue);
+		if (self.armortype)
+		{
+			e.armortype = self.armortype;
+		}
+		else	// value but no type: assume a color from amount given
+		{
+			if (self.armorvalue > 150)
+				e.armortype = ARMORTYPE_RED;
+			else if (self.armorvalue > 100)
+				e.armortype = ARMORTYPE_YELLOW;
+			else
+				e.armortype = ARMORTYPE_GREEN;
+		}
 		armor_set_type(e);
 	}
+	else if (self.armortype && e.armorvalue)	// type but not value: override color on player
+	{
+		e.armortype = self.armortype;
+		armor_set_type(e);
+	}
+
 
 	if (self.svflags)
 	{
@@ -817,6 +844,7 @@ Keyvalues:
 "ammo_shells" number of shells player should receive - same for _cells, _rockets, and _nails
 "health" health (will overheal beyond 100)
 "armorvalue" armor (protection color scales automatically)
+"armortype" armor strength (0.3+ green, 0.5+ yellow, 0.7+ red)
 "weapon" item bitflag (not impulse number!) of the weapon the player should swap to (if he has it)
 "items" bitmask of what items the player should get (see below for reference)
 "svflags" bitmask of serverflags to alter (1/2/4/8 are the episode runes, 16+ are invisible)
@@ -893,6 +921,7 @@ TEST: behaves like TAKE, but doesn't take anything
 		64 : "Lightning Gun"
 		4096 : "Axe"
 	]
+	noise(string) : "wav file to play on activator"
 ]
 */
 void() target_items =
@@ -922,6 +951,17 @@ void() target_items =
 			precache_super_damage();
 		*/
 	}
+	
+	// snap armor color to only allowed values
+	if (self.armortype >= ARMORTYPE_RED)
+		self.armortype = ARMORTYPE_RED;
+	else if (self.armortype >= ARMORTYPE_YELLOW)
+		self.armortype = ARMORTYPE_YELLOW;
+	else if (self.armortype >= ARMORTYPE_GREEN)
+		self.armortype = ARMORTYPE_GREEN;
+	else
+		self.armortype = 0;
+	
 	if (self.noise != string_null)
 		precache_sound_safe(self.noise);
 	if (self.spawnflags & 32)
@@ -956,53 +996,3 @@ void() trigger_inventory =
 	self.spawnflags |= SPAWN_TGTITEMS_TEST + (SPAWN_TGTITEMS_TAKE * inv);
 	target_items();
 }
-/*
-	InitTrigger();
-	if (!self.wait) self.wait = 0.2;
-	self.touch = trigger_inventory_touch;
-	
-	// if we give the player any powerups, have the sounds precached
-	if (!(self.spawnflags & (SPAWN_TGTITEMS_TAKE | SPAWN_TGTITEMS_TEST)))
-	{
-		if (self.items & IT_INVULNERABILITY)
-			precache_invulnerability();
-		if (self.items & IT_INVISIBILITY)
-			precache_invisibility();
-		if (self.items & IT_SUIT)
-			precache_envirosuit();
-		if (self.items & IT_QUAD)
-			precache_super_damage();
-	}
-}
-
-void() trigger_inventory_touch =
-{
-	// for multiple coop clients touching this at once
-	if (time != self.dmgtime)
-		if (time < self.attack_finished)
-			return;
-	
-	if (self.wait > 0)
-	{
-		self.attack_finished = time + self.wait;
-	}
-	else
-	{
-		self.attack_finished = time + 1;
-		self.think = SUB_Remove;
-		self.nextthink = time + 0.1;
-	}
-	
-	// the trigger has to test every client touching this frame until one passes, then stop testing
-	// but set attack_finished to the next wait interval either way
-	if (target_items_testinv(other) != !!(self.spawnflags & 2))
-	{
-		multi_trigger();
-		self.dmgtime = 0;	// stop checking clients
-		return;
-	}
-	SUB_PrintMessage();
-	self.dmgtime = time;
-}
-
-*/
