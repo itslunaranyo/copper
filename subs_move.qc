@@ -137,7 +137,7 @@ SUB_CalcAngleMoveDone
 void() SUB_CalcAngleMoveDone =
 {
 // After rotating, set angle to exact final angle
-	self.angles = self.finalangle;
+	self.angles = self.dest2;
 	self.avelocity = '0 0 0';
 	self.nextthink = -1;
 	if (self.think1)
@@ -178,7 +178,7 @@ local float		len, traveltime;
 	self.avelocity = destdelta * (1 / traveltime);
 	
 	self.think1 = func;
-	self.finalangle = destangle;
+	self.dest2 = destangle;
 	self.think = SUB_CalcAngleMoveDone;
 }
 
