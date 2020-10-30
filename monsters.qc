@@ -247,6 +247,7 @@ entity( void() spawnthink ) mon_spawner_use =
 	mon.nextthink = time + pause;
 	mon.spawnflags = self.spawnflags;
 	mon.movedir = self.movedir;
+	mon.rmovedir = self.rmovedir;
 	mon.lip = self.lip;
 	mon.state = self.state;
 	mon.alpha = self.alpha;
@@ -393,7 +394,13 @@ void() monster_start =
 {
 	if (self.oldorigin == VEC_ORIGIN)
 		self.oldorigin = self.origin;
-
+	
+	if (self.rmovedir != VEC_ORIGIN)
+	{
+		makevectors(self.angles);
+		self.movedir = v_forward * self.rmovedir_x + v_right * self.rmovedir_y + v_up * self.rmovedir_z;
+	}
+		
 	// moved from mon_spawner_use because it was too early to catch the monster's mins and maxs
 	spawn_tdeath(self.origin, self);
 
@@ -495,7 +502,14 @@ void() walkmonster_start_go =
 	if (self.oldorigin != VEC_ORIGIN)
 		setorigin(self,self.oldorigin);
 	
-	if (self.movedir == '0 0 0' && !(self.spawnflags & SPAWN_TRIGGERED) )	// always put telespawned monsters where the mapper wants
+	if (self.rmovedir != VEC_ORIGIN)
+	{
+		makevectors(self.angles);
+		self.movedir = v_forward * self.rmovedir_x + v_right * self.rmovedir_y + v_up * self.rmovedir_z;
+		self.rmovedir = VEC_ORIGIN;
+	}
+	
+	if (self.movedir == VEC_ORIGIN && !(self.spawnflags & SPAWN_TRIGGERED) )	// always put telespawned monsters where the mapper wants
 	{
 		self.origin_z = self.origin_z + 1;	// raise off floor a bit
 		droptofloor(0,0);
@@ -512,6 +526,11 @@ void() walkmonster_start_go =
 		self.yaw_speed = 20;
 	self.view_ofs = '0 0 25';
 	
+	if (self.spawnflags & SPAWN_TRIGGERED && self.movedir != VEC_ORIGIN)
+	{
+		self.velocity = self.movedir;
+		self.movedir = VEC_ORIGIN;
+	}
 	
 	monster_start_go();
 }
