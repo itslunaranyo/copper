@@ -457,14 +457,14 @@ If the train is the target of a button or trigger, it will not begin moving unti
 void() func_flytrain =
 {
 	if (!SUB_ShouldSpawn()) return;
+	if (!self.target)
+		objerror ("func_train without a target");
+	
+	self.dmg = zeroconvertdefault(self.dmg,2);
 	if (!self.speed) {
 		self.speed2 = 128;
 		self.speed = 128;
 	}
-	if (!self.target)
-		objerror ("func_train without a target");
-	self.dmg = zeroconvertdefault(self.dmg,2);
-
 	train_sounds();
 
 	self.use = flytrain_init;
@@ -475,6 +475,10 @@ void() func_flytrain =
 	self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
 	self.classname = "train";
+		
+	setmodel (self, self.model);
+	setsize (self, self.mins, self.maxs);
+	setorigin (self, self.origin);
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -497,12 +501,8 @@ void() func_flytrain_point =
 {	
 	if (!SUB_ShouldSpawn()) return;
 
-	func_flytrain();
-	
 	precache_model_safe(self.model);
-	setmodel (self, self.model);
-	setsize (self, self.mins, self.maxs);
-	setorigin (self, self.origin);
+	func_flytrain();
 }
 
 //============================================================================
