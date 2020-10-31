@@ -1913,6 +1913,13 @@ Debug starting point for a level.  Overrides info_player_start if present and 'U
 "angle" viewing angle when spawning
 "fog_color"/"fog_density" set the fog when spawning at this spot
 */
+/*FGD
+@PointClass base(PlayerClass) = testplayerstart : "Developer-only spawn point" [
+	spawnflags(flags) = [
+		1 : "Spawn at this one plz" : 0
+	]
+]
+*/
 void() testplayerstart =
 {
 	self.mangle = self.angles;
