@@ -19,7 +19,8 @@ All things spawning and initializing
 		64 : "Don't Spawn If Would Telefrag" : 0
 		128 : "Spawn Angry" : 0
 	]
-	movedir(string) : "Auto jump velocity on awaken"
+	movedir(string) : "Auto jump velocity on spawn/awaken"
+	rmovedir(string) : "Angle-relative auto jump velocity on spawn/awaken"
 	count(integer) : "Number of times to spawn if triggered (-1 for infinite)"
 	wait(string) : "Pause before spawning if triggered" : "0"
 	rand(string) : "Random extra before spawning if triggered" : "0"
