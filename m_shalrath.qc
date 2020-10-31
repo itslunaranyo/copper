@@ -6,8 +6,8 @@ SHAL-RATH
 ==============================================================================
 */
 
-float SHAL_BALL_TURN_RATE	= 270;//225;
-float SHAL_BALL_THINK_RATE	= 0.1;//0.075;
+float SHAL_BALL_TURN_RATE	= 256;
+float SHAL_BALL_THINK_RATE	= 0.1;
 float SHAL_BALL_VEL			= 272;
 
 
