@@ -42,6 +42,7 @@ string light_off = "a";
 	_softangle(integer) : "Spotlight inner cone angle"
 	_dirt(integer) : "Override dirt"
 	message(string) : "override the style string directly for the assigned style (clashes will overwrite each other)"
+	target(string) : "Entity to aim at"
 	delay(choices) : "Attenuation" =
 	[
 		0 : "Linear falloff (Default)"
