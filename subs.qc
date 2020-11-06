@@ -47,6 +47,8 @@ void(entity victim) RemoveTarget =
 	if (victim.trigger_field != world)
 		remove(victim.trigger_field);
 
+	// silence movers
+	sound(victim, CHAN_VOICE, "misc/null.wav", 1, 1);
 	
 	remove (victim);
 }
