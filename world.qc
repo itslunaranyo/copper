@@ -188,6 +188,12 @@ Keys:
 	sounds(integer) : "CD track to play" : 0
 	light(integer) : "Ambient light"
 	gravity(integer) : "Gravity"
+	sky(string) : "Skybox"
+	_skyfog(string) : "Sky fog strength"
+	gravity(integer) : "Gravity"
+	_wateralpha(string) : "Water alpha"
+	_lavaalpha(string) : "Lava alpha" : "1.0"
+	_telealpha(string) : "Tele alpha" : "1.0"
 	_sunlight(integer) : "Sunlight"
 	_sun_mangle(string) : "Sun mangle (Yaw pitch roll)"
 	_sunlight_color(string) : "Sun color"
