@@ -1037,7 +1037,6 @@ void() WaterMove =
 			}
 			else if (time > self.air_finished - 9)
 			{
-				dprint5("blep @ ", ftos(time),": ", ftos(self.air_finished),"\n");
 				sound (self, CHAN_VOICE, "player/gasp1.wav", 1, ATTN_NORM);
 			}
 		}		
