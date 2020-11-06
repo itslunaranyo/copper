@@ -236,6 +236,11 @@ void(string tname) target_lock_do =
 			if (self.state) plat_unlock(t);
 			else plat_lock(t);
 		}
+		else if (t.classname == "func_button")
+		{
+			if (self.state) button_unlock(t);
+			else button_lock(t);
+		}
 		// dumb way to make coop starts visible/invisible to the cyclical spawnpoint search 
 		// code without making that code overly complex
 		else if (t.classname == "info_player_coop")

@@ -1,3 +1,4 @@
+
 /*
 =============================================================================
 Doors are similar to buttons, but can spawn a fat trigger field around them
@@ -147,6 +148,7 @@ void() door_fire =
 
 void() door_use =
 {
+	if (self.customflags & CFL_LOCKED) return;
 	if (!( self.spawnflags & DOOR_TOGGLE ) ) 
 	{
 		self.message = string_null;			// door message are for touch only
@@ -254,15 +256,9 @@ void(entity d) door_lock =
 {
 	entity e;
 	d.customflags = d.customflags | CFL_LOCKED;
-	
-//	d.owner.touch = SUB_Null;
-//	d.owner.use = SUB_Null;
-	if (d.owner.trigger_field == world && !d.owner.items) objerror("door being locked doesn't have a trigger");
-	else if (d.owner.trigger_field)
-		d.owner.trigger_field.touch = SUB_Null;
 
 	// close any open doors immediately
-	if (d.state != STATE_BOTTOM)
+	if (d.state != STATE_BOTTOM && !(d.spawnflags & DOOR_TOGGLE))
 	{
 		e = d;
 		do {
@@ -270,20 +266,40 @@ void(entity d) door_lock =
 			e = e.enemy;
 		}
 		while ( e != d && e != world );
-	}	
+	}
+	
+	if (d.max_health)
+	{
+		d.takedamage = DAMAGE_NO;
+	}
+	else
+	{
+		if (d.owner.trigger_field == world && !d.owner.items && !(d.spawnflags & DOOR_TOGGLE))
+			objerror("door being locked doesn't have a trigger");
+		else if (d.owner.trigger_field)
+			d.owner.trigger_field.touch = SUB_Null;
+	}
 }
 
 void(entity d) door_unlock =
 {
 	d.customflags = not(d.customflags, CFL_LOCKED);
 	
-//	d.owner.touch = door_touch;
-//	d.owner.use = door_use;
-	if (d.owner.trigger_field == world && !d.owner.items) objerror("door being unlocked doesn't have a trigger");
-	else if (d.owner.trigger_field)
-		d.owner.trigger_field.touch = door_trigger_touch;
+	if (d.max_health)
+	{
+		d.takedamage = DAMAGE_YES;
+		d.health = d.max_health;
+	}
+	else
+	{
+		if (d.owner.trigger_field == world && !d.owner.items && !(d.spawnflags & DOOR_TOGGLE))
+			objerror("door being unlocked doesn't have a trigger");
+		else if (d.owner.trigger_field)
+			d.owner.trigger_field.touch = door_trigger_touch;
+	}
 }
 
+// checks if a door ONLY has locks targeting it
 float(entity d) door_getslocked =
 {
 	if (d.targetname == string_null)
@@ -292,25 +308,25 @@ float(entity d) door_getslocked =
 	entity t;
 	t = find(world, target, d.targetname);
 	while (t) {
-		if (t.classname == "target_lock") return TRUE;
+		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target, d.targetname);
 	}
 	t = find(world, target2, d.targetname);
 	while (t) {
-		if (t.classname == "target_lock") return TRUE;
+		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target2, d.targetname);
 	}
 	t = find(world, target3, d.targetname);
 	while (t) {
-		if (t.classname == "target_lock") return TRUE;
+		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target3, d.targetname);
 	}
 	t = find(world, target4, d.targetname);
 	while (t) {
-		if (t.classname == "target_lock") return TRUE;
+		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target4, d.targetname);
 	}
-	return FALSE;
+	return TRUE;
 }
 
 /*
@@ -373,9 +389,9 @@ void(vector cmins, vector cmaxs) door_finalize =
 	if (self.health)
 		return;
 	if (self.targetname != string_null)
-		if (!door_getslocked(self))
+		if (!door_getslocked(self) || self.spawnflags & DOOR_TOGGLE)
 			return;
-
+	
 	self.trigger_field = door_spawn_field(cmins, cmaxs);
 }
 

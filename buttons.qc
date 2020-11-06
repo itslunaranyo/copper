@@ -13,8 +13,9 @@ void() button_wait =
 	self.nextthink = self.ltime + self.wait;
 	self.think = button_return;
 	activator = self.enemy;
-	SUB_UseTargets();
 	self.frame = 1;			// use alternate textures
+	if (self.customflags & CFL_LOCKED) return;
+	SUB_UseTargets();
 }
 
 void() button_done =
@@ -59,14 +60,6 @@ void() button_use =
 	
 	if (self.state == STATE_UP || self.state == STATE_DOWN)
 		return;
-	/*
-	// this is what target_lock is for
-	if (self.state == STATE_TOP)
-	{
-		if (self.wait < 0)
-			button_return();
-		return;
-	}*/
 	
 	button_fire ();
 }
@@ -79,6 +72,35 @@ void() button_touch =
 		
 	self.enemy = other;
 	button_fire ();
+}
+
+void(entity b) button_lock =
+{
+	entity oself;
+	b.customflags |= CFL_LOCKED;
+	if (b.max_health)
+		b.takedamage = DAMAGE_NO;
+	b.state = STATE_UP;
+	oself = self;
+	self = b;
+	SUB_CalcMove (self.pos2, self.speed, button_wait);
+	self = oself;
+}
+void(entity b) button_unlock =
+{
+	entity oself;
+	b.customflags = not(b.customflags,CFL_LOCKED);
+	if (b.max_health)
+	{
+		b.takedamage = DAMAGE_YES;
+		b.health = b.max_health;
+	}
+	b.frame = 0;			// use normal textures
+	b.state = STATE_DOWN;
+	oself = self;
+	self = b;
+	SUB_CalcMove (self.pos1, self.speed, button_done);
+	self = oself;
 }
 
 // failed experiment: this check kept moving farther and farther away from 
@@ -114,6 +136,7 @@ float(entity inflictor, entity attacker) button_check_attacker =
 
 void() button_killed =
 {
+	if (self.customflags & CFL_LOCKED) return;
 	self.enemy = damage_attacker;
 	self.health = self.max_health;
 	self.takedamage = DAMAGE_NO;	// wil be reset upon return
