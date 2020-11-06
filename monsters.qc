@@ -665,13 +665,48 @@ void() nomonster_find =
 	self.think = nomonster_sleep;
 	self.nextthink = time + 0.2;
 	entity e;
-	e = findalltargets(self);
-	while (e)
+
+	if (self.target != string_null)
 	{
-		if (e.classname != "path_corner")
-			return;
-		e = e.chain;
+		e = find(world, targetname, self.target);
+		while(e)
+		{
+			if (e.classname != "path_corner")
+				return;
+			e = find(e, targetname, self.target);
+		}
 	}
+	if (self.target2 != string_null)
+	{
+		e = find(world, targetname, self.target2);
+		while(e)
+		{
+			if (e.classname != "path_corner")
+				return;
+			e = find(e, targetname, self.target2);
+		}
+	}
+	if (self.target3 != string_null)
+	{
+		e = find(world, targetname, self.target3);
+		while(e)
+		{
+			if (e.classname != "path_corner")
+				return;
+			e = find(e, targetname, self.target3);
+		}
+	}
+	if (self.target4 != string_null)
+	{
+		e = find(world, targetname, self.target4);
+		while(e)
+		{
+			if (e.classname != "path_corner")
+				return;
+			e = find(e, targetname, self.target4);
+		}
+	}
+
 	remove(self);
 }
 
@@ -701,8 +736,6 @@ float() nomonster =
 		return TRUE;
 	}
 	
-	self.classname = "nomonster";
-	
 	// make teleports work:
 	self.health = 1;
 	self.flags += FL_MONSTER;
@@ -711,6 +744,8 @@ float() nomonster =
 		self.use = nomonster_go;
 	else
 		nomonster_go();
+	
+	//self.classname = "nomonster";
 	
 	return TRUE;
 }
