@@ -134,54 +134,133 @@ void(vector c, float r, float color) fx_ring =
 
 //============================================================================
 
+
+float PFIELD_START_ON = 1; 
+float PFIELD_INWARD = 2; 
+float PFIELD_OUTWARD = 4; 
+float PFIELD_BURST = 8;
+
+vector(vector org) particlefield_dir =
+{
+	vector dir;
+	dir = self.movedir;
+	if (self.spawnflags & PFIELD_INWARD)	// in
+	{
+		dir -= org * vlen(self.movedir);
+	}
+	else if (self.spawnflags & PFIELD_OUTWARD)	// out
+	{
+		dir += org * vlen(self.movedir);
+	}
+	return dir;
+}
+
+void(float num) particlefield_sweep =
+{
+	/*
+	call x and y the two axes perpendicular to the sweep, z the direction of the sweep
+	random x and y are chosen
+	z determined by projecting x and y down z axis onto wherever the plane should be
+		ie solving plane equation for z by plugging in x and y
+		ax + by + cz = d
+		cz = d - ax - by
+		z = (d-ax-by)/c
+	*/
+	float d, t, z, frac;
+	vector plane, porg;
+	
+	// self.dest = transformed bounds
+	// self.pos1 = transformed velocity
+	
+	plane = normalize(self.pos1);
+	d = vabs(plane) * self.dest * 2;	// total distance
+	
+	// determine position in the cycle
+	t = time - self.attack_finished;
+	frac = t / (d / vlen(self.pos1));
+	if (frac > 1)
+	{
+		if (self.spawnflags & PFIELD_BURST)
+		{
+			self.state = 0;
+			return;	// done with a loop
+		}
+		frac = 0;
+		self.attack_finished = time;
+	}
+	z = d * (frac - 0.5);
+	
+	while (num > 0)
+	{
+		num -= 1;
+		// choose x and y randomly within field bounds
+		porg_x = crandom() * self.dest_x;
+		porg_y = crandom() * self.dest_y;
+		// solve plane equation to derive z (if sweep vel is non-axial)
+		porg_z = (z - plane_x * porg_x - plane_y * porg_y) / plane_z;
+		if (fabs(porg_z) > self.dest_z)
+			continue;	// reject outside bounds
+
+		// transform result back
+		if (self.worldtype == 0)	// sweeping down x
+		{
+			porg = Vector(porg_z, porg_x, porg_y);
+		}
+		else if (self.worldtype == 1)	// sweeping down y
+		{
+			porg = Vector(porg_x, porg_z, porg_y);
+		}
+
+		// add self.origin and go
+		particle (porg + self.origin, particlefield_dir(porg), self.health, self.speed2);
+	}
+}
+
 void(float num) particlefield_burst =
 {
-	vector org, org2, dir;
+	vector org, org2;
 	while (num > 0)
 	{
 		num -= 1;
 		org = Vector(crandom(), crandom(), crandom());
 		org2 = vec_scale(org, self.mangle);
 		
-		dir = self.movedir;
-		if (self.spawnflags & 2)
-		{
-			// in
-			dir -= org * vlen(self.movedir);
-		}
-		else if (self.spawnflags & 4)
-		{
-			// out
-			dir += org * vlen(self.movedir);
-		}
-		
-		particle (org2 + self.origin, dir, self.health, self.speed2);
+		particle (org2 + self.origin, particlefield_dir(org), self.health, self.speed2);
 	}
 }
 
 void() particlefield_think =
 {
-	float num;
-	
-	num = floor(0.5 + self.speed / 10);
-	
-	particlefield_burst(num);
+	if (self.finaldest == VEC_ORIGIN)
+		particlefield_burst(floor(0.5 + self.speed / 10));
+	else
+		particlefield_sweep(self.speed);
 	
 	if (self.state)
-		self.nextthink = time + 0.1;
+		self.nextthink = time + self.wait;
 }
 
 void() particlefield_use =
 {
-	if (self.spawnflags & 8)
+	if (self.spawnflags & PFIELD_BURST)
 	{
-		particlefield_burst(self.speed);
+		if (self.finaldest == VEC_ORIGIN)
+		{
+			particlefield_burst(self.speed);
+		}
+		else
+		{
+			self.attack_finished = time;
+			self.state = 1;
+			self.nextthink = time + self.wait;
+			particlefield_sweep(self.speed);
+		}
 		return;
 	}
 	
 	self.state = !self.state;
 	if (self.state)
-		self.nextthink = time + 0.1;
+		self.nextthink = time + self.wait;
 }
 
 
@@ -197,6 +276,8 @@ void() particlefield_use =
 	speed2(integer) : "Dots per clump" : 16
 	health(integer) : "Color index (0-255)" : 0
 	movedir(string) : "Velocity of particles (x y z)"
+	wait(string) : "Interval" : 0.1
+	velocity(string) : "Direction of optional sweep effect (x y z)"
 ]
 
 @Pointclass base(Targetname, Appearflags, Bounds, Particlefield) color(0 160 255) size(16 16 16) = misc_particlefield_box : 
@@ -246,10 +327,12 @@ Color Reference:
 Makes dots appear continuously within its bounds. Trigger to toggle on or off. 
 
 "mangle" dimensions of sparkly zone
-"speed" number of clumps per second
-"speed2" number of dots per clump
+"speed" number of clumps per second, default 10
+"speed2" number of dots per clump, default 16
 "health" color index (0-255). quake will use every color in the row (each row is 16 colors)
 "movedir" give particles a velocity
+"velocity" add a sweep effect - vector specifies direction and speed
+"wait" dot interval, default 0.1
 
 Flags:
 INWARD		particles are sucked toward origin. additive with movedir.
@@ -277,7 +360,6 @@ Color Reference:
 void() misc_particlefield_box =
 {
 	if (!SUB_ShouldSpawn()) return;
-	self.state = self.spawnflags & 1;
 	self.think = particlefield_think;
 	self.use = particlefield_use;
 	
@@ -285,17 +367,51 @@ void() misc_particlefield_box =
 		self.speed = 10;
 	if (!self.speed2)
 		self.speed2 = 16;
+	if (!self.wait)
+		self.wait = 0.1;
+	
+	self.mangle = self.mangle * 0.5;
+	
+	self.finaldest = self.velocity;
+	if (self.finaldest != VEC_ORIGIN)
+	{
+		self.velocity = VEC_ORIGIN;
+		// transform so that the sweep axis is locally z to simplify later math
+		float x, y, z;
+		x = fabs(self.finaldest_x);
+		y = fabs(self.finaldest_y);
+		z = fabs(self.finaldest_z);
 		
+		if (z < y || z < x)
+		{
+			if (y < x)
+			{	// sweeping down x
+				self.worldtype = 0;
+				self.dest = Vector(self.mangle_y, self.mangle_z, self.mangle_x);
+				self.pos1 = Vector(self.finaldest_y, self.finaldest_z, self.finaldest_x);
+			}
+			else
+			{	// sweeping down y
+				self.worldtype = 1;
+				self.dest = Vector(self.mangle_x, self.mangle_z, self.mangle_y);
+				self.pos1 = Vector(self.finaldest_x, self.finaldest_z, self.finaldest_y);
+			}
+		}
+		else
+		{	// already z
+			self.worldtype = 2;	
+			self.dest = self.mangle;
+			self.pos1 = self.finaldest;
+		}
+	}
+
+	self.state = self.spawnflags & PFIELD_START_ON;
 	if (self.state)
-		self.nextthink = time + 0.1;
+		self.nextthink = time + self.wait;
 	
 	// innie and outie cancel
-	if (self.spawnflags & 2 && self.spawnflags & 4)
+	if (self.spawnflags & (PFIELD_INWARD | PFIELD_OUTWARD) == (PFIELD_INWARD | PFIELD_OUTWARD))
 		self.spawnflags -= 6;
-	
-	self.mangle_x *= 0.5;
-	self.mangle_y *= 0.5;
-	self.mangle_z *= 0.5;
 }
 
 /*QUAKED misc_particlefield (0 .6 1) ? START_ON INWARD OUTWARD BURST

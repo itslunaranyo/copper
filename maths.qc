@@ -183,6 +183,11 @@ float() crandom =
 	return 2*(random() - 0.5);
 }
 
+vector(vector v) vabs =
+{
+	return Vector(fabs(v_x),fabs(v_y),fabs(v_z));
+}
+
 vector(vector a, vector b) vec_scale =
 {
 	return Vector(a_x * b_x, a_y * b_y, a_z * b_z);
