@@ -184,6 +184,47 @@ void() light_inc_use =
 	else if (bright <= 1 ) lightstyle(self.style, "a");
 }
 
+void() light_message =
+{
+	if (self.message != string_null)
+	{
+		if (self.oldstyle > 11)
+			lightstyle(self.oldstyle, self.message);
+		else if (self.style > 11)
+			lightstyle(self.style, self.message);
+		else
+			dprint5("WARNING: light at ", vtos(self.origin), " with message ", self.message, " but no style # set\n");
+	}
+}
+
+void() light_oldstyle =
+{
+	if (self.style >= 32)
+	{
+		if (self.count > 0)
+		{
+			self.use = light_inc_use;
+			if (self.spawnflags & START_OFF)
+			{
+				lightstyle(self.style, light_off);
+				self.cnt = 0;
+			}
+			else
+			{
+				lightstyle(self.style, GetLightStyle(self.oldstyle));
+				self.cnt = self.count;
+			}
+			return;
+		}
+		
+		self.use = light_use;
+		if (self.spawnflags & START_OFF)
+			lightstyle(self.style, light_off);
+		else
+			lightstyle(self.style, GetLightStyle(self.oldstyle));
+	}
+}
+
 /*QUAKED light (0 .75 0) (-8 -8 -8) (8 8 8) START_OFF
 Non-displayed light. If targeted, it will toggle between on or off. 
 
@@ -225,15 +266,7 @@ Keys:
 */
 void() light =
 {
-	if (self.message != string_null)
-	{
-		if (self.oldstyle > 11)
-			lightstyle(self.oldstyle, self.message);
-		else if (self.style > 11)
-			lightstyle(self.style, self.message);
-		else
-			dprint5("WARNING: light at ", vtos(self.origin), " with message ", self.message, " but no style # set\n");
-	}
+	light_message();
 	
 	if (self.targetname == string_null)
 	{	// inert light
@@ -241,30 +274,7 @@ void() light =
 		return;
 	}
 	
-	if (self.style >= 32)
-	{
-		if (self.count > 0)
-		{
-			self.use = light_inc_use;
-			if (self.spawnflags & START_OFF)
-			{
-				lightstyle(self.style, light_off);
-				self.cnt = 0;
-			}
-			else
-			{
-				lightstyle(self.style, GetLightStyle(self.oldstyle));
-				self.cnt = self.count;
-			}
-			return;
-		}
-		
-		self.use = light_use;
-		if (self.spawnflags & START_OFF)
-			lightstyle(self.style, light_off);
-		else
-			lightstyle(self.style, GetLightStyle(self.oldstyle));
-	}
+	light_oldstyle();
 }
 
 //============================================================================
@@ -574,6 +584,129 @@ Same as light_flame_small_yellow. Use that one.
 void() light_flame_small_white =
 {
 	light_flame_small_yellow();
+}
+
+// ================================================================
+
+void() light_candle_group_off =
+{
+	entity c;
+	c = self;
+	do {
+		c.frame = not(c.frame, 1);
+		c = c.buddy;
+	} while (c != self && c != world);
+}
+
+void() light_candle_group_on =
+{
+	entity c;
+	c = self;
+	do {
+		c.frame |= 1;
+		c = c.buddy;
+	} while (c != self && c != world);
+}
+
+void() light_candle_use =
+{
+	light_use();
+	if (self.spawnflags & START_OFF)
+		light_candle_group_off();
+	else
+		light_candle_group_on();
+}
+
+// cache all candles with the same targetname as a linked list, with the first
+// one as master, so they can all be turned on and off in one target activation
+// without searching the whole map each time
+void() light_candle_group =
+{
+	if (self.buddy)
+		return;
+	
+	entity c, clast;
+	string oh = self.targetname;
+	c = self;	
+	do {
+		c.targetname = string_null;
+		c.nextthink = 0;
+		clast = c;
+		c = find(c, targetname, self.targetname);
+		clast.buddy = c;
+	} while (c != world);
+	
+	self.targetname = oh;
+	self.use = light_candle_use;
+}
+
+/*QUAKED light_candle (1 1 0) (-4 -4 0) (4 4 16) START_OFF
+Candle. If triggered to turn on and off, all candles with a matching targetname will ignite or go out as well.
+Keys:
+"width" - choose width 1-3, default (0) is random
+"height" - choose height 1-3, default (0) is random
+"angle" - choose orientation, blank is random yaw
+See 'light' keyvalues/spawnflags for more.
+*/
+/*FGD
+@PointClass base(Light) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame2.mdl" }) = 
+	light_candle : "Candle" 
+[
+	width(choices) : "Width" : 0 =
+	[
+		0: "Random"
+		1: "Narrow"
+		2: "Medium"
+		3: "Thick"
+	]
+	height(choices) : "Height" : 0 =
+	[
+		0: "Random"
+		1: "Short"
+		2: "Medium"
+		3: "Tall"
+	]
+]
+*/
+void() light_candle =
+{
+	if (!self.width)
+		self.width = 1 + floor(random()*2.99);
+	if (!self.height)
+		self.height = 1 + floor(random()*2.99);
+	if (self.angles == VEC_ORIGIN)
+		self.angles_y = random()*360;
+	
+	if (self.height == 1)
+		self.model = "progs/candle1.mdl";
+	else if (self.height == 2)
+		self.model = "progs/candle2.mdl";
+	else if (self.height == 3)
+		self.model = "progs/candle3.mdl";
+
+	precache_model2(self.model);
+	setmodel(self,self.model);
+		
+	if (self.width == 1)
+		self.frame = 4;
+	else if (self.width == 2)
+		self.frame = 0;
+	else if (self.width == 3)
+		self.frame = 2;
+	if (!(self.spawnflags & START_OFF))
+		self.frame += 1;
+	
+	light_message();
+	
+	if (self.targetname == string_null && self.style < 32)
+	{
+		makestatic(self);
+		return;
+	}
+	
+	light_oldstyle();
+	self.think = light_candle_group;
+	self.nextthink = time + 0.1;
 }
 
 // ================================================================
