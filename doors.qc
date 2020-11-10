@@ -389,7 +389,7 @@ void(vector cmins, vector cmaxs) door_finalize =
 	if (self.health)
 		return;
 	if (self.targetname != string_null)
-		if (!door_getslocked(self) || self.spawnflags & DOOR_TOGGLE)
+		if (!door_getslocked(self) || self.spawnflags & DOOR_TOGGLE || self.owner)
 			return;
 	
 	self.trigger_field = door_spawn_field(cmins, cmaxs);
