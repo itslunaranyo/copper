@@ -55,7 +55,7 @@ void() explobox_explode_go =
 {
 	self.takedamage = DAMAGE_NO;
 	self.classname = "explo_box";
-	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
+	//sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 	
 	self.use = SUB_Null;
 	self.health = 0;	// ensure triggered exploboxes don't hurt themselves and loop again
@@ -76,7 +76,7 @@ void() explobox_explode_go =
 	
 	self.think = explobox_prespawn;
 	self.attack_finished = self.ltime + self.wait;
-	self.nextthink = self.attack_finished - 3.5;
+	self.nextthink = max(self.ltime + 0.05, self.attack_finished - 3.5);
 	
 	playercount_convert(count);
 	if (self.count > 0)		// only respawn 'count' more times
