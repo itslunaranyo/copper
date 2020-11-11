@@ -316,6 +316,7 @@ void() worldspawn =
 
 	precache_model ("progs/s_bubble.spr");	// drowning bubbles
 	precache_model ("progs/s_explod.spr");	// sprite explosion
+	precache_model ("progs/s_explo2.spr");	// sprite weak explosion
 
 	precache_model ("progs/bolt.mdl");		// for lightning gun
 	precache_model ("progs/bolt2.mdl");		// for lightning gun

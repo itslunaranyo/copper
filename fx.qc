@@ -41,7 +41,10 @@ void() BecomeBlast =
 	self.movetype = MOVETYPE_NONE;
 	self.velocity = '0 0 0';
 	self.touch = SUB_Null;
-	setmodel (self, "progs/s_explod.spr");
+	if (other.classname == "monster_shambler")
+		setmodel (self, "progs/s_explo2.spr");
+	else
+		setmodel (self, "progs/s_explod.spr");
 	self.solid = SOLID_NOT;
 	self.nextthink = time + 0.5;
 	self.think = SUB_Remove;
