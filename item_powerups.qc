@@ -41,7 +41,7 @@ void(entity h, float t) powerup_invisibility =
 {
 	sprint (h, "Others' eyes deceive them, but yours give you away ...\n");
 	h.items |= IT_INVISIBILITY;
-	h.notrace = 1;
+	//h.notrace = 1;
 	h.invisible_time = 1;
 	h.invisible_finished = time + t;
 }

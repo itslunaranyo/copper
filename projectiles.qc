@@ -50,6 +50,7 @@ void(vector start, vector end, entity ignore, float traceflags) traceline2 =
 			if ( trace_ent.deadflag == DEAD_DYING || 	// don't let guys in death frames who aren't nonsolid yet act like solid walls to bullets
 				trace_ent == ignore || 					// always ignore the original ignore ent on future loops
 				trace_ent.movetype == MOVETYPE_NOCLIP || // don't shoot noclipping players
+				invis_miss_check(other,start,end-start) || 
 				trace_ent.notrace)						// flag to make things game-functionally nonsolid (monsterclip/etc)
 			{
 				// if two entities that are both to be ignored are touching, the trace will
@@ -228,6 +229,7 @@ float() projectile_valid_passthru =
 	
 	if (other.deadflag == DEAD_DYING || // corpses not yet on the ground
 		other.notrace  || 				// specially marked (monsterclip)
+		invis_miss_check(other,self.origin,self.velocity) || 
 		other.movetype == MOVETYPE_NOCLIP || // ignore noclipping players
 		other == self.trueowner	)		// still track the original owner - there are cases when monsters 
 										// or players firing fat FLYMISSILE projectiles into an adjacent 
@@ -288,6 +290,24 @@ float() CheckProjectilePassthru =
 
 void() projectile_touch_null = { CheckProjectilePassthru(); }
 
+/*
+========
+invis_miss_check
+
+when invisible, to split the difference between the near-invulnerability of notrace 
+and the cheap weak feeling of catching a stray grenade because you dodged wrong,
+projectiles and hitscan are verified against a thin cylinder (20u diameter) so most
+incidental or glancing hits miraculously miss, while only the real dead-on shots land
+========
+*/
+float(entity tgt, vector start, vector dir) invis_miss_check =
+{
+	if (!has_invis(tgt))
+		return FALSE;	
+	vector p = CrossProduct('0 0 1', normalize(dir));
+	float d = (start - tgt.origin) * p;
+	return (fabs(d) >= 10);
+}
 
 
 

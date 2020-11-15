@@ -1214,7 +1214,7 @@ void() CheckPowerups =
 		if (self.invisible_finished < time)
 		{	// just stopped
 			self.items = self.items - IT_INVISIBILITY;
-			self.notrace = 0;
+			//self.notrace = 0;
 			self.invisible_finished = 0;
 			self.invisible_time = 0;
 		}
