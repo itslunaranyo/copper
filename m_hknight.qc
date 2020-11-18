@@ -52,8 +52,10 @@ void(float offset) hknight_shot =
 	
 	vec = enemy_vispos() - self.origin;
 	vec += enemy_aim_vertical();
+	vec_z += crandom() * 16;
 	offang = vectoangles(vec);
 	offang_y = offang_y + offset * 6;
+	offang_x *= -1;
 	
 	if (angledif(self.ideal_yaw, offang_y) > 80)	// no assbolts
 		makevectors (self.angles + '0 1 0' * offset * 6);
@@ -64,7 +66,7 @@ void(float offset) hknight_shot =
 
 // set missile speed
 	vec = normalize (v_forward);
-	vec_z = 0 - vec_z + (random() - 0.5)*0.1;
+	vec_z += crandom() * 0.05;
 	
 	launch_knightspike (org, vec*425);
 
