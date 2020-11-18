@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 # gtkradiant doesn't add skill flags by default and I'd rather keep the source 
 # clean by adding them here instead, because what else is python for?
@@ -47,7 +47,14 @@ def getQuakeds(qc):
 def go():
 	cwd = os.path.dirname(os.path.realpath(__file__))
 	qcDir = cwd + "\\"
-	defDir = cwd + "\\..\\"
+	defDir = os.path.normpath(cwd + "\\..\\")
+	defName = ""
+	if len(sys.argv) > 1:
+		defName = sys.argv[1]
+	else:
+		defName = os.path.basename(defDir)
+	defFile = defName + ".def"
+	defDir += "\\"
 
 	print("Scanning *.qc for def comments...")
 	defOut = ""
@@ -62,7 +69,8 @@ def go():
 		defOut += defs
 		numDefs += n
 	
-	dfn = defDir + "copper.def"
+	dfn = defDir + defFile
+	print("Writing to",dfn)
 	with open(dfn, "w") as df:
 		df.write(defOut)
 	print("Completed, found",numDefs)

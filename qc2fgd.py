@@ -1,4 +1,4 @@
-import os, datetime
+import os, datetime, sys
 
 # TODO: put all the baseclasses first
 
@@ -37,7 +37,14 @@ def getQCs():
 def go():
 	cwd = os.path.dirname(os.path.realpath(__file__))
 	qcDir = cwd + "\\"
-	fgdDir = cwd + "\\..\\"
+	fgdDir = os.path.normpath(cwd + "\\..\\")
+	fgdName = ""
+	if len(sys.argv) > 1:
+		fgdName = sys.argv[1]
+	else:
+		fgdName = os.path.basename(fgdDir)
+	fgdFile = fgdName + ".fgd"
+	fgdDir += "\\"
 
 	print("Scanning *.qc for FGD comments...")
 	defOut = """// Copper Quake game definition file (.fgd)
@@ -67,7 +74,8 @@ def go():
 			numDefs += n
 			defOut += "\n"
 	
-	dfn = fgdDir + "copper.fgd"
+	dfn = fgdDir + fgdFile
+	print("Writing to",dfn)
 	with open(dfn, "w") as df:
 		df.write(defOut)
 	print("Completed, found",numDefs)
