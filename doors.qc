@@ -255,6 +255,8 @@ void() door_touch =
 void(entity d) door_lock =
 {
 	entity e;
+	if (d.customflags & CFL_LOCKED)
+		return;
 	d.customflags = d.customflags | CFL_LOCKED;
 
 	// close any open doors immediately
@@ -262,7 +264,7 @@ void(entity d) door_lock =
 	{
 		e = d;
 		do {
-			SUB_CallAsSelf(door_go_down,d);
+			SUB_CallAsSelf(door_go_down,e);
 			e = e.enemy;
 		}
 		while ( e != d && e != world );
@@ -283,6 +285,9 @@ void(entity d) door_lock =
 
 void(entity d) door_unlock =
 {
+	if (!(d.customflags & CFL_LOCKED))
+		return;
+		
 	d.customflags = not(d.customflags, CFL_LOCKED);
 	
 	if (d.max_health)
@@ -306,27 +311,32 @@ float(entity d) door_getslocked =
 		return FALSE;
 	
 	entity t;
+	float found = FALSE;
 	t = find(world, target, d.targetname);
 	while (t) {
+		found = TRUE;
 		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target, d.targetname);
 	}
 	t = find(world, target2, d.targetname);
 	while (t) {
+		found = TRUE;
 		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target2, d.targetname);
 	}
 	t = find(world, target3, d.targetname);
 	while (t) {
+		found = TRUE;
 		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target3, d.targetname);
 	}
 	t = find(world, target4, d.targetname);
 	while (t) {
+		found = TRUE;
 		if (t.classname != "target_lock") return FALSE;
 		t = find(t, target4, d.targetname);
 	}
-	return TRUE;
+	return found;	// no targeters has to be FALSE
 }
 
 /*
@@ -341,7 +351,7 @@ entity(vector fmins, vector fmaxs) door_spawn_field =
 {
 	local entity	trigger;
 	local	vector	t1, t2;
-
+	bprint("spawning door field\n");
 	trigger = spawn();
 	trigger.movetype = MOVETYPE_NONE;
 	trigger.solid = SOLID_TRIGGER;
@@ -389,7 +399,7 @@ void(vector cmins, vector cmaxs) door_finalize =
 	if (self.health)
 		return;
 	if (self.targetname != string_null)
-		if (!door_getslocked(self) || self.spawnflags & DOOR_TOGGLE || self.owner)
+		if (!door_getslocked(self) || self.spawnflags & DOOR_TOGGLE)
 			return;
 	
 	self.trigger_field = door_spawn_field(cmins, cmaxs);
