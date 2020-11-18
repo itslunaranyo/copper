@@ -344,7 +344,7 @@ entity(entity me) void_find_teleport =
 		me.target3 == string_null &&
 		me.target4 == string_null)
 		return world;
-	bprint("in void find teleport\n");
+
 	entity head;
 	head = world;
 	while (1)
@@ -352,7 +352,6 @@ entity(entity me) void_find_teleport =
 		head = find(head, targetname, me.target);
 		if (!head)
 			break;
-		bprint3("trying a ", head.classname, "\n");
 		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
 			return head;
 	}
@@ -362,7 +361,6 @@ entity(entity me) void_find_teleport =
 		head = find(head, targetname, me.target2);
 		if (!head)
 			break;
-		bprint3("trying a ", head.classname, "\n");
 		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
 			return head;
 	}
@@ -372,7 +370,6 @@ entity(entity me) void_find_teleport =
 		head = find(head, targetname, me.target3);
 		if (!head)
 			break;
-		bprint3("trying a ", head.classname, "\n");
 		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
 			return head;
 	}
@@ -382,11 +379,10 @@ entity(entity me) void_find_teleport =
 		head = find(head, targetname, me.target4);
 		if (!head)
 			break;
-		bprint3("trying a ", head.classname, "\n");
 		if (head.classname == "info_teleport_destination" && !(head.customflags & CFL_LOCKED))
 			return head;
 	}
-	bprint("all fails\n");
+
 	return world;
 }
 
