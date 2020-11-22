@@ -260,7 +260,7 @@ void(entity d) door_lock =
 	d.customflags = d.customflags | CFL_LOCKED;
 
 	// close any open doors immediately
-	if (d.state != STATE_BOTTOM && !(d.spawnflags & DOOR_TOGGLE))
+	if (d.state != STATE_BOTTOM && !(d.spawnflags & DOOR_TOGGLE || d.wait == -1))
 	{
 		e = d;
 		do {
