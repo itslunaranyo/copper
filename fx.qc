@@ -279,7 +279,7 @@ void() particlefield_use =
 	speed2(integer) : "Dots per clump" : 16
 	health(integer) : "Color index (0-255)" : 0
 	movedir(string) : "Velocity of particles (x y z)"
-	wait(string) : "Interval" : 0.1
+	wait(string) : "Interval" : "0.1"
 	velocity(string) : "Direction of optional sweep effect (x y z)"
 ]
 

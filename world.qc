@@ -190,7 +190,6 @@ Keys:
 	gravity(integer) : "Gravity"
 	sky(string) : "Skybox"
 	_skyfog(string) : "Sky fog strength"
-	gravity(integer) : "Gravity"
 	_wateralpha(string) : "Water alpha"
 	_lavaalpha(string) : "Lava alpha" : "1.0"
 	_telealpha(string) : "Tele alpha" : "1.0"

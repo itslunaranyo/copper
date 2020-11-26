@@ -166,7 +166,7 @@ When a button is touched, it moves some distance in the direction of its angle, 
 4) trigger noise (big light switch)
 */
 /*FGD
-@SolidClass base(Appearflags,Angle,Target,Targetname,LipDist) = func_button : 
+@SolidClass base(Appearflags,Angle,Target,Targetname) = func_button : 
 "Button. When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
 Acts as if touched when triggered." 
 [

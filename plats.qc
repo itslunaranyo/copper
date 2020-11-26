@@ -451,7 +451,7 @@ If the train is the target of a button or trigger, it will not begin moving unti
 2) base plat
 */
 /*FGD
-@SolidClass base(Train) size(16 16 16) = func_flytrain : 
+@SolidClass base(Train) = func_flytrain : 
 "A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key." []
 */
 void() func_flytrain =
