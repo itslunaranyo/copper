@@ -74,7 +74,8 @@ void(entity e) void_unplunge =
 	//e.flags &~= FL_NOTARGET;
 	e.takedamage = DAMAGE_AIM;
 	e.solid = SOLID_SLIDEBOX;
-	e.movetype = MOVETYPE_WALK;
+	if (e.movetype != MOVETYPE_NOCLIP)
+		e.movetype = MOVETYPE_WALK;
 	e.model = "progs/player.mdl";
 
 	SUB_CallAsSelf(W_ResetWeaponState, e);	// restore weaponmodel
