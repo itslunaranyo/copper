@@ -781,7 +781,14 @@ void() target_lightstyle_go =
 	{
 		l = world;
 		while (l.style == 0)
+		{
 			l = find(l, targetname, self.target);		
+			if (l == world)
+			{
+				dprint3("target_lightstyle couldn't find target ", self.target, "\n");
+				break;
+			}
+		}
 	}
 	if (l) lightstyle(l.style, newstyle);
 	
@@ -789,7 +796,14 @@ void() target_lightstyle_go =
 	{
 		l = world;
 		while (l.style == 0)
-			l = find(l, targetname, self.target2);		
+		{
+			l = find(l, targetname, self.target2);	
+			if (l == world)
+			{
+				dprint3("target_lightstyle couldn't find target2 ", self.target, "\n");
+				break;
+			}
+		}
 	}
 	if (l) lightstyle(l.style, newstyle);
 
@@ -797,7 +811,14 @@ void() target_lightstyle_go =
 	{
 		l = world;
 		while (l.style == 0)
-			l = find(l, targetname, self.target3);		
+		{
+			l = find(l, targetname, self.target3);
+			if (l == world)
+			{
+				dprint3("target_lightstyle couldn't find target3 ", self.target, "\n");
+				break;
+			}
+		}
 	}
 	if (l) lightstyle(l.style, newstyle);
 
@@ -805,8 +826,15 @@ void() target_lightstyle_go =
 	{
 		l = world;
 		while (l.style == 0)
+		{
 			l = find(l, targetname, self.target4);		
-	}
+			if (l == world)
+			{
+				dprint3("target_lightstyle couldn't find target4 ", self.target, "\n");
+				break;
+			}
+		}
+	}	
 	if (l) lightstyle(l.style, newstyle);
 }
 
