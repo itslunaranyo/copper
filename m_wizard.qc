@@ -192,6 +192,7 @@ void() Wiz_StartFast =
 
 void() Wiz_idlesound =
 {
+	if (self.show_hostile > time) return;
 local float wr;
 	wr = random() * 5;
 

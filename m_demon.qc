@@ -95,7 +95,7 @@ void()	demon1_run3	=[	$run3,		demon1_run4	] {ai_run(36);}
 void()	demon1_run4	=[	$run4,		demon1_run5	] {ai_run(20);}
 void()	demon1_run5	=[	$run5,		demon1_run6	] {ai_run(15);}
 void()	demon1_run6	=[	$run6,		demon1_run1	] {ai_run(36);
-	if (random() < 0.2)
+	if (random() < 0.2 && time > self.show_hostile)
 		sound (self, CHAN_VOICE, "demon/idle1.wav", 1, ATTN_IDLE);
 }
 

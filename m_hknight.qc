@@ -343,7 +343,7 @@ void()	hknight_watk22	=[	$w_attack22,	hknight_run1	] {ai_charge(3);}
 
 void() hk_idle_sound =
 {
-	if (random() < 0.2)
+	if (random() < 0.2 && time > self.show_hostile)
 		sound (self, CHAN_VOICE, "hknight/idle.wav", 1, ATTN_NORM);
 }
 

@@ -76,7 +76,7 @@ void()	knight_walk14	=[	$walk14,	knight_walk1	] {ai_walk(3);}
 
 void()	knight_run1	=[	$runb1,		knight_run2	]
 {
-	if (random() < 0.2)
+	if (random() < 0.2 && time > self.show_hostile)
 		sound (self, CHAN_VOICE, "knight/idle.wav", 1,  ATTN_IDLE);
 		
 	ai_run(16);

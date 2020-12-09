@@ -144,10 +144,11 @@ void()	enf_walk15	=[	$walk15,	enf_walk16	] {ai_walk(4);}
 void()	enf_walk16	=[	$walk16,	enf_walk1	] {ai_walk(2);}
 
 void()	enf_run1	=[	$run1  ,	enf_run2	] {
-if (random() < 0.2)
-	sound (self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
+	if (random() < 0.2 && time > self.show_hostile)
+		sound (self, CHAN_VOICE, "enforcer/idle1.wav", 1, ATTN_IDLE);
 	self.yaw_speed = 20;
-ai_run(18);}
+	ai_run(18);
+}
 void()	enf_run2	=[	$run2  ,	enf_run3	] {ai_run(14);}
 void()	enf_run3	=[	$run3  ,	enf_run4	] {ai_run(7);}
 void()	enf_run4	=[	$run4  ,	enf_run5	] {ai_run(12);}

@@ -140,9 +140,10 @@ void() dog_walk7	=[	$walk7 ,	dog_walk8	] {ai_walk(8);}
 void() dog_walk8	=[	$walk8 ,	dog_walk1	] {ai_walk(8);}
 
 void() dog_run1		=[	$run1  ,	dog_run2	] {
-if (random() < 0.2)
-	sound (self, CHAN_VOICE, "dog/idle.wav", 1, ATTN_IDLE);
-ai_run(16);}
+	if (random() < 0.2 && time > self.show_hostile)
+		sound (self, CHAN_VOICE, "dog/idle.wav", 1, ATTN_IDLE);
+	ai_run(16);
+}
 void() dog_run2		=[	$run2  ,	dog_run3	] {ai_run(32);}
 void() dog_run3		=[	$run3  ,	dog_run4	] {ai_run(32);}
 void() dog_run4		=[	$run4  ,	dog_run5	] {ai_run(20);}

@@ -81,7 +81,7 @@ void()	army_walk23	=[	$prowl_23,	army_walk24	] {ai_walk(1);}
 void()	army_walk24	=[	$prowl_24,	army_walk1	] {ai_walk(1);}
 
 void()	army_run1	=[	$run1,		army_run2	] {
-if (random() < 0.2)
+if (random() < 0.2 && time > self.show_hostile)
 	sound (self, CHAN_VOICE, "soldier/idle.wav", 1, ATTN_IDLE);
 ai_run(11);}
 void()	army_run2	=[	$run2,		army_run3	] {ai_run(15);}
