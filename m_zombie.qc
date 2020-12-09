@@ -416,7 +416,8 @@ void() zombie_paine30	=[	$paine30,	zombie_run1		] {ai_attack_finished (1);}
 
 void() zombie_try_stand =
 {
-	sound (self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_NORM);
+	if (time > self.show_hostile)
+		sound (self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_NORM);
 	self.solid = SOLID_SLIDEBOX;
 	setsize (self, '-16 -16 -24', '16 16 40');
 	if (!walkmove (0, 0))
