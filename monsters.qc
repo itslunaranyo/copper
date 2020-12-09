@@ -267,6 +267,7 @@ entity( void() spawnthink ) mon_spawner_use =
 	mon.message = self.message;
 	mon.deathtype = self.deathtype;
 	SUB_CopyTargets(mon);
+	mon.targetname = self.netname;
 	
 	// don't spawnfrag monsters if the mapper expects us to be spawning into chaos
 	if ( (self.spawnflags & SPAWN_NO_TFRAG) )
