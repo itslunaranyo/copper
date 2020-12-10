@@ -73,6 +73,19 @@ string light_off = "a";
 		1 : "Start off" : 0
 	]
 ]
+@baseclass base() = Flame [
+	volume(string) : "Crackle Volume" : "1"
+	distance(choices) : "Crackle Range" : 0 =
+	[
+		0 : "Ambient"
+		1 : "Monster Idle"
+		2 : "Monster Bark"
+		3 : "Global (plz no)"
+	]
+	spawnflags(flags) = [
+		2 : "Silent" : 0
+	]
+]
 */
 
 //
@@ -434,7 +447,7 @@ void() FireAmbient =
 Short wall torch. Makes crackly torch sound.
 
 Flags:
-"start_off"	starts off until triggered
+"silent"	no ambient noise
 
 Keys:
 "light"		sets brightness (default: 300)
@@ -465,9 +478,14 @@ Keys:
     styles 32-62 are assigned by the light program for switchable lights 
     (default: 0)
 "message"	override the style string directly for the assigned style (clashes will overwrite each other)
+"distance" sound attenuation range (integer) - defaults to 0, which is the same as other ambient sounds.
+  1 = 'idle' - monster idle sound range
+  2 = 'normal' - monster bark sound range
+  3 = 'none' - loops everywhere forever (don't use this)
+"volume" loudness (0-1), distinct from distance
 */
 /*FGD
-@PointClass base(Light) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame.mdl" }) = 
+@PointClass base(Light, Flame) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame.mdl" }) = 
 	light_torch_small_walltorch : "Small walltorch" []
 */
 void() light_torch_small_walltorch =
@@ -482,7 +500,7 @@ void() light_torch_small_walltorch =
 Large yellow flame ball.  Makes crackly torch sound.
 
 Flags:
-"start_off"	starts off until triggered
+"silent"	no ambient noise
 
 Keys:
 "light"		sets brightness (default: 300)
@@ -513,10 +531,14 @@ Keys:
     styles 32-62 are assigned by the light program for switchable lights 
     (default: 0)
 "message"	override the style string directly for the assigned style (clashes will overwrite each other)
-
+"distance" sound attenuation range (integer) - defaults to 0, which is the same as other ambient sounds.
+  1 = 'idle' - monster idle sound range
+  2 = 'normal' - monster bark sound range
+  3 = 'none' - loops everywhere forever (don't use this)
+"volume" loudness (0-1), distinct from distance
 */
 /*FGD
-@PointClass base(Light) size(-8 -8 -12, 8 8 20) model({ "path": ":progs/flame2.mdl" }) = 
+@PointClass base(Light, Flame) size(-8 -8 -12, 8 8 20) model({ "path": ":progs/flame2.mdl" }) = 
 	light_flame_large_yellow : "Large yellow flame" []
 */
 void() light_flame_large_yellow =
@@ -531,6 +553,9 @@ void() light_flame_large_yellow =
 /*QUAKED light_flame_small_yellow (1 1 0) (-4 -4 -12) (4 4 20)
 Small yellow flame ball.  Makes crackly torch sound.
 
+Flags:
+"silent"	no ambient noise
+
 Keys:
 "light"		sets brightness (default: 300)
 "mangle"	spotlight direction - the first # is yaw, 0 to 360 around Z. second # is pitch, 90 up to -90 down.
@@ -560,10 +585,14 @@ Keys:
     styles 32-62 are assigned by the light program for switchable lights 
     (default: 0)
 "message"	override the style string directly for the assigned style (clashes will overwrite each other)
-
+"distance" sound attenuation range (integer) - defaults to 0, which is the same as other ambient sounds.
+  1 = 'idle' - monster idle sound range
+  2 = 'normal' - monster bark sound range
+  3 = 'none' - loops everywhere forever (don't use this)
+"volume" loudness (0-1), distinct from distance
 */
 /*FGD
-@PointClass base(Light) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame2.mdl" }) = 
+@PointClass base(Light, Flame) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame2.mdl" }) = 
 	light_flame_small_yellow : "Small yellow flame"  []
 */
 void() light_flame_small_yellow =
@@ -578,7 +607,7 @@ void() light_flame_small_yellow =
 Same as light_flame_small_yellow. Use that one.
 */
 /*FGD
-@PointClass base(Light) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame2.mdl" }) = 
+@PointClass base(Light, Flame) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame2.mdl" }) = 
 	light_flame_small_white : "Small white flame (same as light_flame_small_yellow)" []
 */
 void() light_flame_small_white =
