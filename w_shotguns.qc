@@ -187,7 +187,7 @@ void() W_FireSuperShotgun =
 	ClearMultiDamage ();
 
 	FireBullets (14, dir, '0.14 0.08 0');
-	self.attack_finished = time + 0.75;
+	self.attack_finished = time + 0.7;
 	
 	ApplyMultiDamage ();
 
