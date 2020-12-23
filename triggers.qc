@@ -126,7 +126,8 @@ void() InitTriggerBounds =
 // to mean no restrictions, so use a yaw of 360 instead.
 
 	// do this first so setsize links us correctly
-	self.solid = SOLID_TRIGGER;
+	if (!self.health)
+		self.solid = SOLID_TRIGGER;
 	setorigin (self, self.origin);
 	
 	setsize (self, self.mangle * -0.5, self.mangle * 0.5);
