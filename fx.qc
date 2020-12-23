@@ -471,9 +471,9 @@ void(entity targ, float mag) screenshake_go =
 	if (intermission_running)
 	{
 		local vector kick;
-		kick_x = (random()- 0.5) * mag;
-		kick_y = (random()- 0.5) * mag;
-		kick_z = (random()- 0.5) * mag * 2;
+		kick_x = (random() - 0.5) * mag;
+		kick_y = (random() - 0.5) * mag;
+		kick_z = crandom() * mag;
 		targ.angles = kick;
 		targ.angles_z = kick_z;
 		targ.fixangle = 1;
@@ -488,15 +488,23 @@ void(entity targ, float mag) screenshake_go =
 	targ.angles_z = kick_z;
 	targ.fixangle = 1;		// turn this way immediately*/
 
-	targ.punchangle_x = random() * mag * 2 - mag;
-	targ.punchangle_y = random() * mag * 2 - mag;
+	targ.punchangle_x = crandom() * mag;
+	targ.punchangle_y = crandom() * mag;
+	
+	if (targ.health > 0)
+	{
+		// jitter viewpoint itself also
+		//targ.view_ofs_x = min(max(-4, crandom() * mag), 4);	// quake only sends the z component
+		//targ.view_ofs_y = min(max(-4, crandom() * mag), 4);	// of view_ofs over the network :/
+		targ.view_ofs_z = min(max(-4, crandom() * mag), 4) + 22;
+	}
 	
 	// punchangle seems to get integerized, so we need some kind of
 	// activity when the magnitude is low so it feels like a faint 
 	// rumble instead of just a dying fish kicking occasionally
 	mag = mag * 2;	// the rolls feel a lot less violent, so bump them up a little
 	
-	targ.punchangle_z = random() * mag * 2 - mag;
+	targ.punchangle_z = crandom() * mag;	
 }
 
 void() screenshake_think =
