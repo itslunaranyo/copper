@@ -658,11 +658,14 @@ void() light_candle_group =
 	string oh = self.targetname;
 	c = self;	
 	do {
-		c.targetname = string_null;
-		c.nextthink = 0;
 		clast = c;
-		c = find(c, targetname, self.targetname);
-		clast.buddy = c;
+		c = find(c, targetname, oh);
+		if (clast.classname == "light_candle")
+		{
+			clast.buddy = c;
+			clast.targetname = string_null;
+			clast.nextthink = 0;
+		}
 	} while (c != world);
 	
 	self.targetname = oh;
@@ -678,7 +681,7 @@ Keys:
 See 'light' keyvalues/spawnflags for more.
 */
 /*FGD
-@PointClass base(Light) size(-4 -4 -12, 4 4 20) model({ "path": ":progs/flame2.mdl" }) = 
+@PointClass base(Light) size(-4 -4 0, 4 4 16) model({ "path": ":progs/flame2.mdl" }) = 
 	light_candle : "Candle" 
 [
 	width(choices) : "Width" : 0 =
