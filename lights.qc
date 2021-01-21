@@ -681,7 +681,7 @@ Keys:
 See 'light' keyvalues/spawnflags for more.
 */
 /*FGD
-@PointClass base(Light) size(-4 -4 0, 4 4 16) model({ "path": ":progs/flame2.mdl" }) = 
+@PointClass base(LightTriggerable) size(-4 -4 0, 4 4 16) model({ "path": ":progs/candle2.mdl" }) = 
 	light_candle : "Candle" 
 [
 	width(choices) : "Width" : 0 =
