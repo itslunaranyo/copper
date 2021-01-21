@@ -117,7 +117,11 @@ deathd: 93 (also on face but arms under forehead as if sad)
 deathe: 102 (on side)
 */
 /*FGD
-@PointClass base(Appearflags) size(16 16 16) color(160 192 224) = misc_model : 
+@PointClass base(Appearflags) size(16 16 16) color(160 192 224) model({ 
+	"path": model,
+    "skin": skin,
+    "frame": frame
+}) = misc_model : 
 "Display a model. Not solid.
 for a misc_model which can be toggled on or off, use a func_wall_point with a targetname."
 [
