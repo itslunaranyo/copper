@@ -703,11 +703,13 @@ See 'light' keyvalues/spawnflags for more.
 void() light_candle =
 {
 	if (!self.width)
-		self.width = 1 + floor(random()*2.99);
+		//self.width = 1 + floor(random()*2.99);
+		self.width = 1 + floor(fabs((self.origin_x % 5) + (self.origin_y % 13) - self.origin_z) % 3);
 	if (!self.height)
-		self.height = 1 + floor(random()*2.99);
+		//self.height = 1 + floor(random()*2.99);
+		self.height = 1 + floor(fabs((self.origin_x % 11) + (self.origin_y % 7) - self.origin_z) % 3);
 	if (self.angles == VEC_ORIGIN)
-		self.angles_y = random()*360;
+		self.angles_y = floor(fabs((self.origin_x % 17) + (self.origin_y % 23) - self.origin_z) % 10) * 36;
 	
 	if (self.height == 1)
 		self.model = "progs/candle1.mdl";
