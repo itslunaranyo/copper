@@ -165,7 +165,7 @@ will do enough damage to set off other barrels at up to ~172u distance (center t
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~172u distance (center to center)." 
 [
-	wait(integer) : "Respawn delay"
+	wait(string) : "Respawn delay"
 	count(integer) : "Respawn limit"
 ]
 */
@@ -197,7 +197,7 @@ will do enough damage to set off other barrels at up to ~128u distance (center t
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~128u distance (center to center)." 
 [
-	wait(integer) : "Respawn delay"
+	wait(string) : "Respawn delay"
 	count(integer) : "Respawn limit"
 ]
 */
@@ -230,7 +230,7 @@ Explodes when triggered or shot. Fires targets when it explodes."
 [
 	health(integer) : "Hit points" : 18
 	dmg(integer) : "Explosion damage" : 150
-	wait(integer) : "Respawn delay"
+	wait(string) : "Respawn delay"
 	count(integer) : "Respawn limit"
 ]
 */

@@ -141,7 +141,7 @@ Laser is only for REGISTERED. YOU PAY FOR LASER
 @PointClass base(Shooter) = trap_shooter : "Continuous shooter"
 [
 	nextthink(integer) : "Delay before first spike"
-	wait(integer) : "Wait between spikes"
+	wait(string) : "Wait between spikes"
 	rand(string) : "Random extra delay between spikes"
 ]
 */

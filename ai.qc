@@ -818,7 +818,7 @@ Keys:
 "Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
 Monsters who wait here will turn to face 'angle'."
 [
-	wait(integer) : "Wait (seconds)" : 0
+	wait(string) : "Wait (seconds)" : 0
 ]
 */
 void() path_corner =
