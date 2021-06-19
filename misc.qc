@@ -425,7 +425,7 @@ Keys:
 "message" change save file name, defaults to 'auto'
 */
 /*FGD
-@Pointclass base(Target, Targetname, Appearflags) color(255 0 128) size(32 32 32) = target_autosave : 
+@Pointclass base(Targetname, Appearflags) color(255 0 128) size(32 32 32) = target_autosave : 
 "Saves the game when triggered by a player. Never appears in multiplayer. 
 the bprint tends to stomp any other prints on screen in most quake clients, so use a delayed trigger_relay if you fire this from an important pickup/trigger_counter/something else that puts text on screen more important than the autosave blurb." 
 [

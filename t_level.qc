@@ -447,7 +447,7 @@ Spawnflags:
 NO_INTERMISSION: the view will not go to the info_intermission spot and display stats
 */
 /*FGD
-@PointClass base(Trigger) = target_changelevel : "Target: Change level"
+@PointClass base(Appearflags, Targetname) = target_changelevel : "Target: Change level"
 [
 	map(string) : "Next map"
 	spawnflags(flags) =
