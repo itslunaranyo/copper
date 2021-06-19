@@ -8,20 +8,46 @@ LIFTS AND TRAINS
 
 float PLAT_LOW_TRIGGER = 1;
 
+void() plat_try_find_trigger =
+{
+	entity t;
+	t = find (world, targetname, self.target);
+	self.target = "";
+	if (!t)
+	{
+		dprint("plat with unmatched target");
+		plat_spawn_inside_trigger();
+	}
+	else if ( (t.classname != "trigger_once") && (t.classname != "trigger_multiple") && (t.classname != "trigger_multiple_box") ) 
+	{
+		dprint("plat targets a non-trigger");
+		plat_spawn_inside_trigger();
+	}
+	else
+	{
+		dprint3("plat trigger found, ", t.classname, "\n");
+		t.touch = plat_center_touch;
+		t.think = SUB_Null;
+		t.movetype = MOVETYPE_NONE;
+		t.enemy = self;
+		self.trigger_field = t;
+	}
+}
 
 void() plat_spawn_inside_trigger =
 {
-	local entity	t;
-	local vector	tmin, tmax;
+	entity t;
+	vector tmin, tmax;
 
-	// FIXME: if the plat spawns before the trigger, will this fail?
-	if (self.target)
+	if (self.target != string_null)
 	{
-		// override touch zone for tweaking/effects
-		t = find (world, targetname, self.target);
-		if (!t) dprint("plat with unmatched target");
-		if ( (t.classname != "trigger_once") && (t.classname != "trigger_multiple") && (t.classname != "trigger_multiple_box") ) 
-			dprint("plat targets a non-trigger");
+		dprint("overriding plat trigger\n");
+		// find overridden trigger for custom trigger zones
+		// if the plat spawns before the trigger this will fail, so delay the search to let triggers spawn
+		self.think = plat_try_find_trigger;
+		self.nextthink = time + 0.1;
+		
+		return;
 	}
 	else
 	{
