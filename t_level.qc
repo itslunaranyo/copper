@@ -259,7 +259,7 @@ void(entity client, entity spot) move_player_to_intermission =
 	client.flags = not(client.flags, FL_ONGROUND);
 	client.view_ofs = VEC_ORIGIN;
 	client.velocity = VEC_ORIGIN;
-	client.angles = client.v_angle = spot.mangle;
+	client.angles = client.v_angle = client.mangle = spot.mangle;
 	client.fixangle = TRUE;		// turn this way immediately
 	client.nextthink = time + 0.5;
 	client.takedamage = DAMAGE_NO;

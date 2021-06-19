@@ -474,8 +474,8 @@ void(entity targ, float mag) screenshake_go =
 		kick_x = (random() - 0.5) * mag;
 		kick_y = (random() - 0.5) * mag;
 		kick_z = crandom() * mag;
-		targ.angles = kick;
-		targ.angles_z = kick_z;
+		targ.angles = targ.mangle + kick;
+	//	targ.angles_z = kick_z;
 		targ.fixangle = 1;
 		return;
 	}	
