@@ -326,12 +326,30 @@ void() target_lock =
 
 //============================================================================
 
+void() counter_reset =
+{
+	self.state = 0;
+	
+	if (self.spawnflags & SPAWNFLAG_NOMESSAGE)
+		return;
+	centerprint (self.enemy, "Counter has reset!");
+	sound (self.enemy, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
+}
 
 void() counter_use =
 {
 	playercount_convert(count);
 	
 	if (time < self.attack_finished) return;
+	self.enemy = activator;
+	
+	// eager reset spawnflag: reset 'wait' seconds after any trigger, not just upon
+	//	completion - for requiring a number of impulses within a window of time
+	if (self.spawnflags & 4)
+	{
+		self.think = counter_reset;
+		self.nextthink = time + self.wait;
+	}
 	
 	self.state = self.state + 1;
 	if (self.state > self.count)
@@ -358,11 +376,12 @@ void() counter_use =
 		return;
 	}
 	
-	if (activator.classname == "player" && (self.spawnflags & SPAWNFLAG_NOMESSAGE) == 0)
+	self.nextthink = 0;
+	
+	if (activator.classname == "player" && self.message != string_null)
 		SUB_PrintMessage();
 //		centerprint(activator, self.message);
 	
-	self.enemy = activator;
 	if (self.wait >= 0) 
 		self.state = 0;	// repeatable
 	//multi_trigger ();
@@ -371,18 +390,20 @@ void() counter_use =
 		self.attack_finished = time + self.wait;
 }
 
-/*QUAKED trigger_counter (.5 .0 .5) (-8 -8 -8) (8 8 8) NOMESSAGE REPEAT
+/*QUAKED trigger_counter (.5 .0 .5) (-8 -8 -8) (8 8 8) NOMESSAGE REPEAT EAGER_RESET
 Acts as an intermediary for an action that takes multiple inputs. 
-If nomessage is not set, it will print "1 more.. " etc when triggered and "sequence complete" when finished. After the counter has been triggered "count" times, it will fire all of it's targets and remove itself, unless 'repeat' has been set.
+If nomessage is not set, it will print "1 more.. " etc when triggered and "sequence complete" when finished. After the counter has been triggered "count" times, it will fire all of it's targets and remove itself, unless 'repeat' has been set, in which case it resets after 'wait' seconds.
 
 Flags:
 "nomessage" disables count display
+"repeat" reusable
+"eager reset" resets its own count 'wait' seconds after being triggered (for requiring multiple triggerings within a narrow window of time)
 
 Keys:
 "count" number of triggers needed to fire own target, default is 2
 "target"  entity to trigger (required)
 "targetname"  entity name (required)
-"message"	override text to print on completion
+"message"	specify text to print on completion (will always print - overrides 'nomessage' on completion)
 */
 /*FGD
 @PointClass base(Appearflags, Target, Targetname) = trigger_counter : "Trigger: Counter" 
@@ -390,6 +411,7 @@ Keys:
 	spawnflags(flags) = [ 
 		1: "No Message" : 0
 		2: "Repeat" : 0
+		4: "Eager Reset" : 0
 	]
 	count(integer) : "Count before trigger" : 2
 	message(string) : "Message"
@@ -401,7 +423,7 @@ void() trigger_counter =
 	
 	if (!self.wait)
 	{
-		if (self.spawnflags & 2)
+		if (self.spawnflags & 6)	// 2 or 4
 			self.wait = 1;
 		else
 			self.wait = -1;
@@ -410,9 +432,7 @@ void() trigger_counter =
 	if (!self.count)
 		self.count = 2;
 		
-	if (self.spawnflags & SPAWNFLAG_NOMESSAGE)
-		self.message = string_null;
-	else if (self.message == string_null)
+	if (!(self.spawnflags & SPAWNFLAG_NOMESSAGE) && self.message == string_null)
 		self.message = "Sequence completed!";
 		
 	//self.cnt = self.count;
