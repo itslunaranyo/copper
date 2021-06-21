@@ -25,6 +25,7 @@ void() explobox_respawn =
 
 	self.alpha = 1;
 	setorigin(self, self.origin);
+	bmodel_lightstyle(self, "a");
 	ItemPiff();
 }
 
@@ -60,6 +61,7 @@ void() explobox_explode_go =
 	self.use = SUB_Null;
 	self.health = 0;	// ensure triggered exploboxes don't hurt themselves and loop again
 	kaboom(BoundsCenter(self), self.dmg, self, 0);
+	bmodel_lightstyle(self, "m");
 	
 	if (!self.wait)
 	{
@@ -241,5 +243,6 @@ void() func_explobox =
 	self.movetype = MOVETYPE_PUSH;
 	setmodel(self,self.model);
 	self.dmg = zeroconvertdefault(self.dmg,150);
+	bmodel_lightstyle(self, "a");
 	explobox_setup();
 }
