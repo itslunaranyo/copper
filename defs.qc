@@ -281,6 +281,7 @@ float	icantsee;
 // lights
 .float		style;
 .float		oldstyle;
+.float		switchshadstyle;	// was "shadowstyle" too clear and easy to type or something
 
 // monster ai
 .void()		th_stand;

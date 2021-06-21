@@ -127,7 +127,10 @@ void() door_fire =
 			starte = self;
 			do
 			{
-				door_go_down ();
+				if (self.classname == "shadowmonitor")
+					door_shadowmonitor_go();
+				else
+					door_go_down ();
 				self = self.enemy;
 			} while ( (self != starte) && (self != world) );
 			self = oself;
@@ -139,7 +142,10 @@ void() door_fire =
 	starte = self;
 	if ( !( self.spawnflags & DOOR_TOGGLE ) || ( self.spawnflags & DOOR_TOGGLE && self.state == STATE_BOTTOM) )
 	do {
-		door_go_up ();
+		if (self.classname == "shadowmonitor")
+			door_shadowmonitor_go();
+		else
+			door_go_up ();
 		self = self.enemy;
 	} while ( (self != starte) && (self != world) );
 	self = oself;
@@ -342,6 +348,50 @@ float(entity d) door_getslocked =
 /*
 =============================================================================
 
+SWITCHABLE SHADOWS
+
+I do not want to screw around with SUB_CalcMove or bog doors down even further with
+thinking-while-moving, so doors with switchable shadows will spawn a little helper
+monitor to do that to keep mover code clean
+
+=============================================================================
+*/
+
+void() door_shadowmonitor_go =
+{
+	float frac;
+	entity o = self.owner;
+	if (o.state == STATE_TOP)
+		frac = 1;
+	else if (o.state == STATE_BOTTOM)
+		frac = 0;
+	else
+		frac = vlen(o.origin - o.pos1) / vlen(o.pos2 - o.pos1);
+	
+	if (o.spawnflags & DOOR_START_OPEN)
+		frac = 1 - frac;
+
+	lightstyle(o.switchshadstyle, light_str(frac));
+
+	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
+	self.think = door_shadowmonitor_go;
+}
+
+void(entity d) door_shadowmonitor =
+{
+	entity m = spawn();
+	m.classname = "shadowmonitor";
+	m.owner = d;
+	m.enemy = d.enemy;
+	d.enemy = m;
+
+	if (!(d.spawnflags & DOOR_START_OPEN))
+		lightstyle(d.switchshadstyle, "a");
+}
+
+/*
+=============================================================================
+
 SPAWNING FUNCTIONS
 
 =============================================================================
@@ -396,6 +446,18 @@ void(vector cmins, vector cmaxs) door_finalize =
 		return;
 		*/
 	}
+
+	t = self;
+	do {
+		// put a light fade monitor in the enemy chain
+		if (self.switchshadstyle)
+		{
+			door_shadowmonitor(t);
+			break;
+		}
+		t = t.enemy;
+	} while (t != self);
+
 	if (self.health)
 		return;
 	if (self.targetname != string_null)

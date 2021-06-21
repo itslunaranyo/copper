@@ -164,11 +164,30 @@ void() light_use =
 	}
 }
 
+string(float f) light_str =
+{
+	// you know what's cool?  arrays.
+	float bright = floor(f * 12 + 0.5);
+	if (bright <= 0 ) return "a";
+	if (bright >= 12) return "m";
+
+	if (bright == 1 ) return "b";
+	if (bright == 2 ) return "c";
+	if (bright == 3 ) return "d";
+	if (bright == 4 ) return "e";
+	if (bright == 5 ) return "f";
+	if (bright == 6 ) return "g";
+	if (bright == 7 ) return "h";
+	if (bright == 8 ) return "i";
+	if (bright == 9 ) return "j";
+	if (bright == 10) return "k";
+	if (bright == 11) return "l";
+	return "a";
+}
+
 // Lights with "count" will gradually change brightness each time they're triggered, reaching normal brightness or complete darkness after 'count' triggers.
 void() light_inc_use =
 {
-	local float bright;
-	
 	if (self.spawnflags & START_OFF)
 	{
 		if (self.cnt == self.count) return;
@@ -180,21 +199,7 @@ void() light_inc_use =
 		self.cnt = self.cnt - 1;
 	}
 	
-	// you know what's cool?  arrays.
-	bright = floor( (self.cnt / self.count) * 13);
-	if (bright >= 13)		lightstyle(self.style, "m");
-	else if (bright == 12) lightstyle(self.style, "l");
-	else if (bright == 11) lightstyle(self.style, "k");
-	else if (bright == 10) lightstyle(self.style, "j");
-	else if (bright == 9 ) lightstyle(self.style, "i");
-	else if (bright == 8 ) lightstyle(self.style, "h");
-	else if (bright == 7 ) lightstyle(self.style, "g");
-	else if (bright == 6 ) lightstyle(self.style, "f");
-	else if (bright == 5 ) lightstyle(self.style, "e");
-	else if (bright == 4 ) lightstyle(self.style, "d");
-	else if (bright == 3 ) lightstyle(self.style, "c");
-	else if (bright == 2 ) lightstyle(self.style, "b");
-	else if (bright <= 1 ) lightstyle(self.style, "a");
+	lightstyle(self.style, light_str(self.cnt / self.count));
 }
 
 void() light_message =
@@ -799,6 +804,14 @@ string() target_lightstyle_next =
 	return tls.message;
 }
 
+void(entity l, string st) lightstyle_switch =
+{
+	if (l.style)
+		lightstyle(l.style, st);
+	if (l.switchshadstyle)
+		lightstyle(l.switchshadstyle, st);
+}
+
 void() target_lightstyle_go =
 {
 	float st;
@@ -814,7 +827,7 @@ void() target_lightstyle_go =
 	if (self.target != string_null)
 	{
 		l = world;
-		while (l.style == 0)
+		while (l.style == 0 && l.switchshadstyle == 0)
 		{
 			l = find(l, targetname, self.target);		
 			if (l == world)
@@ -824,12 +837,12 @@ void() target_lightstyle_go =
 			}
 		}
 	}
-	if (l) lightstyle(l.style, newstyle);
+	if (l) lightstyle_switch(l, newstyle);
 	
 	if (self.target2 != string_null)
 	{
 		l = world;
-		while (l.style == 0)
+		while (l.style == 0 && l.switchshadstyle == 0)
 		{
 			l = find(l, targetname, self.target2);	
 			if (l == world)
@@ -839,12 +852,12 @@ void() target_lightstyle_go =
 			}
 		}
 	}
-	if (l) lightstyle(l.style, newstyle);
+	if (l) lightstyle_switch(l, newstyle);
 
 	if (self.target3 != string_null)
 	{
 		l = world;
-		while (l.style == 0)
+		while (l.style == 0 && l.switchshadstyle == 0)
 		{
 			l = find(l, targetname, self.target3);
 			if (l == world)
@@ -854,12 +867,12 @@ void() target_lightstyle_go =
 			}
 		}
 	}
-	if (l) lightstyle(l.style, newstyle);
+	if (l) lightstyle_switch(l, newstyle);
 
 	if (self.target4 != string_null)
 	{
 		l = world;
-		while (l.style == 0)
+		while (l.style == 0 && l.switchshadstyle == 0)
 		{
 			l = find(l, targetname, self.target4);		
 			if (l == world)
@@ -869,7 +882,7 @@ void() target_lightstyle_go =
 			}
 		}
 	}	
-	if (l) lightstyle(l.style, newstyle);
+	if (l) lightstyle_switch(l, newstyle);
 }
 
 void() target_lightstyle_use =
