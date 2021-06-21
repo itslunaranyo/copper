@@ -382,6 +382,7 @@ float	icantsee;
 .string exclude = map;
 .float light_lev = bubble_count;	// shuts up a stupid stupid warning
 .vector rmovedir = finaldest;
+.float version = worldtype;
 
 
 //===========================================================================

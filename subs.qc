@@ -105,13 +105,19 @@ void(float frame, void() th, float thtime) SUB_FrameThinkTime
 /*
 ===============
 SUB_ShouldSpawn
-
-check coop spawn flags, because we invented them and the exe 
-only checks skill/dm flags
 ===============
 */
 float() SUB_ShouldSpawn =
 {
+	// do a minimum-version check so cheeky mappers can place surprise 
+	// trigger_hurts to frag people who don't upgrade
+	if (self.version >= version_f)
+	{
+		remove(self);
+		return FALSE;
+	}
+	// check coop spawn flags, because we invented them and the exe only 
+	// checks skill/dm flags
 	if (self.spawnflags & SPAWN_COOPONLY && self.spawnflags & SPAWN_NOTCOOP)
 		objerror("cooponly and notincoop flags both set on the same entity");
 	if ( ((self.spawnflags & SPAWN_NOTCOOP) && coop) || ((self.spawnflags & SPAWN_COOPONLY) && !(coop)) )
