@@ -34,8 +34,7 @@ void() bmodel_appear =
 	// NOT ANY OTHER ORDERS
 	// ***
 	
-	if (self.switchshadstyle)
-		lightstyle(self.switchshadstyle, "a");
+	bmodel_lightstyle(self,"a");
 	self.state = STATE_BOTTOM;
 	//force_retouch = 2;
 }
@@ -45,8 +44,7 @@ void() bmodel_vanish =
 	self.solid = SOLID_NOT;
 	self.state = STATE_TOP;
 	self.modelindex = 0;
-	if (self.switchshadstyle)
-		lightstyle(self.switchshadstyle, "m");
+	bmodel_lightstyle(self,"m");
 	//self.alpha = -1;
 	
 	// drop things that are sitting on the bmodel:
@@ -59,7 +57,6 @@ void() bmodel_vanish =
 			drop.flags = not(drop.flags, FL_ONGROUND);
 	} while (drop);
 }
-
 
 // ==========================================
 
@@ -165,8 +162,7 @@ void() func_wall =
 	}
 	else
 	{
-		if (self.switchshadstyle)
-			lightstyle(self.switchshadstyle, "a");
+		bmodel_lightstyle(self,"a");
 		self.state = STATE_BOTTOM;
 	}
 }
@@ -261,12 +257,11 @@ void() func_episodegate =
 	if (!SUB_ShouldSpawn()) return;
 	if (!(serverflags & self.spawnflags))
 	{
-		if (self.switchshadstyle)
-			lightstyle(self.switchshadstyle, "m");
+		bmodel_lightstyle(self,"m");
 		return;			// can still enter episode
 	}
-	if (self.switchshadstyle)
-		lightstyle(self.switchshadstyle, "a");
+	bmodel_lightstyle(self,"a");
+	self.style = 0;
 	self.switchshadstyle = 0;
 	self.spawnflags = 0;
 	func_wall();
@@ -291,12 +286,11 @@ void() func_bossgate =
 	if (!SUB_ShouldSpawn()) return;
 	if ( (serverflags & SVFL_ALLEPISODES) == SVFL_ALLEPISODES)
 	{
-		if (self.switchshadstyle)
-			lightstyle(self.switchshadstyle, "m");
+		bmodel_lightstyle(self,"m");
 		return;		// all episodes completed
 	}
-	if (self.switchshadstyle)
-		lightstyle(self.switchshadstyle, "a");
+	bmodel_lightstyle(self,"a");
+	self.style = 0;
 	self.switchshadstyle = 0;
 	self.spawnflags = 0;
 	func_wall();

@@ -371,7 +371,7 @@ void() door_shadowmonitor_go =
 	if (o.spawnflags & DOOR_START_OPEN)
 		frac = 1 - frac;
 
-	lightstyle(o.switchshadstyle, light_str(frac));
+	bmodel_lightstyle(o, light_str(frac));
 
 	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
 	self.think = door_shadowmonitor_go;
@@ -386,7 +386,9 @@ void(entity d) door_shadowmonitor =
 	d.enemy = m;
 
 	if (!(d.spawnflags & DOOR_START_OPEN))
-		lightstyle(d.switchshadstyle, "a");
+	{
+		bmodel_lightstyle(d, "a");
+	}
 }
 
 /*
@@ -450,7 +452,7 @@ void(vector cmins, vector cmaxs) door_finalize =
 	t = self;
 	do {
 		// put a light fade monitor in the enemy chain
-		if (self.switchshadstyle)
+		if (self.style || self.switchshadstyle)
 		{
 			door_shadowmonitor(t);
 			break;
@@ -886,7 +888,7 @@ void() secret_shadowmonitor_go =
 		frac = (p * normalize(mv)) / vlen(mv);
 	}
 
-	lightstyle(o.switchshadstyle, light_str(frac));
+	bmodel_lightstyle(o, light_str(frac));
 
 	if ((frac == 0 || frac == 1) && o.wait == -1)
 	{
@@ -908,7 +910,7 @@ void () secretdoor_move0 =
 	SUB_CalcMove(self.dest1, self.speed, secretdoor_move1);
 	sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	
-	if (!self.switchshadstyle)
+	if (!self.switchshadstyle && !self.style)
 		return;
 	
 	entity s = spawn();
@@ -1159,6 +1161,5 @@ void () func_door_secret =
 	self.dest1 = self.origin + firstmove * self.t_width;
 	self.dest2 = self.dest1 + secondmove * self.t_length;
 
-	if (self.switchshadstyle)
-		lightstyle(self.switchshadstyle, "a");
+	bmodel_lightstyle(self, "a");
 }

@@ -164,6 +164,14 @@ void() light_use =
 	}
 }
 
+void(entity b, string l) bmodel_lightstyle =
+{
+	if (b.style)
+		lightstyle(b.style, l);
+	if (b.switchshadstyle)
+		lightstyle(b.switchshadstyle, l);
+}
+
 string(float f) light_str =
 {
 	// you know what's cool?  arrays.
