@@ -868,6 +868,37 @@ void(entity attacker, float damage) secretdoor_pain =
 	secretdoor_use();
 }
 
+
+void() secret_shadowmonitor_go =
+{
+	float frac;
+	vector mv, p;
+	entity o = self.owner;
+	
+	if (o.think == secretdoor_move2 || o.think == secretdoor_move6)
+		frac = 0;
+	else if (o.think == secretdoor_move4)
+		frac = 1;
+	else
+	{
+		mv = o.dest2 - o.dest1;
+		p = o.origin - o.dest1;
+		frac = (p * normalize(mv)) / vlen(mv);
+	}
+
+	lightstyle(o.switchshadstyle, light_str(frac));
+
+	if ((frac == 0 || frac == 1) && o.wait == -1)
+	{
+		remove(self);
+		return;
+	}
+	
+	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
+	self.think = secret_shadowmonitor_go;
+}
+
+
 // Make a sound, wait a little...
 void () secretdoor_move0 = 
 {
@@ -876,6 +907,14 @@ void () secretdoor_move0 =
 
 	SUB_CalcMove(self.dest1, self.speed, secretdoor_move1);
 	sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
+	
+	if (!self.switchshadstyle)
+		return;
+	
+	entity s = spawn();
+	s.classname = "shadowmonitor";
+	s.owner = self;
+	SUB_CallAsSelf(secret_shadowmonitor_go, s);
 }
 
 // Wait after first movement...
@@ -1118,5 +1157,8 @@ void () func_door_secret =
 		self.t_length = BoundsAngleSize(secondmove, self.size);
 
 	self.dest1 = self.origin + firstmove * self.t_width;
-	self.dest2 = self.dest1 + secondmove * self.t_length;	
+	self.dest2 = self.dest1 + secondmove * self.t_length;
+
+	if (self.switchshadstyle)
+		lightstyle(self.switchshadstyle, "a");
 }
