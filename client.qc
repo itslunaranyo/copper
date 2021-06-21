@@ -1958,7 +1958,7 @@ void() info_player_start_test =
 	}
 	self.mangle = self.angles;
 }
-void() testplayerstart = {};	// back compat with old editors that use regioned compiles
+void() testplayerstart = {info_player_start_test();}	// back compat with old editors that use regioned compiles
 
 /*QUAKED info_player_deathmatch (1 0 1) (-16 -16 -24) (16 16 24)
 potential spawning position for deathmatch games
