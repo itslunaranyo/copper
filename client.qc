@@ -449,7 +449,7 @@ entity() SelectSpawnPoint =
 	// testinfo_player_start is only found in regioned levels
 	if (!coop)
 	{
-		spot = find (world, classname, "testplayerstart");
+		spot = find (world, classname, "info_player_start_test");
 		if (spot)
 		{
 			return spot;
