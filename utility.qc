@@ -442,7 +442,13 @@ void(.float fld) playercount_convert =
 	if (!coop)
 		self.fld = 1;
 	else
-		self.fld = clients;
+	{
+		// limit this because we can't assume a max of 4 coop players (... thanks decino)
+		if (clients <= 4)
+			self.fld = clients;
+		else
+			self.fld = min(8, 4 + floor((clients-4)/2));
+	}
 }
 
 
