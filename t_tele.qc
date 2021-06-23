@@ -165,7 +165,7 @@ float(entity spot) teleport_check_for_client =
 	{
 		pl = find(pl, classname, "player");
 		if (!pl) break;
-		
+		if (pl.health <= 0 || pl.type == "head") continue;
 		if (pl != self)	// players can't block themselves
 			if (BoundsTouching(spot.absmin, spot.absmax, pl.absmin, pl.absmax, 2))
 				return TRUE;
