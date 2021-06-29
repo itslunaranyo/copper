@@ -288,7 +288,7 @@ void() trap_lightning_fire =
 								}
 								else if (trace_ent.classname == "monster_oldone")
 								{
-									bprint4(ftos(self.count)," ", ftos(self.strength), " zapping shub with a thing\n");
+									dprint4(ftos(self.count)," ", ftos(self.strength), " zapping shub with a thing\n");
 									T_Damage (trace_ent, self, self, 10001);	// auto-trigger one pain warble
 								}
 							}
@@ -304,7 +304,7 @@ void() trap_lightning_fire =
 				{
 					last = trace_ent;
 					// get non-takedamage cthons too
-					bprint4(ftos(self.count)," ", ftos(self.strength), " zapping cthon with a thing\n");
+					dprint4(ftos(self.count)," ", ftos(self.strength), " zapping cthon with a thing\n");
 					oself = self;
 					self = trace_ent;
 					self.health = self.health - 1;
