@@ -32,20 +32,9 @@ void(vector org, float rad) T_GibDownedZombies =
 
 // =======================================================
 
-
-void() T_MissileTouch =
+void() T_MissileExplode =
 {
 	local float	damg;
-
-	if (other == self.owner) return;		// don't explode on owner
-	if (CheckProjectilePassthru()) return;
-
-	if (pointcontents(self.origin) == CONTENT_SKY)
-	{
-		remove(self);
-		return;
-	}
-
 	damg = 100 + random()*20;
 	
 	if (other.health)
@@ -59,13 +48,24 @@ void() T_MissileTouch =
 
 	// don't do radius damage to other, because all damage will be done in the impact
 	T_RadiusDamage (self, self.trueowner, 120, other);
-
-	self.origin = self.origin - 8*normalize(self.velocity);
-
-	BecomeExplosion ();
 }
 
+void() T_MissileTouch =
+{
+	if (other == self.owner) return;		// don't explode on owner
+	if (CheckProjectilePassthru()) return;
 
+	if (pointcontents(self.origin) == CONTENT_SKY)
+	{
+		remove(self);
+		return;
+	}
+
+	T_MissileExplode();
+
+	self.origin = self.origin - 8*normalize(self.velocity);
+	BecomeExplosion ();
+}
 
 /*
 ================
@@ -73,7 +73,6 @@ W_FireRocket
 player rocket launch inherited from generic launch_rocket
 ================
 */
-
 void() W_FireRocket =
 {
 	local entity missile;
@@ -92,11 +91,7 @@ void() W_FireRocket =
 		self.attack_finished = time + 0.8;
 }
 
-
-
 //=============================================================================
-
-
 
 /*
 ===============
@@ -105,8 +100,6 @@ GERNADES
 
 ===============
 */
-
-
 
 void() GrenadeExplode =
 {
@@ -123,15 +116,14 @@ void() GrenadeTouch =
 	if (other.takedamage == DAMAGE_AIM)
 	{
 		self.velocity = '0 0 0';
-		GrenadeExplode();
+		T_MissileExplode();
+		BecomeExplosion();
 		return;
 	}
 	sound (self, CHAN_WEAPON, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
 	if (self.velocity == '0 0 0')
 		self.avelocity = '0 0 0';
 }
-
-
 
 /*
 ================
