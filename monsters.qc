@@ -553,6 +553,11 @@ Flymonster starts
 void() flymonster_start_go =
 {
 	self.movetype = MOVETYPE_FLY;
+	
+	// fix monsters dropping to floor because of QSS fix
+	if (self.oldorigin != VEC_ORIGIN)
+		setorigin(self,self.oldorigin);
+		
 	if (!self.yaw_speed)
 		self.yaw_speed = 10;
 	self.view_ofs = '0 0 25';
@@ -586,6 +591,11 @@ Swimmonster starts
 void() swimmonster_start_go =
 {
 	self.movetype = MOVETYPE_FLY;
+	
+	// fix monsters dropping to floor because of QSS fix
+	if (self.oldorigin != VEC_ORIGIN)
+		setorigin(self,self.oldorigin);
+
 	if (!self.yaw_speed)
 		self.yaw_speed = 20;//10
 	self.view_ofs = '0 0 10';
