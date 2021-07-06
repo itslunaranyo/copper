@@ -1083,6 +1083,7 @@ void() trigger_monsterjump_touch =
 	vector dir;
 	
 	if (self.customflags & CFL_LOCKED) return;
+	if (other.health <= 0) return;
 	if ( other.flags & (FL_MONSTER | FL_FLY | FL_SWIM) != FL_MONSTER )
 		return;
 	// this might break a map that tosses monsters into view before they wake up
