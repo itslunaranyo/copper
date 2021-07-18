@@ -193,7 +193,7 @@ void() door_killed =
 
 void(entity d) door_force =
 {
-	self.items = 0;
+	d.items = 0;
 	SUB_CallAsSelf(door_fire,d.owner);
 }
 
