@@ -443,11 +443,27 @@ void(.float fld) playercount_convert =
 		self.fld = 1;
 	else
 	{
-		// limit this because we can't assume a max of 4 coop players (... thanks decino)
+		// limit this because we can't assume a max of 8 coop players (... thanks decino)
 		if (clients <= 4)
 			self.fld = clients;
-		else
-			self.fld = min(8, 4 + floor((clients-4)/2));
+		else if (clients >= 20)
+			self.fld = 10;	// hard cap of 10 @ 20 players
+		else if (clients >= 16)
+			self.fld = 9;
+		else if (clients >= 12)
+			self.fld = 8;
+		else if (clients >= 10)
+			self.fld = 7;
+		else if (clients >= 8)
+			self.fld = 6;
+		else if (clients >= 6)
+			self.fld = 5;		
+		/*
+			self.fld =	// magic formula ...
+				min(4, clients)	+							// first four clients count full
+				floor(max(0, min(12, clients) - 4) / 2) +	// clients above 4th count half
+				floor(max(0, clients - 12) / 4);			// clients above 12th count quarter
+		*/
 	}
 }
 
