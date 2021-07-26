@@ -404,10 +404,11 @@ void() target_sound_use =
 	else
 		wh = self;
 	
+	playercount_convert(count);
 	if (self.count > 0)
 	{
 		self.count -= 1;
-		if (self.count == 0)
+		if (self.count <= 0)
 			SUB_RemoveSoon();
 	}
 	
