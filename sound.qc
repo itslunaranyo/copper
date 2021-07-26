@@ -404,6 +404,13 @@ void() target_sound_use =
 	else
 		wh = self;
 	
+	if (self.count > 0)
+	{
+		self.count -= 1;
+		if (self.count == 0)
+			SUB_RemoveSoon();
+	}
+	
 	if (self.delay > 0)
 	{
 		sound_delayed(wh, snd, self.volume, self.distance, self.delay);
@@ -423,6 +430,7 @@ play a sound when triggered.
 "noise"  wav to play - don't leave off the ".wav"!
 "noise1-4"  add additional wavs to cycle through
 "delay"	delay sound after trigger
+"count" limit number of uses before self destruction
 
 Spawnflags:
 "SHUFFLE"	select next sound randomly if more than one noise is specified
@@ -438,6 +446,7 @@ Spawnflags:
 	noise4(string) : "optional additional .wav to cycle"
 	volume(string) : "Volume" : "1"
 	delay(string) : "Delay" : "1"
+	count(integer) : "Limit Uses" : "0"
 	spawnflags(flags) = 
 	[
 		1 : "Random next sound" : 0
