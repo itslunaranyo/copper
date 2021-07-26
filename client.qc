@@ -440,22 +440,27 @@ Returns the entity to spawn at
 */
 entity() SelectSpawnPoint =
 {
-	local	entity spot;
-	local	entity thing;
-	local	float  pcount;
+	entity spot;
+	float  pcount;
 	
-	spot = world;
-	
-	// testinfo_player_start is only found in regioned levels
-	if (!coop)
+	if (deathmatch)
 	{
-		spot = find (world, classname, "info_player_start_test");
-		if (spot)
+		spot = lastspawn;
+		pcount = ceil(random() * 4);
+		while (pcount)
 		{
-			return spot;
+			pcount--;
+			
+			spot = find(spot, classname, "info_player_deathmatch");
+			if (spot == world)
+				spot = find(world, classname, "info_player_deathmatch");
+			if (spot == world)
+				error("This map does not support deathmatch! (no spawn points)\n");
 		}
+		lastspawn = spot;
+		return spot;
 	}
-		
+
 	// choose a start point
 	if (coop)
 	{
@@ -479,33 +484,12 @@ entity() SelectSpawnPoint =
 		lastspawn = spot;
 		return lastspawn;
 	}
-	else if (deathmatch)
+
+	// testinfo_player_start is only found in regioned levels
+	spot = find (world, classname, "info_player_start_test");
+	if (spot)
 	{
-		spot = lastspawn;
-		while (1)
-		{
-			spot = find(spot, classname, "info_player_deathmatch");
-			if (spot != world)
-			{
-				if (spot == lastspawn)
-					return lastspawn;
-				pcount = 0;
-				thing = findradius(spot.origin, 32);
-				while(thing)
-				{
-					if (thing.classname == "player")
-						pcount = pcount + 1;
-					thing = thing.chain;
-				}
-				if (pcount == 0)
-				{
-					lastspawn = spot;
-					return spot;
-				}
-			}
-			else
-				error("This map does not support deathmatch! (no spawn points)\n");
-		}
+		return spot;
 	}
 
 	if (serverflags & (SVFL_ALLEPISODES))
