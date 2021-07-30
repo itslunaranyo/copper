@@ -464,47 +464,48 @@ void() misc_particlefield =
 
 void(entity targ, float mag) screenshake_go =
 {
-	mag = mag + 1;
+	vector kick;
 	
 	// punchangle doesn't work when we're in an intermission camera, so do
 	// this with actual angle offsets when intermission_running > 0
 	if (intermission_running)
 	{
-		local vector kick;
-		kick_x = (random() - 0.5) * mag;
-		kick_y = (random() - 0.5) * mag;
-		kick_z = crandom() * mag;
-		targ.angles = targ.mangle + kick;
-	//	targ.angles_z = kick_z;
-		targ.fixangle = 1;
+		kick = Vector(crandom(),crandom(),crandom());
+		kick *= clamp(mag,1,4);	// don't let vp wander too far, it might clip
+		setorigin(targ, targ.goalentity.origin + kick);	// goalentity = current info_intermission
+		
+		// angle kicks look a lot harder in intermission for some reason, don't 
+		// do them unless we mean it
+		if (mag >= 1)
+		{
+			kick_z = crandom() * mag;
+			mag *= 0.5;
+			kick_x = crandom() * mag;
+			kick_y = crandom() * mag;
+			targ.angles = targ.mangle + kick;
+			targ.fixangle = 1;
+		}
 		return;
 	}	
 	
-/*	local vector kick;
-	kick_x = (-0.5 + random()) * mag;
-	kick_y = (-0.5 + random()) * mag;
-	kick_z = (-0.5 + random()) * mag;
-	targ.angles = targ.v_angle + kick;
-	targ.angles_z = kick_z;
-	targ.fixangle = 1;		// turn this way immediately*/
-
-	targ.punchangle_x = crandom() * mag;
-	targ.punchangle_y = crandom() * mag;
+	mag += 0.4;
 	
-	if (targ.health > 0)
+	if (mag > 0.2)
 	{
-		// jitter viewpoint itself also
-		//targ.view_ofs_x = min(max(-4, crandom() * mag), 4);	// quake only sends the z component
-		//targ.view_ofs_y = min(max(-4, crandom() * mag), 4);	// of view_ofs over the network :/
-		targ.view_ofs_z = min(max(-4, crandom() * mag), 4) + 22;
+		targ.punchangle_x = crandom() * mag;
+		targ.punchangle_y = crandom() * mag;
 	}
+	// the rolls feel a lot less violent, so bump them up a little
+	if (mag > 0.1)
+		targ.punchangle_z = crandom() * mag * 2;	
 	
-	// punchangle seems to get integerized, so we need some kind of
-	// activity when the magnitude is low so it feels like a faint 
-	// rumble instead of just a dying fish kicking occasionally
-	mag = mag * 2;	// the rolls feel a lot less violent, so bump them up a little
-	
-	targ.punchangle_z = crandom() * mag;	
+	// punchangle is integerized, so jitter viewpoint itself also for the feel of a faint 
+	// rumble when the magnitude is low instead of just a dying fish kicking occasionally
+	if (targ.health > 0) // view_ofs_z == 0 is a byword for 'dead' elsewhere :/
+	{
+		// quake only sends the z component of view_ofs over the network
+		targ.view_ofs_z = crandom() * clamp(mag * 2, 0, 4) + 22;
+	}	
 }
 
 void() screenshake_think =
@@ -518,6 +519,10 @@ void() screenshake_think =
 		while (t.classname == "player")
 		{
 			t.v_angle_z = 0;	// unroll
+			if (intermission_running || t.health <= 0)
+				t.view_ofs_z = 0;
+			else
+				t.view_ofs_z = 22;
 			t = nextent(t);
 		}
 		self.state = 0;
@@ -603,7 +608,7 @@ void() target_screenshake =
 		if (self.volume)
 			objerror("convert target_screenshake to .strength please");
 		
-		self.strength = 10;	// set your own value goddamnit
+		self.strength = 1;
 	}
 	self.use = screenshake_use;
 }
