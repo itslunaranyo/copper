@@ -765,6 +765,7 @@ entity(vector org) bubble_spawn =
 	entity	bubble;
 
 	bubble = spawn();
+	bubble.watertype = pointcontents(org);
 	setmodel (bubble, "progs/s_bubble.spr");
 	setorigin (bubble, org);
 	bubble.movetype = MOVETYPE_NOCLIP;
@@ -861,7 +862,7 @@ void() make_bubbles =
 
 void() bubble_split =
 {
-	if (pointcontents(self.origin + '0 0 8') != pointcontents(self.origin))
+	if (pointcontents(self.origin + '0 0 8') != self.watertype)
 		return;
 		
 	entity	bubble;
@@ -882,7 +883,7 @@ void() bubble_bob =
 {
 	float		rnd1, rnd2, rnd3;
 
-	if (pointcontents(self.origin + '0 0 8') != pointcontents(self.origin))
+	if (pointcontents(self.origin + '0 0 8') != self.watertype)
 	{
 		SUB_Remove();
 		return;
