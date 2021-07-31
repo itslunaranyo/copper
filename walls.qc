@@ -158,6 +158,7 @@ void() func_wall =
 	
 	if (self.spawnflags & SPAWN_WALL_STARTINVIS)
 	{
+		self.spawnflags |= SPAWN_WALL_TOGGLEVIS;	// starting invis implies toggle
 		bmodel_vanish();
 	}
 	else
