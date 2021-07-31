@@ -344,7 +344,11 @@ float(void() lay, void() getup) zombie_forget =
 	if (self.enemy.classname != "player")
 	{
 		if (self.oldenemy.classname == "player")
+		{
 			self.enemy = self.oldenemy;
+			self.goalentity = self.enemy;
+			self.ideal_yaw = enemy_yaw();
+		}
 		else
 			self.enemy = world;
 		self.oldenemy = world;
