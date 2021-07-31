@@ -1080,7 +1080,7 @@ void() WaterMove =
 				local vector b;
 				while(i > self.jump_flag)
 				{
-					i -= 40;
+					i -= 75;
 					b = self.absmin + vec_scale(self.size, Vector(random(),random(),random()));
 					if (pointcontents(b) == CONTENT_WATER)
 						bubble_spawn(b);
