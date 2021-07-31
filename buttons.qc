@@ -55,6 +55,7 @@ void() button_fire =
 	SUB_CalcMove (self.pos2, self.speed, button_wait);
 	if (self.spawnflags & 1)
 	{
+		activator = self.enemy;
 		self.frame = 1;			// use alternate textures
 		SUB_UseTargets();
 	}
