@@ -21,6 +21,7 @@ float	FL_ONGROUND				= 512;	// standing on something
 float	FL_PARTIALGROUND		= 1024;	// not all corners are valid
 float	FL_WATERJUMP			= 2048;	// player jumping out of water
 float	FL_JUMPRELEASED			= 4096;	// for jump debouncing
+float	FL_UNDERWATER			= 8192;	// for dive/surface water sounds
 
 // edict.customflags
 float	CFL_LEFTY			= 1;	// used by slidemovers (scrags) to alternate strafe direction
