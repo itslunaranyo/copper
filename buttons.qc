@@ -192,9 +192,9 @@ Acts as if touched when triggered."
 		3 : "In-out"
 		4 : "Trigger noise (big light switch)"
 	]
-	spawnflags(flags) : "Spawnflags" =
+	spawnflags(Flags) =
 	[
-		1 : "Act Immediately"
+		1 : "Act Immediately" : 0
 	]
 	wait(string) : "Delay before reset" : "1"
 	message(string) : "Message" 

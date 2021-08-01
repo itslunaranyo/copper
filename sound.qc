@@ -447,7 +447,7 @@ Spawnflags:
 	noise4(string) : "optional additional .wav to cycle"
 	volume(string) : "Volume" : "1"
 	delay(string) : "Delay" : "1"
-	count(integer) : "Limit Uses" : "0"
+	count(integer) : "Limit Uses" : 0
 	spawnflags(flags) = 
 	[
 		1 : "Random next sound" : 0
