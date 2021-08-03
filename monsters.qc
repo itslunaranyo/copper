@@ -404,7 +404,8 @@ void() monster_start =
 	}
 		
 	// moved from mon_spawner_use because it was too early to catch the monster's mins and maxs
-	spawn_tdeath(self.origin, self);
+	if (self.type != "zombie" || !(self.spawnflags & SPAWN_LYING))	// lying zombies are nonsolid
+		spawn_tdeath(self.origin, self);
 
 	// wait a few frames to make sure doors have spawned before doing droptofloor
 	self.nextthink = 1.15;
