@@ -638,7 +638,7 @@ Keys:
 "count" remove after this many uses
 */
 /*FGD
-@SolidClass base(Teleport) = trigger_teleport : "Trigger: Teleporter" []
+@SolidClass base(Trigger, Teleport) = trigger_teleport : "Trigger: Teleporter" []
 */
 void() trigger_teleport =
 {
@@ -668,7 +668,7 @@ Keys:
 "targetname" entity name (required)
 */
 /*FGD
-@PointClass base(Teleport, Bounds) = trigger_teleport_box : "Trigger: Teleporter bounds" []
+@PointClass base(Trigger, Teleport, Bounds) = trigger_teleport_box : "Trigger: Teleporter bounds" []
 */
 void() trigger_teleport_box =
 {
