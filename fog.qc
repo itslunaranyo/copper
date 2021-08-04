@@ -8,7 +8,7 @@ adapted from similar things czg did in honey_fog.qc god bless him
 ====================
 */
 
-float FOG_INTERVAL = 0.04166667; //1/24;
+float FOG_INTERVAL = 0.05; //1/20;
 /*FGD
 @baseclass = Fog [ 
 	fog_density(string) : "Fog Density" 
@@ -21,6 +21,30 @@ float FOG_INTERVAL = 0.04166667; //1/24;
 	fog_color2(string) : "End Fog Color" 
 ]
 */
+
+
+float(entity e, float dens, vector col) fog_sigdif =
+{
+	float sig;
+	
+	if ((e.fog_density + dens) * 0.5 < 0.1) sig = 0.0025;
+	else sig = 0.005;
+	if (fabs(e.fog_density - dens) > sig) return TRUE;
+	
+	if ((e.fog_color_x + col_x) * 0.5 < 0.1) sig = 0.005;
+	else sig = 0.01;
+	if (fabs(e.fog_color_x - col_x) > sig) return TRUE;
+	
+	if ((e.fog_color_y + col_y) * 0.5 < 0.1) sig = 0.005;
+	else sig = 0.01;
+	if (fabs(e.fog_color_y - col_y) > sig) return TRUE;
+	
+	if ((e.fog_color_z + col_z) * 0.5 < 0.1) sig = 0.005;
+	else sig = 0.01;
+	if (fabs(e.fog_color_z - col_z) > sig) return TRUE;
+	return FALSE;
+}
+
 
 /*
 ================
@@ -62,8 +86,10 @@ fog_set
 void( entity client, float density, vector color ) fog_set =
 {
 	if (client.classname != "player") return;
+	if (client.fog_density == density && client.fog_color == color) return FALSE;
 
 	//stuffcmd(client, "r_showtris 0\n"); return;
+	dprint3("setting fog at ", ftos(time*1000), "\n");
 	
 	stuffcmd(client, "\nfog ");
 	stuffcmd_float(client, density);
@@ -92,9 +118,11 @@ void() fog_blendTouch =
 		if (time < self.attack_finished)
 			return;
 		
-	float f, ldensity, leaving;
+	float f, ldensity, leaving, force;
 	vector dorg, mid, ovel;
 	vector lcolor;
+	
+	force = (time - self.invisible_time >= FOG_INTERVAL * 10);
 	
 	// if you run/fall through a fogblend fast enough you can come out the other side 
 	// partially blended, so check if player will exit the trigger bounds before the 
@@ -121,6 +149,7 @@ void() fog_blendTouch =
 			ldensity = self.fog_density;
 			lcolor = self.fog_color;
 		}
+		force = TRUE;
 	}
 	else
 	{
@@ -134,8 +163,13 @@ void() fog_blendTouch =
 		ldensity = lerp(self.fog_density, self.fog_density2, f);
 		lcolor = lerpVector(self.fog_color, self.fog_color2, f);
 	}
-	fog_set(other, ldensity, lcolor);
-	fog_save(other, ldensity, lcolor);
+	
+	if (force || fog_sigdif(other,ldensity,lcolor))
+	{
+		self.invisible_time = time;
+		fog_set(other, ldensity, lcolor);
+	}
+	//fog_save(other, ldensity, lcolor);
 	
 	self.rad_time = time;
 	self.attack_finished = time + FOG_INTERVAL;
