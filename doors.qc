@@ -193,7 +193,13 @@ void() door_killed =
 
 void(entity d) door_force =
 {
-	d.items = 0;
+	entity od;
+	od = d.owner;
+	do {
+		od.items = 0;
+		od = od.enemy;
+	} while (od != d);
+
 	SUB_CallAsSelf(door_fire,d.owner);
 }
 
