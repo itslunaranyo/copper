@@ -811,6 +811,7 @@ Keys:
 "target" the next spot to move to.  If not present, stop here for good.
 "wait" The number of seconds to spend standing here
 "angle" direction to face while standing here
+"speed" tell a visiting func_train to change its speed. If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
 */
 /*FGD
 @PointClass base(Appearflags, Targetname, Target, Angle) size(16 16 16) color(0 255 255) = 
@@ -819,6 +820,7 @@ Keys:
 Monsters who wait here will turn to face 'angle'."
 [
 	wait(string) : "Wait (seconds)" : 0
+	speed(string) : "Speed" : "0"
 ]
 */
 void() path_corner =
