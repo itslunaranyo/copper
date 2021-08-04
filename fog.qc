@@ -131,7 +131,7 @@ void() fog_blendTouch =
 	// if you run/fall through a fogblend fast enough you can come out the other side 
 	// partially blended, so check if player will exit the trigger bounds before the 
 	// next touch (same class of bug as leaping through lasers in Q2)
-	ovel = other.velocity * FOG_INTERVAL;
+	ovel = (other.groundentity.velocity + other.velocity) * FOG_INTERVAL;
 	leaving = ( (other.absmax_x + ovel_x < self.absmin_x) ||
 				(other.absmax_y + ovel_y < self.absmin_y) ||
 				(other.absmax_z + ovel_z < self.absmin_z) ||
@@ -142,7 +142,7 @@ void() fog_blendTouch =
 	if (leaving)
 	{
 		// last chance to set fog correctly, so snap it to the final values
-		leaving = other.velocity * self.movedir;
+		leaving = ovel * self.movedir;
 		if (leaving > 0)
 		{
 			ldensity = self.fog_density2;
@@ -176,7 +176,7 @@ void() fog_blendTouch =
 	//fog_save(other, ldensity, lcolor);
 	
 	self.rad_time = time;
-	self.attack_finished = time + FOG_INTERVAL;
+	self.attack_finished = time + FOG_INTERVAL / 2;
 	
 //	bprint(ftos(f*1000));
 //	bprint("\n");
