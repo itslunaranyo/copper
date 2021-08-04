@@ -93,7 +93,7 @@ void( entity client, float density, vector color ) fog_set =
 	}
 
 	//stuffcmd(client, "r_showtris 0\n"); return;
-	dprint3("setting fog at ", ftos(time*1000), "\n");
+	//dprint3("setting fog at ", ftos(time*1000), "\n");
 	
 	stuffcmd(client, "\nfog ");
 	stuffcmd_float(client, density);
