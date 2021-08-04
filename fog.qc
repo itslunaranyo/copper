@@ -86,7 +86,11 @@ fog_set
 void( entity client, float density, vector color ) fog_set =
 {
 	if (client.classname != "player") return;
-	if (client.fog_density == density && client.fog_color == color) return FALSE;
+	if (!cleanUpClientShit)
+	{
+		if (client.fog_density == density && client.fog_color == color)
+			return FALSE;
+	}
 
 	//stuffcmd(client, "r_showtris 0\n"); return;
 	dprint3("setting fog at ", ftos(time*1000), "\n");
