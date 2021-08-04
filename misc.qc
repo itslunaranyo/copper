@@ -458,6 +458,7 @@ void() target_autosave =
 
 void() lavaball_touch =
 {
+	if (CheckProjectilePassthru()) return FALSE;
 	if (other.takedamage)
 	{
 		sound (self, CHAN_WEAPON, "zombie/z_hit.wav", 1, ATTN_IDLE);
