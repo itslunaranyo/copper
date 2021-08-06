@@ -53,15 +53,15 @@ void() fly_go =
 	if (self.delay > 0)
 		self.delay = self.delay - 0.1;
 	
-//	//dprint( ftos(lspeed));
-//	//dprint( "\n");
+//	dprint( ftos(lspeed));
+//	dprint( "\n");
 	
 	self.velocity = vel * lspeed;
 }
 
 void() fly_idle =
 {
-	//dprint("in fly_idle," );
+	dprint("in fly_idle," );
 	local vector vel, destvel;
 	local float frac, lspeed;
 	
@@ -80,9 +80,9 @@ void() fly_idle =
 	
 	local string what;
 	what = ftos(frac);
-	//dprint("frac: ");
-	//dprint( what );
-	//dprint("\n");
+	dprint("frac: ");
+	dprint( what );
+	dprint("\n");
 	
 	vel = self.velocity;
 	vel = normalize(vel);
@@ -117,11 +117,11 @@ void() fly_findnextgoal =
 
 void( float nowait, float idlespeed ) fly_newgoal = 
 {
-	//dprint("in fly_newgoal\n");
-
+	dprint("in fly_newgoal\n");
+	entity t;
 	if (self.goalentity.wait && !nowait)
 	{
-		//dprint("waiting at pathcorner\n");
+		dprint("waiting at pathcorner\n");
 		self.speed2 = vlen(self.velocity); // self.speed;
 		if ( self.classname == "train" )
 			self.speed = 8;
@@ -141,8 +141,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		self.dest = self.goalentity.origin + randy;
 		
 		if (self.goalentity.wait > 0) {
-			local entity t;
-			//dprint("waiting here for a few seconds\n");
+			dprint("waiting here for a few seconds\n");
 
 			// create a temp object to fire at a later time
 			t = spawn();
@@ -158,7 +157,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		// get new destination
 		if (!self.goalentity.target)
 		{
-			//dprint("no goalentity target\n");
+			dprint("no goalentity target\n");
 			if (self.classname != "train")
 			{
 				self.th_die();
@@ -167,16 +166,17 @@ void( float nowait, float idlespeed ) fly_newgoal =
 			SUB_CalcMove(self.goalentity.origin, self.speed, self.th_die);	// lerp straight to the finish point, then die
 		}
 
+		t = self.goalentity;
 		//self.goalentity = find(world, targetname, self.goalentity.target);
 		fly_findnextgoal();
 
 		if (!self.goalentity) {
-			//dprint("no goalentity\n");
+			dprint("no goalentity\n");
 			self.th_die();
 			return;
 		}
-		else
-			self.think1 = fly_go;
+
+		self.think1 = fly_go;
 		
 		// get new speed from where we are now
 		self.speed2 = vlen(self.velocity);//self.speed;
@@ -186,10 +186,28 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		else if (self.goalentity.wait != 0)
 			self.speed = 16;	// should be 32 but this makes up for a hard jolt when arriving at a waited pathcorner
 								// the math here is really rough
-		else if (self.goalentity.speed)
-			self.speed = self.goalentity.speed;
-
+		else
+		{
+			if (self.goalentity.speed > 0)
+				self.speed = self.goalentity.speed;
+			else if (!self.speed)
+				self.speed = self.speed2;
+		}
+		
+		if (t.wait == -1)
+		{
+			self.velocity += self.speed2 * normalize(self.goalentity.origin - t.origin);
+			self.velocity /= 2;
+		}
+		
 		self.dest = self.goalentity.origin;
+		if (t.speed == -1)
+		{
+			setorigin(self, self.goalentity.origin);
+			self.distance = 0;
+			self.velocity = 32 * normalize(self.goalentity.origin - t.origin);
+			fly_go();
+		}
 	}
 	// ... really, really rough:
 	self.distance = self.delay = 4 * (vlen( self.origin - self.dest ) / (self.speed + self.speed2));	
