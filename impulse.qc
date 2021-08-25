@@ -260,6 +260,9 @@ void() ImpulseCommands =
 	case 200:
 		dev_remaining_monsters();
 		break;
+	case 210:
+		toggle_autosave();
+		break;
 	case 215:
 		Cheat_Undying();
 		break;

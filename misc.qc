@@ -393,9 +393,40 @@ void() target_kill =
 
 //============================================================================
 
+void() toggle_autosave =
+{
+	entity e = world;
+	float printed = FALSE;
+	do {
+		e = find(e, classname, "target_autosave");
+		if (!e) break;
+		
+		if (e.use == target_autosave_use)
+		{
+			e.use = SUB_Null;
+			if (!printed)
+			{
+				bprint("Autosaves disabled\n");
+				printed = TRUE;
+			}
+		} else {
+			e.use = target_autosave_use;
+			if (!printed)
+			{
+				bprint("Autosaves reenabled\n");
+				printed = TRUE;
+			}
+		}
+
+	} while (e != world);
+}
 
 void() target_autosave_use =
 {
+	if (time < self.pain_finished)
+		return;
+	self.pain_finished = time + 0.5;	// fix for juzley double autosaving, the numpty
+	
 	if (self.enemy)
 	{
 		activator = self.enemy;
