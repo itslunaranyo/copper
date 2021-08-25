@@ -225,6 +225,12 @@ void() worldspawn =
 	cvar_set("sv_gravity", ftos(self.gravity));
 	self.light_lev = 0;	// shut up FTEQCC warning
 	
+	if (cvar("pr_checkextension"))
+	{
+		if (checkextension("QUAKE_EX"))
+			isKex = TRUE;
+	}
+
 // the area based ambient sounds MUST be the first precache_sounds
 
 // player precaches	
