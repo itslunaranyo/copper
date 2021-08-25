@@ -15,8 +15,7 @@ void() button_wait =
 	activator = self.enemy;
 	self.frame = 1;			// use alternate textures
 	if (self.customflags & CFL_LOCKED) return;
-	if (!(self.spawnflags & 1))
-		SUB_UseTargets();
+	SUB_UseTargets();
 }
 
 void() button_done =
@@ -30,8 +29,7 @@ void() button_return =
 	if (self.customflags & CFL_LOCKED) return;
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos1, self.speed, button_done);
-	if (!(self.spawnflags & 1))
-		self.frame = 0;			// use normal textures
+	self.frame = 0;			// use normal textures
 	if (self.health)
 		self.takedamage = DAMAGE_YES;	// can be shot again
 }
@@ -53,12 +51,6 @@ void() button_fire =
 
 	self.state = STATE_UP;
 	SUB_CalcMove (self.pos2, self.speed, button_wait);
-	if (self.spawnflags & 1)
-	{
-		activator = self.enemy;
-		self.frame = 1;			// use alternate textures
-		SUB_UseTargets();
-	}
 }
 
 
@@ -158,7 +150,7 @@ void(entity b) button_force =
 	SUB_CallAsSelf(button_fire, b);
 }
 
-/*QUAKED func_button (0 .5 .8) ? ACT_IMMED
+/*QUAKED func_button (0 .5 .8) ? 
 When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
 
 "angle"		determines the opening direction
@@ -191,10 +183,6 @@ Acts as if touched when triggered."
 		2 : "Metallic clink"
 		3 : "In-out"
 		4 : "Trigger noise (big light switch)"
-	]
-	spawnflags(Flags) =
-	[
-		1 : "Act Immediately" : 0
 	]
 	wait(string) : "Delay before reset" : "1"
 	message(string) : "Message" 
