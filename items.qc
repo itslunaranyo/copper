@@ -521,10 +521,6 @@ void(entity e) target_items_giveinv =
 		if (self.armorvalue)
 			armor_give(e, zeroconvert(self.armorvalue), self.armortype, FALSE);
 
-	#ifdef LUNSP2
-		if (mapname != "start" && serverflags & SVFL_AXECHALLENGE)
-			return;
-	#endif
 		if (self.ammo_shells) e.ammo_shells += zeroconvert(self.ammo_shells);
 		if (self.ammo_nails) e.ammo_nails += zeroconvert(self.ammo_nails);
 		if (self.ammo_rockets) e.ammo_rockets += zeroconvert(self.ammo_rockets);
