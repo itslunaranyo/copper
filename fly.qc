@@ -15,17 +15,22 @@ the flying entity eases in and out of waypoints/idles
 =======================================
 */
 
+vector() fly_origin =
+{
+	return self.origin - self.movedir;
+}
+
 // FIXME: if triggered when waiting at a path_corner in holding pattern mode,
 // if current idle drift is away from the next path corner, flying object
 // will make an unsightly long arc to get back on track
 // sometimes this is desirable but sometimes not (big flytrains)
 void() fly_go =
 {
-	//dprint("in fly_go\n");
+	dprint("in fly_go\n");
 	local vector vel, destvel;
 	local float frac, lspeed;
 	
-	destvel = self.dest - self.origin;
+	destvel = self.dest - fly_origin();
 	
 	lspeed = vlen(self.velocity);
 	
@@ -35,7 +40,7 @@ void() fly_go =
 		// avoids the sprite spazzing out very near the destination
 		SUB_UseEntTargets(self.goalentity);	// fire this path_corner's target2/3/4s
 		fly_newgoal( 0, 0 );
-		destvel = self.dest - self.origin;
+		destvel = self.dest - fly_origin();
 	}
 	
 	destvel = normalize(destvel);
@@ -65,12 +70,12 @@ void() fly_idle =
 	local vector vel, destvel;
 	local float frac, lspeed;
 	
-	destvel = self.dest - self.origin;
+	destvel = self.dest - fly_origin();
 	
 	if (vlen(destvel) < 4) {
 		// close enough
 		fly_newgoal( 0, 1 );
-		destvel = self.dest - self.origin;
+		destvel = self.dest - fly_origin();
 	}
 	
 	destvel = normalize(destvel);
@@ -163,12 +168,17 @@ void( float nowait, float idlespeed ) fly_newgoal =
 				self.th_die();
 				return;
 			}
-			SUB_CalcMove(self.goalentity.origin, self.speed, self.th_die);	// lerp straight to the finish point, then die
+			SUB_CalcMove(self.goalentity.origin + self.movedir, self.speed, self.th_die);	// lerp straight to the finish point, then die
 		}
 
-		t = self.goalentity;
 		//self.goalentity = find(world, targetname, self.goalentity.target);
-		fly_findnextgoal();
+			t = self.goalentity;
+			fly_findnextgoal();
+		while (vlen(fly_origin() - self.goalentity.origin) < 16)
+		{
+			t = self.goalentity;
+			fly_findnextgoal();
+		}
 
 		if (!self.goalentity) {
 			dprint("no goalentity\n");
@@ -203,12 +213,12 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		self.dest = self.goalentity.origin;
 		if (t.speed == -1)
 		{
-			setorigin(self, self.goalentity.origin);
+			setorigin(self, self.goalentity.origin + self.movedir);
 			self.distance = 0;
 			self.velocity = 32 * normalize(self.goalentity.origin - t.origin);
 			fly_go();
 		}
 	}
 	// ... really, really rough:
-	self.distance = self.delay = 4 * (vlen( self.origin - self.dest ) / (self.speed + self.speed2));	
+	self.distance = self.delay = 4 * (vlen( fly_origin() - self.dest ) / (self.speed + self.speed2));	
 }

@@ -505,6 +505,8 @@ void() func_flytrain =
 	setmodel (self, self.model);
 	setsize (self, self.mins, self.maxs);
 	setorigin (self, self.origin);
+	
+	self.movedir = self.origin - BoundsCenter(self); // offset so _point and bmodel types can work the same
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -529,6 +531,7 @@ void() func_flytrain_point =
 
 	precache_model_safe(self.model);
 	func_flytrain();
+	self.movedir = '0 0 0';
 }
 
 //============================================================================
