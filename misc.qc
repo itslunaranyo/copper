@@ -69,24 +69,35 @@ void() misc_model_animate =
 
 void() misc_model_use =
 {
-	float tmp;
 	self.state = !self.state;
 	if (self.spawnflags & SPAWN_MODEL_TOGGLEVIS)
 	{
-		tmp = self.oldstyle;
-		self.oldstyle = self.alpha;
-		self.alpha = tmp;
-	}
-	if (self.state)
-	{
-		self.frame = self.pos2_y;
+		if (self.state)
+		{
+			self.modelindex = self.oldstyle;
+		}
+		else
+		{
+			self.oldstyle = self.modelindex;
+			self.modelindex = 0;
+		}
+		//tmp = self.oldstyle;
+		//self.oldstyle = self.alpha;
+		//self.alpha = tmp;
 	}
 	else
 	{
-		self.frame = self.pos1_y;
+		if (self.state)
+		{
+			self.frame = self.pos2_y;
+		}
+		else
+		{
+			self.frame = self.pos1_y;
+		}
+		self.think = misc_model_animate;
+		self.nextthink = time + self.speed;
 	}
-	self.think = misc_model_animate;
-	self.nextthink = time + self.speed;
 }
 
 float SPAWN_MODEL_TOGGLEVIS = 1;
@@ -166,12 +177,6 @@ void() misc_model =
 	setmodel (self, self.model);
 	setsize(self, '-16 -16 -16', '16 16 16');
 	
-	if (self.spawnflags & SPAWN_MODEL_STARTINVIS)
-	{
-		self.oldstyle = self.alpha;
-		self.alpha = -1;		
-	}
-
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_NONE;
 	if (!self.speed)
@@ -181,6 +186,13 @@ void() misc_model =
 	if (self.targetname != string_null)
 	{
 		self.use = misc_model_use;
+		if (self.spawnflags & SPAWN_MODEL_STARTINVIS)
+		{
+			self.oldstyle = self.modelindex;
+			self.modelindex = 0;
+			//self.alpha = -1;	
+			self.state = 1;
+		}
 	}
 	if (self.pos1)
 	{
