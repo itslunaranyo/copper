@@ -448,6 +448,7 @@ void() ogre_die =
 	if (self.health < -80)
 	{
 		Gib ("progs/h_ogre.mdl", self.health);
+		ogre_dropammo();
 		return;
 	}
 

@@ -278,6 +278,8 @@ void() army_die =
 	if (self.health < -35)
 	{
 		Gib("progs/h_guard.mdl", self.health);
+		self.ammo_shells = 5;
+		DropBackpack();
 		return;
 	}
 
