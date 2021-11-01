@@ -1073,22 +1073,31 @@ void() WaterMove =
 		if (!(self.flags & FL_UNDERWATER))
 		{
 			self.flags |= FL_UNDERWATER;
-			if (self.jump_flag < -300)
+			if (self.watertype != CONTENT_LAVA)
 			{
-				sound (self, CHAN_BODY, "misc/w_under2.wav", 1, ATTN_NORM);
-				local float i = 0;
-				local vector b;
-				while(i > self.jump_flag)
+				if (self.jump_flag < -300)
 				{
-					i -= 75;
-					b = self.absmin + vec_scale(self.size, Vector(random(),random(),random()));
-					if (pointcontents(b) == CONTENT_WATER)
-						bubble_spawn(b);
+					if (self.watertype == CONTENT_SLIME)
+						sound (self, CHAN_BODY, "misc/s_under2.wav", 1, ATTN_NORM);
+					else
+						sound (self, CHAN_BODY, "misc/w_under2.wav", 1, ATTN_NORM);
+					local float i = 0;
+					local vector b;
+					while(i > self.jump_flag)
+					{
+						i -= 75;
+						b = self.absmin + vec_scale(self.size, Vector(random(),random(),random()));
+						if (pointcontents(b) == CONTENT_WATER)
+							bubble_spawn(b);
+					}
 				}
-			}
-			else
-			{
-				sound (self, CHAN_BODY, "misc/w_under.wav", 1, ATTN_STATIC);
+				else
+				{
+					if (self.watertype == CONTENT_SLIME)
+						sound (self, CHAN_BODY, "misc/s_under.wav", 1, ATTN_STATIC);
+					else
+						sound (self, CHAN_BODY, "misc/w_under.wav", 1, ATTN_STATIC);
+				}
 			}
 		}
 		// if you don't catch your breath from the last drowning episode before diving 
