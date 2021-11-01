@@ -309,8 +309,6 @@ void() worldspawn =
 	precache_sound ("misc/outwater.wav");		// leaving water sound
 	precache_sound ("misc/w_under.wav");		// copper: diving water sound
 	precache_sound ("misc/w_under2.wav");		// copper: diving water sound
-	precache_sound ("misc/s_under.wav");		// copper: slime water sound
-	precache_sound ("misc/s_under2.wav");		// copper: slime water sound
 	precache_sound ("player/lburn1.wav");		// lava burn
 	precache_sound ("player/lburn2.wav");		// lava burn
 	precache_sound ("misc/water1.wav");			// swimming

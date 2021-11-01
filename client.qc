@@ -1077,10 +1077,7 @@ void() WaterMove =
 			{
 				if (self.jump_flag < -300)
 				{
-					if (self.watertype == CONTENT_SLIME)
-						sound (self, CHAN_BODY, "misc/s_under2.wav", 1, ATTN_NORM);
-					else
-						sound (self, CHAN_BODY, "misc/w_under2.wav", 1, ATTN_NORM);
+					sound (self, CHAN_ITEM2, "misc/w_under2.wav", 1, ATTN_NORM);
 					local float i = 0;
 					local vector b;
 					while(i > self.jump_flag)
@@ -1093,10 +1090,7 @@ void() WaterMove =
 				}
 				else
 				{
-					if (self.watertype == CONTENT_SLIME)
-						sound (self, CHAN_BODY, "misc/s_under.wav", 1, ATTN_STATIC);
-					else
-						sound (self, CHAN_BODY, "misc/w_under.wav", 1, ATTN_STATIC);
+					sound (self, CHAN_ITEM2, "misc/w_under.wav", 1, ATTN_STATIC);
 				}
 			}
 		}
