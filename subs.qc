@@ -111,7 +111,7 @@ float() SUB_ShouldSpawn =
 {
 	// do a minimum-version check so cheeky mappers can place surprise 
 	// trigger_hurts to frag people who don't upgrade
-	if (self.version >= version_f)
+	if (self.version && self.version <= version_f)
 	{
 		remove(self);
 		return FALSE;
