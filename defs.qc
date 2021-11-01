@@ -216,9 +216,10 @@ void		end_sys_fields;			// flag for structure dumping
 
 float	gameover;		// set when a rule exits
 
-string	nextmap;		// used by changelevel code in client.qc - 'mapname' is current map
+string	nextmap;		// used by changelevel code in t_level.qc - 'mapname' is current map
+string	inter_text;		// used by changelevel code in t_level.qc
 
-string	string_null;	// null string, nothing should be held here
+nosave string	string_null;	// null string, nothing should be held here
 
 entity	activator;		// the entity that activated a trigger or brush
 
