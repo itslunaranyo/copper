@@ -32,6 +32,7 @@ void() plat_try_find_trigger =
 		t.enemy = self;
 		self.trigger_field = t;
 	}
+	self.think = SUB_Null;
 }
 
 void() plat_spawn_inside_trigger =
