@@ -223,7 +223,7 @@ void() door_touch =
 	if (self.message != string_null && self.state == STATE_BOTTOM && !(self.items))
 	{
 		centerprint (other, self.message);
-		sound (other, CHAN_VOICE, "doors/locked4.wav", 1, ATTN_NORM);
+		sound (other, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 	}
 	
 	// from here on is key door stuff
@@ -604,21 +604,36 @@ void(.string nois, string path) door_set_sound =
 
 void() door_sounds_init =
 {
-	if (world.worldtype == 1)
+	if (self.items & (IT_KEY1 | IT_KEY2))
 	{
-		door_set_sound(noise3, "doors/runetry.wav");
-		door_set_sound(noise4, "doors/runeuse.wav");
-	}
-	else if (world.worldtype == 2)
-	{
-		door_set_sound(noise3, "doors/basetry.wav");
-		door_set_sound(noise4, "doors/baseuse.wav");
+		if (world.worldtype == 1)
+		{
+			door_set_sound(noise3, "doors/runetry.wav");
+			door_set_sound(noise4, "doors/runeuse.wav");
+		}
+		else if (world.worldtype == 2)
+		{
+			door_set_sound(noise3, "doors/basetry.wav");
+			door_set_sound(noise4, "doors/baseuse.wav");
+		}
+		else
+		{
+			door_set_sound(noise3, "doors/medtry.wav");
+			door_set_sound(noise4, "doors/meduse.wav");
+		} 
 	}
 	else
 	{
-		door_set_sound(noise3, "doors/medtry.wav");
-		door_set_sound(noise4, "doors/meduse.wav");
-	} 
+		if (world.worldtype == 2)
+		{
+			door_set_sound(noise3, "doors/locked5.wav");
+		}
+		else
+		{
+			door_set_sound(noise3, "doors/locked4.wav");
+		} 
+		door_set_sound(noise4, "misc/null.wav");
+	}
 	
 	if (self.sounds == 0)
 	{
@@ -660,7 +675,7 @@ void() door_sounds_init =
 	precache_sound_safe(self.noise2);
 	precache_sound_safe(self.noise3);
 	precache_sound_safe(self.noise4);
-	precache_sound_safe("doors/locked4.wav");
+	//precache_sound_safe("doors/locked4.wav");
 }
 
 /*QUAKED func_door (0 .5 .8) ? START_OPEN ? DONT_LINK GOLD_KEY SILVER_KEY TOGGLE CRUSHER
@@ -736,8 +751,6 @@ void() func_door =
 {
 	if (!SUB_ShouldSpawn()) return;
 	
-	door_sounds_init();
-
 	SetMovedir ();
 
 	self.max_health = self.health;
@@ -771,6 +784,8 @@ void() func_door =
 		self.items = IT_KEY2;
 		self.wait = -1;
 	}
+	door_sounds_init();
+
 	//door_key_init();
 	
 	if (!self.wait)
@@ -1025,7 +1040,7 @@ void() secret_touch =
 	if (self.message != string_null)
 	{
 		centerprint (other, self.message);
-		sound (other, CHAN_BODY, "doors/locked4.wav", 1, ATTN_NORM);
+		sound (other, CHAN_BODY, self.noise4, 1, ATTN_NORM);
 	}
 }
 
@@ -1117,6 +1132,16 @@ void () func_door_secret =
 		precache_sound_safe (self.noise3);
 	}
 
+	if (world.worldtype == 2)
+	{
+		door_set_sound(noise4, "doors/locked5.wav");
+	}
+	else
+	{
+		door_set_sound(noise4, "doors/locked4.wav");
+	} 
+	precache_sound_safe (self.noise4);
+	
 	self.dmg = zeroconvertdefault(self.dmg, 2);
 	
 	self.mangle = self.angles;
