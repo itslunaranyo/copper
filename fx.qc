@@ -143,6 +143,23 @@ float PFIELD_INWARD = 2;
 float PFIELD_OUTWARD = 4; 
 float PFIELD_BURST = 8;
 
+float() particlefield_should_sleep =
+{
+	if (self.distance <= 0) return FALSE;
+	if (clients > 4) return FALSE;	// probably dropping tons of particles anyway, don't bother
+	
+	entity client = world;
+	for (float i = 0; i < clients; i++)
+	{
+		client = nextent(client);
+		if (vlen(self.origin - client.origin) < self.distance)
+		{
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
 vector(vector org) particlefield_dir =
 {
 	vector dir;
@@ -191,8 +208,10 @@ void(float num) particlefield_sweep =
 		frac = 0;
 		self.attack_finished = time;
 	}
-	z = d * (frac - 0.5);
 	
+	if (particlefield_should_sleep()) return;
+	
+	z = d * (frac - 0.5);
 	while (num > 0)
 	{
 		num -= 1;
@@ -221,6 +240,8 @@ void(float num) particlefield_sweep =
 
 void(float num) particlefield_burst =
 {
+	if (particlefield_should_sleep()) return;
+	
 	vector org, org2;
 	while (num > 0)
 	{
@@ -281,6 +302,7 @@ void() particlefield_use =
 	movedir(string) : "Velocity of particles (x y z)"
 	wait(string) : "Interval" : "0.1"
 	velocity(string) : "Direction of optional sweep effect (x y z)"
+	distance(integer) : "Min player distance for dots"
 ]
 
 @Pointclass base(Targetname, Appearflags, Bounds, Particlefield) color(0 160 255) size(16 16 16) = misc_particlefield_box : 
@@ -336,6 +358,7 @@ Makes dots appear continuously within its bounds. Trigger to toggle on or off.
 "movedir" give particles a velocity
 "velocity" add a sweep effect - vector specifies direction and speed
 "wait" dot interval, default 0.1
+"distance" don't make dots if all players are farther away than this. 0 = always dots.
 
 Flags:
 INWARD		particles are sucked toward origin. additive with movedir.
@@ -424,6 +447,7 @@ Makes dots appear continuously within its bounds. Trigger to toggle on or off.
 "speed2" number of dots per clump
 "health" color index (0-255). quake will use every color in the row (each row is 16 colors)
 "movedir" give particles a velocity
+"distance" don't make dots if all players are farther away than this. 0 = always dots.
 
 Flags:
 INWARD		particles are sucked toward origin. additive with movedir.
