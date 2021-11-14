@@ -175,7 +175,9 @@ void() ShalHome =
 	}		
 	if (!enemy_alive())
 	{
-		remove(self);
+		self.think = ShalMissileExplode;
+		self.nextthink = self.lifetime_finished;
+		//remove(self);
 		return;
 	}
 	
