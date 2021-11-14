@@ -1111,7 +1111,9 @@ void() WaterMove =
 					T_Damage (self, world, world, max(self.dmg, 1));
 				self.deathtype = string_null;
 				self.pain_finished = time + 1;
-				self.dmg = min(15, self.dmg + 1);
+				
+				if (!has_invuln(self))	// don't advance the drowning timer with pent, or we
+					self.dmg = min(15, self.dmg + 1);	// could recover health we didn't lose
 			}
 		}
 	}
