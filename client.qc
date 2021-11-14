@@ -128,13 +128,17 @@ void() DecodeLevelParms =
 	armor_set_type(self);
 }
 
-
+// should this use localcmd()?
 void(entity client, string savename) autosave =
 {
-	//autosavename = savename;
-	stuffcmd(client, "echo Autosaving...; wait; save ");
-	stuffcmd(client, savename);
-	stuffcmd(client, "\n");
+	// quake rerelease default behavior is to quicksave over s0,
+	// so just go ahead and do that in that engine for consistency
+	if (!isKex)
+	{
+		stuffcmd(client, "echo Autosaving...; wait; save ");
+		stuffcmd(client, savename);
+		stuffcmd(client, "\n");
+	}
 }
 
 // this is no longer called
