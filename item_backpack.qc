@@ -57,6 +57,7 @@ void() BackpackTouch =
 	{
 		entity oself;
 		acount = TRUE;
+		other.items |= self.items;
 		sprint (other, "the ");
 		sprint (other, self.netname);
 	
