@@ -1751,7 +1751,7 @@ void() ClientObituary =
 			if (rnum < 0.25)
 				deathstring = " mows down a teammate\n";
 			else if (rnum < 0.50)
-				deathstring = " checks his glasses\n";
+				deathstring = " checks their glasses\n";
 			else if (rnum < 0.75)
 				deathstring = " gets a frag for the other team\n";
 			else
@@ -1770,7 +1770,10 @@ void() ClientObituary =
 			rnum = attacker.weapon;
 			if (rnum == IT_AXE)
 			{
-				deathstring = " was axe-murdered by ";
+				if (random() < 0.5)
+					deathstring = " was axe-murdered by ";
+				else
+					deathstring = " got the chop from ";
 				deathstring2 = "\n";
 			}
 			if (rnum == IT_SHOTGUN)
@@ -1906,7 +1909,7 @@ void() ClientObituary =
 			if (random() < 0.5)
 				bprint (" cratered\n");
 			else
-				bprint (" fell to his death\n");
+				bprint (" fell to their death\n");
 			return;
 		}
 
