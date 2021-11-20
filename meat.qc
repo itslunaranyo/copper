@@ -61,7 +61,7 @@ void(string gibname, float dm) ThrowHead =
 	self.view_ofs = '0 0 8';
 	setsize (self, '-16 -16 0', '16 16 56');
 	self.velocity += GibVelocityForHealth(dm);
-	self.origin_z = self.absmax_z - 24;
+	self.origin_z = self.origin_z - 24;
 	self.flags = self.flags - (self.flags & FL_ONGROUND);
 	self.type = "head";
 	self.avelocity = crandom() * '0 600 0';
