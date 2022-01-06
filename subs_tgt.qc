@@ -99,7 +99,20 @@ DelayThink
 void() DelayThink =
 {
 	activator = self.enemy;
-	SUB_UseTargets ();
+	SUB_PrintMessage();
+	SUB_UseTargetsGo();
+	remove(self);
+}
+
+/*
+=============
+DelayThinkSilent
+===============
+*/
+void() DelayThinkSilent =
+{
+	activator = self.enemy;
+	SUB_UseTargetsGo();
 	remove(self);
 }
 
@@ -285,7 +298,7 @@ call stack, but entities that trigger each other in sequence within one frame
 targets not to fire.
 ==============================
 */
-float() SUB_UseCheck =
+float(float hush) SUB_UseCheck =
 {
 	if (activator == world)
 	{
@@ -296,7 +309,10 @@ float() SUB_UseCheck =
 	
 	if (self.delay)
 	{
-		SUB_UseTargetsDelay(DelayThink);
+		if (hush)
+			SUB_UseTargetsDelay(DelayThinkSilent);
+		else
+			SUB_UseTargetsDelay(DelayThink);
 		return FALSE;
 	}
 	return TRUE;
@@ -334,7 +350,7 @@ void() SUB_UseTargetsGo =
 
 void() SUB_UseTargets =
 {
-	if (!SUB_UseCheck())
+	if (!SUB_UseCheck(FALSE))
 		return;
 	SUB_PrintMessage();
 	SUB_UseTargetsGo();
@@ -342,7 +358,7 @@ void() SUB_UseTargets =
 
 void() SUB_UseTargetsSilent =
 {
-	if (SUB_UseCheck())
+	if (SUB_UseCheck(TRUE))
 		SUB_UseTargetsGo();
 }
 
