@@ -417,7 +417,9 @@ void() changelevel_touch =
 	}
 	
 	activator = other;
-	SUB_UseTargets ();
+	SUB_UseTargetsSilent();	
+		// silent so that a 'message' key on the changelevel, which is meant for intermission text,
+		// doesn't also get insta-centerprinted
 	
 	changelevel_do();
 }
