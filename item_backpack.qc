@@ -199,9 +199,6 @@ void() item_backpack =
 	precache_sound3("items/pack.wav");	// backpacks can play either of these
 	precache_sound3("items/patch.wav");
 
-	self.flags = FL_ITEM;
-	self.solid = SOLID_TRIGGER;
-	self.movetype = MOVETYPE_TOSS;
 	setmodel (self, "progs/backpack.mdl");
 	setsize (self, '-16 -16 0', '16 16 56');
 	self.skin = 1;
