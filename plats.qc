@@ -507,7 +507,7 @@ void() func_flytrain =
 	self.th_die = flytrain_stop;
 	self.th_stand = SUB_Null;
 	
-	self.solid = SOLID_BSP;
+	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
 	self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
 	//self.classname = "train";
@@ -667,7 +667,7 @@ void() func_train_setup =
 	train_sounds();
 
 //	self.cnt = 1;
-	self.solid = SOLID_BSP;
+	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
 	self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
 	self.use = train_use;
