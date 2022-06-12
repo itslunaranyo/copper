@@ -128,7 +128,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 	{
 		dprint("waiting at pathcorner\n");
 		self.speed2 = vlen(self.velocity); // self.speed;
-		if ( self.classname == "train" )
+		if ( self.classname == "func_flytrain" )
 			self.speed = 8;
 		else
 			self.speed = 32;
@@ -137,7 +137,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		randy_x = crandom();
 		randy_y = crandom();
 		randy_z = crandom();
-		if ( self.classname == "train" )
+		if ( self.classname == "func_flytrain" )
 			randy = normalize(randy) * 4;
 		else
 			randy = normalize(randy) * 12;
@@ -163,7 +163,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		if (!self.goalentity.target)
 		{
 			dprint("no goalentity target\n");
-			if (self.classname != "train")
+			if (self.classname != "func_flytrain")
 			{
 				self.th_die();
 				return;

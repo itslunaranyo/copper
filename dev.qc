@@ -112,9 +112,9 @@ void() dev_invoke =
 	makevectors(self.v_angle);
 	org = self.origin + self.view_ofs;
 	traceline2(org, org + v_forward * 8192, self, 0);
-
 	if (trace_fraction < 1.0 && trace_ent)
 	{
+		eprint(trace_ent);
 		activator = self;
 		
 		if (trace_ent.flags & FL_MONSTER)
@@ -125,6 +125,12 @@ void() dev_invoke =
 			secret_door_force(trace_ent);
 		else if (trace_ent.classname == "func_button")
 			button_force(trace_ent);
+		else if (trace_ent.classname == "func_plat")
+			plat_force(trace_ent);
+		else if (trace_ent.classname == "train")
+			SUB_CallAsSelf(train_use, trace_ent);
+		else if (trace_ent.classname == "func_flytrain")
+			SUB_CallAsSelf(trace_ent.use, trace_ent);			
 	}
 }
 

@@ -231,6 +231,14 @@ void() plat_crush =
 		dprint("plat_crush: bad self.state\n");
 }
 
+void(entity p) plat_force = 
+{
+	if (p.state == STATE_TOP || p.state == STATE_UP)
+		SUB_CallAsSelf(plat_go_down, p);
+	else
+		SUB_CallAsSelf(plat_go_up, p);
+}
+
 void() plat_use =
 {
 	self.use = SUB_Null;
@@ -330,7 +338,7 @@ void() func_plat =
 	self.mangle = self.angles;
 	self.angles = '0 0 0';
 
-	self.classname = "plat";
+//	self.classname = "plat";
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
 	setorigin (self, self.origin);	
@@ -416,6 +424,7 @@ void() flytrain_think =
 
 void() flytrain_use =
 {
+	dprint("in flytrain_use\n");
 	if (self.think1 == fly_idle)
 		fly_newgoal( 1, 0 );
 }
@@ -501,7 +510,7 @@ void() func_flytrain =
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
-	self.classname = "train";
+	//self.classname = "train";
 		
 	setmodel (self, self.model);
 	setsize (self, self.mins, self.maxs);
@@ -532,6 +541,7 @@ void() func_flytrain_point =
 
 	precache_model_safe(self.model);
 	func_flytrain();
+	self.classname = "func_flytrain";
 	self.movedir = '0 0 0';
 }
 
