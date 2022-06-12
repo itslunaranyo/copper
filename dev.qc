@@ -127,6 +127,8 @@ void() dev_invoke =
 			button_force(trace_ent);
 		else if (trace_ent.classname == "func_plat")
 			plat_force(trace_ent);
+		else if (trace_ent.classname == "func_bobbing")
+			SUB_CallAsSelf(func_bobbing_use, trace_ent);
 		else if (trace_ent.classname == "train")
 			SUB_CallAsSelf(train_use, trace_ent);
 		else if (trace_ent.classname == "func_flytrain")
