@@ -354,20 +354,20 @@ void() monster_boss =
 		remove(self);
 		return;
 	}
-	precache_model ("progs/boss.mdl");
-	precache_model ("progs/lavaball.mdl");
+	precache_model_safe ("progs/boss.mdl");
+	precache_model_safe ("progs/lavaball.mdl");
 
-	precache_sound ("weapons/rocket1i.wav");
-	precache_sound ("weapons/lavabal1.wav");
-	precache_sound ("weapons/lavabal2.wav");
-	precache_sound ("weapons/lavabal3.wav");
-	precache_sound ("weapons/lavabal4.wav");
-	precache_sound ("boss1/out1.wav");
-	precache_sound ("boss1/sight1.wav");
-	precache_sound ("misc/power.wav");
-	precache_sound ("boss1/throw.wav");
-	precache_sound ("boss1/pain.wav");
-	precache_sound ("boss1/death.wav");
+	precache_sound_safe ("weapons/rocket1i.wav");
+	precache_sound_safe ("weapons/lavabal1.wav");
+	precache_sound_safe ("weapons/lavabal2.wav");
+	precache_sound_safe ("weapons/lavabal3.wav");
+	precache_sound_safe ("weapons/lavabal4.wav");
+	precache_sound_safe ("boss1/out1.wav");
+	precache_sound_safe ("boss1/sight1.wav");
+	precache_sound_safe ("misc/power.wav");
+	precache_sound_safe ("boss1/throw.wav");
+	precache_sound_safe ("boss1/pain.wav");
+	precache_sound_safe ("boss1/death.wav");
 	
 	if (self.deathtype == string_null)
 		self.deathtype = "was owned by Chthon";

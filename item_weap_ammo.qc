@@ -172,7 +172,7 @@ Keys:
 void() weapon_supershotgun =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model ("progs/g_shot.mdl");
+	precache_model_safe ("progs/g_shot.mdl");
 	setmodel (self, "progs/g_shot.mdl");
 	self.items = IT_SUPER_SHOTGUN;
 	self.ammo_shells = 10;
@@ -195,7 +195,7 @@ Keys:
 void() weapon_nailgun =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model ("progs/g_nail.mdl");
+	precache_model_safe ("progs/g_nail.mdl");
 	setmodel (self, "progs/g_nail.mdl");
 	self.items = IT_NAILGUN;
 	self.ammo_nails = 30;
@@ -218,7 +218,7 @@ Keys:
 void() weapon_supernailgun =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model ("progs/g_nail2.mdl");
+	precache_model_safe ("progs/g_nail2.mdl");
 	setmodel (self, "progs/g_nail2.mdl");
 	self.items = IT_SUPER_NAILGUN;
 	self.ammo_nails = 30;
@@ -241,7 +241,7 @@ Keys:
 void() weapon_grenadelauncher =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model ("progs/g_rock.mdl");
+	precache_model_safe ("progs/g_rock.mdl");
 	setmodel (self, "progs/g_rock.mdl");
 	self.items = IT_GRENADE_LAUNCHER;
 	self.ammo_rockets = 5;
@@ -264,7 +264,7 @@ Keys:
 void() weapon_rocketlauncher =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model ("progs/g_rock2.mdl");
+	precache_model_safe ("progs/g_rock2.mdl");
 	setmodel (self, "progs/g_rock2.mdl");
 	self.items = IT_ROCKET_LAUNCHER;
 	self.ammo_rockets = 5;
@@ -288,7 +288,7 @@ Keys:
 void() weapon_lightning =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model ("progs/g_light.mdl");
+	precache_model_safe ("progs/g_light.mdl");
 	setmodel (self, "progs/g_light.mdl");
 	self.items = IT_LIGHTNING;
 	self.ammo_cells = 12;
@@ -397,13 +397,13 @@ void() item_shells =
 	if (self.spawnflags & ITEM_AMMO_BIG)
 	{
 		self.ammo_shells = 40;
-		precache_model ("progs/m_shell2.mdl");
+		precache_model_safe ("progs/m_shell2.mdl");
 		setmodel (self, "progs/m_shell2.mdl");
 	}
 	else
 	{
 		self.ammo_shells = 20;
-		precache_model ("progs/m_shell1.mdl");
+		precache_model_safe ("progs/m_shell1.mdl");
 		setmodel (self, "progs/m_shell1.mdl");
 	}
 	self.weapon = 1;
@@ -438,13 +438,13 @@ void() item_spikes =
 	if (self.spawnflags & ITEM_AMMO_BIG)
 	{
 		self.ammo_nails = 50;
-		precache_model ("progs/m_nails2.mdl");
+		precache_model_safe ("progs/m_nails2.mdl");
 		setmodel (self, "progs/m_nails2.mdl");
 	}
 	else
 	{
 		self.ammo_nails = 25;
-		precache_model ("progs/m_nails1.mdl");
+		precache_model_safe ("progs/m_nails1.mdl");
 		setmodel (self, "progs/m_nails1.mdl");
 	}
 	self.weapon = 2;
@@ -480,13 +480,13 @@ void() item_rockets =
 	if (self.spawnflags & ITEM_AMMO_BIG)
 	{
 		self.ammo_rockets = 8;
-		precache_model ("progs/m_rock2.mdl");
+		precache_model_safe ("progs/m_rock2.mdl");
 		setmodel (self, "progs/m_rock2.mdl");
 	}
 	else
 	{
 		self.ammo_rockets = 4;
-		precache_model ("progs/m_rock1.mdl");
+		precache_model_safe ("progs/m_rock1.mdl");
 		setmodel (self, "progs/m_rock1.mdl");
 	}
 	self.weapon = 3;
@@ -522,13 +522,13 @@ void() item_cells =
 	if (self.spawnflags & ITEM_AMMO_BIG)
 	{
 		self.ammo_cells = 12;
-		precache_model ("progs/m_cells2.mdl");
+		precache_model_safe ("progs/m_cells2.mdl");
 		setmodel (self, "progs/m_cells2.mdl");
 	}
 	else
 	{
 		self.ammo_cells = 6;
-		precache_model ("progs/m_cells1.mdl");
+		precache_model_safe ("progs/m_cells1.mdl");
 		setmodel (self, "progs/m_cells1.mdl");
 	}
 	self.weapon = 4;

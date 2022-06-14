@@ -240,21 +240,21 @@ void() item_key1 =
 	if (!SUB_ShouldSpawn()) return;
 	if (world.worldtype == 0)
 	{
-		precache_model ("progs/m_key.mdl");
+		precache_model_safe ("progs/m_key.mdl");
 		setmodel (self, "progs/m_key.mdl");
 		self.netname = "silver key";
 		self.skin = 0;
 	}
 	else if (world.worldtype == 1)
 	{
-		precache_model ("progs/r_key.mdl");
+		precache_model_safe ("progs/r_key.mdl");
 		setmodel (self, "progs/r_key.mdl");
 		self.netname = "silver runekey";
 		self.skin = 0;
 	}
 	else if (world.worldtype == 2)
 	{
-		precache_model2 ("progs/b_s_key.mdl");
+		precache_model2_safe ("progs/b_s_key.mdl");
 		setmodel (self, "progs/b_s_key.mdl");
 		self.netname = "silver keycard";
 	}
@@ -286,21 +286,21 @@ void() item_key2 =
 	if (!SUB_ShouldSpawn()) return;
 	if (world.worldtype == 0)
 	{
-		precache_model ("progs/m_key.mdl");
+		precache_model_safe ("progs/m_key.mdl");
 		setmodel (self, "progs/m_key.mdl");
 		self.netname = "gold key";
 		self.skin = 1;
 	}
 	else if (world.worldtype == 1)
 	{
-		precache_model ("progs/r_key.mdl");
+		precache_model_safe ("progs/r_key.mdl");
 		setmodel (self, "progs/r_key.mdl");
 		self.netname = "gold runekey";
 		self.skin = 1;
 	}
 	if (world.worldtype == 2)
 	{
-		precache_model2 ("progs/b_g_key.mdl");
+		precache_model2_safe ("progs/b_g_key.mdl");
 		setmodel (self, "progs/b_g_key.mdl");
 		self.netname = "gold keycard";
 	}
@@ -383,21 +383,21 @@ void() item_sigil =
 	
 	if (self.spawnflags & 8)
 	{
-		precache_model2 ("progs/end4.mdl");
+		precache_model2_safe ("progs/end4.mdl");
 		setmodel (self, "progs/end4.mdl");
 		msg = "You got the rune\n of Elder Magic!";
 		self.svflags = 8;
 	}
 	else if (self.spawnflags & 4)
 	{
-		precache_model2 ("progs/end3.mdl");
+		precache_model2_safe ("progs/end3.mdl");
 		setmodel (self, "progs/end3.mdl");
 		msg = "You got the rune\n of Hell Magic!";
 		self.svflags = 4;
 	}
 	else if (self.spawnflags & 2)
 	{
-		precache_model2 ("progs/end2.mdl");
+		precache_model2_safe ("progs/end2.mdl");
 		setmodel (self, "progs/end2.mdl");
 		msg = "You got the rune\n of Black Magic!";
 		self.svflags = 2;
@@ -413,7 +413,7 @@ void() item_sigil =
 	{
 		if (!self.model)
 			self.model = "progs/end1.mdl";
-		precache_model2(self.model);
+		precache_model2_safe(self.model);
 		setmodel(self, self.model);
 		if (!self.svflags)
 			self.svflags = 16;

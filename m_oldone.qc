@@ -384,13 +384,13 @@ void() monster_oldone =
 		return;
 	}
 
-	precache_model2 ("progs/oldone.mdl");
+	precache_model2_safe ("progs/oldone.mdl");
 
-	precache_sound2 ("boss2/death.wav");
-	precache_sound2 ("boss2/idle.wav");
-	precache_sound2 ("boss2/sight.wav");
-	precache_sound2 ("boss2/pop2.wav");
-	precache_sound ("misc/null.wav");
+	precache_sound2_safe ("boss2/death.wav");
+	precache_sound2_safe ("boss2/idle.wav");
+	precache_sound2_safe ("boss2/sight.wav");
+	precache_sound2_safe ("boss2/pop2.wav");
+	precache_sound_safe ("misc/null.wav");
 
 	self.solid = SOLID_SLIDEBOX;
 	//self.movetype = MOVETYPE_STEP;

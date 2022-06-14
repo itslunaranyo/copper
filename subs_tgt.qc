@@ -530,7 +530,7 @@ float() SUB_VerifyTriggerable =
 	// some quake maps use SUB_regen as a hack to make items respawn, but
 	// they expect those items to still spawn at map start, so catch those
 	// cases and return false to force the item to spawn
-	if (self.use == SUB_regen) return FALSE;
+	if (self.use == SUB_regen || self.classname == "info_notnull") return FALSE;
 		
 	float validTriggerers;
 	entity tg;

@@ -176,7 +176,7 @@ void() misc_explobox =
 	if (!SUB_ShouldSpawn()) return;
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
-	precache_model ("maps/b_explob.bsp");
+	precache_model_safe ("maps/b_explob.bsp");
 	setmodel (self, "maps/b_explob.bsp");
 	
 	self.dmg = zeroconvertdefault(self.dmg,150);
@@ -208,7 +208,7 @@ void() misc_explobox2 =
 	if (!SUB_ShouldSpawn()) return;
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
-	precache_model2 ("maps/b_exbox2.bsp");
+	precache_model2_safe ("maps/b_exbox2.bsp");
 	setmodel (self, "maps/b_exbox2.bsp");
 	self.dmg = zeroconvertdefault(self.dmg,100);
 		

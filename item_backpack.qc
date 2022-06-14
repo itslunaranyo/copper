@@ -201,7 +201,7 @@ Keys:
 void() item_backpack =
 {
 	if (!SUB_ShouldSpawn()) return;
-	precache_model("progs/backpack.mdl");
+	precache_model_safe("progs/backpack.mdl");
 	precache_sound3("items/pack.wav");	// backpacks can play either of these
 	precache_sound3("items/patch.wav");
 

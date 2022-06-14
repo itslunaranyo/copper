@@ -268,7 +268,7 @@ void(float skn, float amt) StartArmor =
 
 	self.touch = armor_touch;
 	self.type = "armor";
-	precache_model ("progs/armor.mdl");
+	precache_model_safe ("progs/armor.mdl");
 	setmodel (self, "progs/armor.mdl");
 	
 	if (deathmatch == 1)

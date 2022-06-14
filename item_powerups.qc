@@ -97,7 +97,7 @@ PENTAGRAM
 */
 void() precache_invulnerability =
 {
-	precache_model ("progs/invul.mdl");
+	precache_model_safe ("progs/invul.mdl");
 	precache_sound_safe ("items/protect.wav");
 	precache_sound_safe ("items/protect2.wav");
 	precache_sound_safe ("items/protect3.wav");
@@ -141,7 +141,7 @@ BIOSUIT
 */
 void() precache_envirosuit =
 {
-	precache_model ("progs/suit.mdl");
+	precache_model_safe ("progs/suit.mdl");
 	precache_sound_safe ("items/suit.wav");
 	precache_sound_safe ("items/suit2.wav");
 }
@@ -184,7 +184,7 @@ RING OF SHADOWS
 */
 void() precache_invisibility =
 {
-	precache_model ("progs/invis.mdl");
+	precache_model_safe ("progs/invis.mdl");
 	precache_sound_safe ("items/inv1.wav");
 	precache_sound_safe ("items/inv2.wav");
 	precache_sound_safe ("items/inv3.wav");
@@ -229,7 +229,7 @@ QUAD
 */
 void() precache_super_damage =
 {
-	precache_model ("progs/quaddama.mdl");
+	precache_model_safe ("progs/quaddama.mdl");
 	precache_sound_safe ("items/damage.wav");
 	precache_sound_safe ("items/damage2.wav");
 	precache_sound_safe ("items/damage3.wav");
