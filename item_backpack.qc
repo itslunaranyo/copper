@@ -40,7 +40,13 @@ void() BackpackTouch =
 	if (!CheckValidTouch()) return;
 
 	// coop 1: players can only pick up their own backpacks
-	if (coop == 1 && self.buddy && self.buddy != other) return;
+	//if (coop == 1 && self.buddy && self.buddy != other) return;
+	// reverted:
+	// with no good way to indicate whose backpack is whose (because .colormap
+	// only works on players outside the original software renderer) this led to 
+	// a lot of ignored mystery backpacks players kept obsessively touching.
+	// going out of your way for your own ammo is also a waste of time unless
+	// the level is extremely linear, which good quake levels never are
 
 	float acount;
 	
