@@ -1066,6 +1066,7 @@ Keys:
 "t_width" override distance for first move
 "t_length" override distance for second move
 "dest1"+"dest2" if both set, uses dest1 and dest2 for first and second move vectors, ignoring 1st_whatever spawnflags. still needs width and length.
+"target" if pointed at a path_corner that targets a second path corner, will use these as the moves instead (relative to min corner, like a func_train) and ignore all of the above.
 "wait"  # of seconds before coming back, default 5
 */
 /*FGD
@@ -1173,11 +1174,29 @@ void () func_door_secret =
 	if (self.spawnflags & SECRET_OPEN_ONCE) self.wait = -1;
 	if (!self.wait) self.wait = 5;	// 5 seconds before closing
 	
+	bmodel_lightstyle(self, "a");
+	
 	// Magic formula...
 	// lunaran: the magic formula sucked
 	// also you moved this to secret_door_use at some point, don't know why, if a secret door breaks somewhere that might be why
 	local vector firstmove, secondmove;
 	
+	if (self.target != string_null)
+	{
+		// ok nobody knows what vectors are? what is our children learning
+		entity p = find(world, targetname, self.target);
+		// now we support literal pathcorners like a literal train
+		if (p && p.classname == "path_corner" && p.target != string_null)
+		{
+			entity p2 = find(world, targetname, p.target);
+			if (p2 && p2.classname == "path_corner")
+			{
+				self.dest1 = p.origin - self.absmin;
+				self.dest2 = p2.origin - self.absmin;
+				return;
+			}
+		}		
+	}
 	if (!self.dest1 && !self.dest2)
 	{
 		// dumb old way
@@ -1204,6 +1223,4 @@ void () func_door_secret =
 
 	self.dest1 = self.origin + firstmove * self.t_width;
 	self.dest2 = self.dest1 + secondmove * self.t_length;
-
-	bmodel_lightstyle(self, "a");
 }
