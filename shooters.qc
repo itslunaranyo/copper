@@ -5,20 +5,23 @@
 float SF_SHOOT_SUPERSPIKE	= 1;
 float SF_SHOOT_LASER		= 2;
 float SF_SHOOT_OGRENADE		= 4;
+float SF_SHOOT_ACTIVATOR	= 16;
 
 
 /*FGD
-@baseclass base(Appearflags, Targetname, Angle) color(220 150 150) = Shooter
+@baseclass base(Appearflags, Target, Targetname, Angle) color(220 150 150) = Shooter
 [
 	spawnflags(Flags) = 
 	[
 		1 : "Spike" : 0
 		2 : "Laser" : 0
 		4 : "Ogre Grenade" : 0
+		16 : "Fire At Activator" : 0
 	]
 	movedir(string) : "Override launch vector (x y z)"
 	volume(string) : "Override sound volume"
 	delay(string) : "Pause before firing" : "0"
+	speed(integer) : "Launch velocity for grenades"
 ]
 */
 
@@ -29,13 +32,22 @@ void() spikeshooter_fire =
 	vector dir;
 	entity e;
 	
-	if (self.target != string_null)
-		e = find(world, targetname, self.target);
-		
-	if (e)
-		dir = normalize(e.origin - self.origin);
+	if (self.spawnflags & SF_SHOOT_ACTIVATOR)
+	{
+		if (!self.enemy)
+			self.enemy = activator;
+		dir = normalize(self.enemy.origin - self.origin);
+	}
 	else
-		dir = self.movedir;
+	{
+		if (self.target != string_null)
+			e = find(world, targetname, self.target);
+			
+		if (e)
+			dir = normalize(e.origin - self.origin);
+		else
+			dir = self.movedir;
+	}
 	
 	if (self.spawnflags & SF_SHOOT_LASER)
 	{
@@ -46,7 +58,7 @@ void() spikeshooter_fire =
 	else if (self.spawnflags & SF_SHOOT_OGRENADE)
 	{
 		sound (self, CHAN_VOICE, "weapons/grenade.wav", self.volume, ATTN_NORM);
-		e = launch_grenade(self.origin, dir);
+		e = launch_grenade(self.origin, dir * self.speed);
 		e.touch = OgreGrenadeTouch;
 		e.th_die = OgreGrenadeExplode;
 	}
@@ -65,6 +77,7 @@ void() spikeshooter_fire =
 
 void() shooter_proxy_think =
 {
+	self.buddy.enemy = self.enemy;
 	SUB_CallAsSelf(spikeshooter_fire,self.buddy);
 	remove(self);
 }
@@ -79,10 +92,12 @@ void() shooter_once_think =
 	{
 		entity shooty = spawn();
 		shooty.buddy = self;
+		shooty.enemy = activator;
 		shooty.think = shooter_proxy_think;
 		shooty.nextthink = time + self.delay;
 		return;
 	}
+	self.enemy = activator;
 	self.think = spikeshooter_fire;
 	self.nextthink = time + self.delay;
 }
@@ -101,14 +116,17 @@ void() shooter_use =
 	if (self.state) return;
 	
 	self.nextthink = time + self.delay;
+	self.enemy = activator;
 }
 
-/*QUAKED trap_spikeshooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE
+/*QUAKED trap_spikeshooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ? AT_ACTIVATOR
 When triggered, fires a spike in the direction set by "angle".
 
 "movedir" override angle with a launch vector of your choosing
+"target" aim at an entity instead. can be moving (like a train.)
 "delay" delay before firing (for staggering shooters)
 "volume" override how loud these things are because damn
+"speed" override launch velocity for grenades only (laser and nail speed is standardized for the player's sake)
 */
 /*FGD
 @PointClass base(Shooter) = trap_spikeshooter : "Triggered shooter" []
@@ -119,6 +137,10 @@ void() trap_spikeshooter =
 	SetMovedir ();
 	self.volume = zeroconvertdefault(self.volume, 1);
 	self.use = shooter_once_think;
+	if (self.spawnflags & SF_SHOOT_OGRENADE)
+	{
+		self.speed = zeroconvertdefault(self.speed, 400);
+	}
 	if (self.spawnflags & SF_SHOOT_LASER)
 	{
 		precache_model2 ("progs/laser.mdl");
@@ -130,12 +152,13 @@ void() trap_spikeshooter =
 		precache_sound_safe ("weapons/spike2.wav");
 }
 
-/*QUAKED trap_shooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE
+/*QUAKED trap_shooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ? AT_ACTIVATOR
 Continuously fires spikes in the direction set by "angle". Trigger to turn on, trigger again to turn off.
 Laser is only for REGISTERED. YOU PAY FOR LASER
 "wait" time between shots (1.0 default)
 "delay" delay before firing first spike, so multiple shooters can be staggered
 "movedir" override angle with a launch vector of your choosing
+"speed" override launch velocity for grenades only (laser and nail speed is standardized for the player's sake)
 */
 /*FGD
 @PointClass base(Shooter) = trap_shooter : "Continuous shooter"
