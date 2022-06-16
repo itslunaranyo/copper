@@ -44,7 +44,7 @@ void() spikeshooter_fire =
 			e = find(world, targetname, self.target);
 			
 		if (e)
-			dir = normalize(e.origin - self.origin);
+			dir = normalize(BoundsCenter(e) - self.origin);
 		else
 			dir = self.movedir;
 	}
