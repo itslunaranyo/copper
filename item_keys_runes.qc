@@ -25,11 +25,20 @@ float(entity cl) key_count_gold =
 	return (cl.worldtype & 240)/16;
 }
 
+void(entity cl, float gold) key_sprint_name =
+{
+	if (gold) sprint(cl, " Gold ");
+	else sprint(cl, " Silver ");
+	sprint(cl, keyType);
+}
+
 float(entity cl) key_give_silver =
 {
 	if (!(cl.items & IT_KEY1))
 	{
-		sprint (cl, "You got the Silver Key\n");
+		sprint (cl, "You got the");
+		key_sprint_name(cl, FALSE);
+		sprint (cl, "\n");
 
 		cl.items |= IT_KEY1;
 		cl.worldtype += 1;
@@ -42,7 +51,8 @@ float(entity cl) key_give_silver =
 	cl.worldtype += 1;
 	sprint (cl, "You have ");
 	sprint (cl, ftos(cl.worldtype & 15));
-	sprint (cl, " Silver Keys\n");
+	key_sprint_name(cl, FALSE);
+	sprint (cl, "s\n");
 	
 	return TRUE;
 }
@@ -64,10 +74,11 @@ float(entity cl) key_take_silver =
 	float keys = (cl.worldtype & 15);
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
+	key_sprint_name(cl, FALSE);
 	if (keys > 1)
-		sprint (cl, " Silver Keys left\n");
+		sprint (cl, "s left\n");
 	else
-		sprint (cl, " Silver Key left\n");
+		sprint (cl, " left\n");
 	
 	return TRUE;
 }
@@ -90,10 +101,11 @@ float(entity cl, float num) key_take_silvers =
 	float keys = (cl.worldtype & 15);
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
+	key_sprint_name(cl, FALSE);
 	if (keys > 1)
-		sprint (cl, " Silver Keys left\n");
+		sprint (cl, "s left\n");
 	else
-		sprint (cl, " Silver Key left\n");
+		sprint (cl, " left\n");
 	
 	return TRUE;
 }
@@ -102,7 +114,9 @@ float(entity cl) key_give_gold =
 {
 	if (!(cl.items & IT_KEY2))
 	{
-		sprint (cl, "You got the Gold Key\n");
+		sprint (cl, "You got the");
+		key_sprint_name(cl, TRUE);
+		sprint (cl, "\n");
 
 		cl.items |= IT_KEY2;
 		cl.worldtype += 16;
@@ -115,7 +129,8 @@ float(entity cl) key_give_gold =
 	cl.worldtype += 16;
 	sprint (cl, "You have ");
 	sprint (cl, ftos((cl.worldtype & 240)/16));
-	sprint (cl, " Gold Keys\n");
+	key_sprint_name(cl, TRUE);
+	sprint (cl, "s\n");
 	
 	return TRUE;
 }
@@ -137,10 +152,11 @@ float(entity cl) key_take_gold =
 	float keys = (cl.worldtype & 240)/16;
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
+	key_sprint_name(cl, TRUE);
 	if (keys > 1)
-		sprint (cl, " Gold Keys left\n");
+		sprint (cl, "s left\n");
 	else
-		sprint (cl, " Gold Key left\n");
+		sprint (cl, " left\n");
 	
 	return TRUE;
 }
@@ -162,10 +178,11 @@ float(entity cl, float num) key_take_golds =
 	float keys = (cl.worldtype & 240)/16;
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
+	key_sprint_name(cl, TRUE);
 	if (keys > 1)
-		sprint (cl, " Gold Keys left\n");
+		sprint (cl, "s left\n");
 	else
-		sprint (cl, " Gold Key left\n");
+		sprint (cl, " left\n");
 	
 	return TRUE;
 }
@@ -242,21 +259,21 @@ void() item_key1 =
 	{
 		precache_model_safe ("progs/m_key.mdl");
 		setmodel (self, "progs/m_key.mdl");
-		self.netname = "silver key";
+		keyType = "Key";
 		self.skin = 0;
 	}
 	else if (world.worldtype == 1)
 	{
 		precache_model_safe ("progs/r_key.mdl");
 		setmodel (self, "progs/r_key.mdl");
-		self.netname = "silver runekey";
+		keyType = "Runekey";
 		self.skin = 0;
 	}
 	else if (world.worldtype == 2)
 	{
 		precache_model2_safe ("progs/b_s_key.mdl");
 		setmodel (self, "progs/b_s_key.mdl");
-		self.netname = "silver keycard";
+		keyType = "Keycard";
 	}
 	key_setsounds();
 	self.touch = key_touch;
@@ -288,21 +305,21 @@ void() item_key2 =
 	{
 		precache_model_safe ("progs/m_key.mdl");
 		setmodel (self, "progs/m_key.mdl");
-		self.netname = "gold key";
+		keyType = "Key";
 		self.skin = 1;
 	}
 	else if (world.worldtype == 1)
 	{
 		precache_model_safe ("progs/r_key.mdl");
 		setmodel (self, "progs/r_key.mdl");
-		self.netname = "gold runekey";
+		keyType = "Runekey";
 		self.skin = 1;
 	}
-	if (world.worldtype == 2)
+	else if (world.worldtype == 2)
 	{
 		precache_model2_safe ("progs/b_g_key.mdl");
 		setmodel (self, "progs/b_g_key.mdl");
-		self.netname = "gold keycard";
+		keyType = "Keycard";
 	}
 	key_setsounds();
 	self.touch = key_touch;

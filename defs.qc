@@ -264,6 +264,8 @@ float	modelindex_eyes, modelindex_player;
 float	icantsee;
 float	isKex;	// running the quake rerelease
 
+string	keyType;
+
 //================================================
 
 // world fields

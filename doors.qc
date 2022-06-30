@@ -568,20 +568,20 @@ void() door_key_init =
 		if (self.items & IT_KEY1)
 		{
 			if (world.worldtype == 2)
-				self.message = "You need the silver keycard";
+				self.message = "You need the Silver Keycard";
 			else if (world.worldtype == 1)
-				self.message = "You need the silver runekey";
+				self.message = "You need the Silver Runekey";
 			else if (world.worldtype == 0)
-				self.message = "You need the silver key";
+				self.message = "You need the Silver Key";
 		}
 		else if (self.items & IT_KEY2)
 		{
 			if (world.worldtype == 2)
-				self.message = "You need the gold keycard";
+				self.message = "You need the Gold Keycard";
 			else if (world.worldtype == 1)
-				self.message = "You need the gold runekey";			
+				self.message = "You need the Gold Runekey";			
 			else if (world.worldtype == 0)
-				self.message = "You need the gold key";
+				self.message = "You need the Gold Key";
 		}
 	}
 	if (self.items)
