@@ -263,6 +263,7 @@ void() CastLightning =
 void() sham_magic1     =[      $magic1,       sham_magic2    ] {ai_face();
 	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
 	self.cnt = 0;
+	ai_attack_finished (2 + 2*random());
 }
 void() sham_magic2     =[      $magic2,       sham_magic3    ] {ai_face();}
 void() sham_magic3     =[      $magic3,       sham_magic4    ] {ai_face();
@@ -381,7 +382,9 @@ float() ShamCheckAttack =
 		return FALSE;
 		
 	self.attack_state = AS_MISSILE;
-	ai_attack_finished (2 + 2*random());
+	// attack_finished can't go here, because the attack may still not 
+	// be successful and we shouldn't reset the next attack timer until it is
+	//ai_attack_finished (2 + 2*random());
 	return TRUE;
 }
 
