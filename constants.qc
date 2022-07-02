@@ -2,8 +2,8 @@
 // constants
 //================================================
 
-string version_s = "Copper Quake 1.17 - 25 Aug 2021";
-float version_f = 1.17;
+string version_s = "Copper Quake 1.19 - 1 July 2022";
+float version_f = 1.19;
 
 float	FALSE					= 0;
 float 	TRUE					= 1;
