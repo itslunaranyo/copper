@@ -632,11 +632,15 @@ void() target_multiprint_use =
 {
 	//dprint("in multiprint_use\n");
 	// print the message
-	if (activator.classname == "player")
-	{
+	//if (activator.classname == "player")
+	//{
 		if ( self.message != string_null )
 		{
-			centerprint (activator, self.message);
+			// just make sure it goes to all if activator is a weirdo, players do
+			// silly things on purpose with monsters shooting buttons
+			//centerprint (activator, self.message);
+			SUB_PrintMessage();
+			
 			if (!(self.spawnflags & 1))
 				sound (activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
 			
@@ -651,7 +655,7 @@ void() target_multiprint_use =
 		{
 			SUB_UseTargets();
 		}
-	}
+	//}
 }
 
 /*QUAKED target_multiprint (.5 .5 .5) (-8 -8 -8) (8 8 8) SILENT
