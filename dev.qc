@@ -114,7 +114,6 @@ void() dev_invoke =
 	traceline2(org, org + v_forward * 8192, self, 0);
 	if (trace_fraction < 1.0 && trace_ent)
 	{
-		eprint(trace_ent);
 		activator = self;
 		
 		if (trace_ent.flags & FL_MONSTER)
