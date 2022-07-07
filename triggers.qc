@@ -971,6 +971,7 @@ void() trigger_hurt_box =
 
 float PUSH_ONCE = 1;
 float PUSH_ADD_VEL = 2;
+float PUSH_TUNNEL = 8;
 
 void() trigger_push_touch =
 {
@@ -983,15 +984,6 @@ void() trigger_push_touch =
 		other.type == "gib" || other.type == "head"))	// suck up gibs too, why not
 		return;
 
-	if (other.classname == "player")
-	{
-		if (other.nextmovesound < time)
-		{
-			other.nextmovesound = time + 1.5;
-			sound (other, CHAN_AUTO, self.noise, 1, ATTN_NORM);
-		}
-	}
-	
 	if (self.spawnflags & PUSH_ADD_VEL)
 	{
 		if (time != self.dmgtime)
@@ -1019,18 +1011,35 @@ void() trigger_push_touch =
 		other.velocity = self.speed * self.movedir * 10;
 	}
 	
+	if (other.classname == "player")
+	{
+		if (other.nextmovesound < time)
+		{
+			other.nextmovesound = time + 1.5;
+			sound (other, CHAN_AUTO, self.noise, 1, ATTN_NORM);
+		}
+		if (self.spawnflags & PUSH_TUNNEL)
+		{
+			vector suck;
+			suck = BoundsCenter(self) - other.origin;
+			suck -= self.movedir * (suck * self.movedir);
+			other.velocity += suck * self.speed * 0.1;
+		}
+	}
+
 	if (self.spawnflags & PUSH_ONCE)
 		SUB_Remove();
 }
 
 
-/*QUAKED trigger_push (.5 .0 .5) ? PUSH_ONCE ADD_VEL TRIGGER_FIRST
+/*QUAKED trigger_push (.5 .0 .5) ? PUSH_ONCE ADD_VEL TRIGGER_FIRST TUNNEL
 Pushes the player and Grenades.
 
 Flags:
 "push_once" removes itself after firing
 "trigger_first" won't be touchable until triggered once by something else
 "add_vel" add to the player's velocity rather than overriding it (player can still move around and push against the current)
+"tunnel" suck players towards the center of the brush in the direction of travel to avoid getting hung up on corners
 
 Keys:
 "angle" direction of push (-2 is down, -1 up)
@@ -1046,6 +1055,7 @@ Keys:
 		1: "Push once" : 0
 		2: "Add Velocity" : 0
 		4: "Trigger First" : 0
+		8: "Tunnel" : 0
 	]
 	speed(integer) : "Speed" : 1000
 	speed2(integer) : "Speed Limit" : 0
