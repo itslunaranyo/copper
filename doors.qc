@@ -930,6 +930,8 @@ void () secretdoor_move0 =
 		sound(self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.nextthink = self.ltime + 0.1;
 
+	dprint(vtos(self.dest1));
+	dprint("\n");
 	SUB_CalcMove(self.dest1, self.speed, secretdoor_move1);
 	if (self.noise2 != string_null)
 		sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
@@ -946,6 +948,8 @@ void () secretdoor_move0 =
 // Wait after first movement...
 void () secretdoor_move1 = 
 {
+	dprint(vtos(self.origin));
+	dprint("\n");
 	self.nextthink = self.ltime + 1.0;
 	self.think = secretdoor_move2;
 	if (self.noise3 != string_null)
@@ -963,6 +967,8 @@ void () secretdoor_move2 =
 // Wait here until time to go back...
 void () secretdoor_move3 =
 {
+	dprint(vtos(self.origin));
+	dprint("\n");
 	if (self.noise3 != string_null)
 		sound(self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 	if (!(self.spawnflags & SECRET_OPEN_ONCE) || self.wait > 0)
@@ -1191,8 +1197,14 @@ void () func_door_secret =
 			entity p2 = find(world, targetname, p.target);
 			if (p2 && p2.classname == "path_corner")
 			{
-				self.dest1 = p.origin - self.absmin;
-				self.dest2 = p2.origin - self.absmin;
+				self.dest1 = p.origin - self.mins;
+				self.dest2 = p2.origin - self.mins;
+				dprint("dest 1: ");
+				dprint(vtos(self.dest1));
+				dprint(" - dest 2: ");
+				dprint(vtos(self.dest2));
+				dprint("\n");
+				
 				return;
 			}
 		}		
@@ -1223,4 +1235,5 @@ void () func_door_secret =
 
 	self.dest1 = self.origin + firstmove * self.t_width;
 	self.dest2 = self.dest1 + secondmove * self.t_length;
+	
 }
