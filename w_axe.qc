@@ -78,7 +78,7 @@ void() W_FireAxe =
 		return;
 	
 	makevectors (self.v_angle);
-	source = self.origin + '0 0 16';
+	source = self.origin + self.view_ofs;//'0 0 16';
 	
 		
 		traceline2(source, source + v_forward * (64), self, 0);
