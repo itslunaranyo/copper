@@ -90,7 +90,7 @@ void() boss_idle30	=[	$walk30, boss_idle31 ] {ai_face();}
 void() boss_idle31	=[	$walk31, boss_idle1 ] {ai_face();}
 
 void() boss_missile1	=[	$attack1, boss_missile2 ] {
-	if (self.state)
+	if (self.lifetime_finished == -1)
 	{
 		boss_idle1();
 		return;
@@ -379,7 +379,7 @@ void() monster_boss =
 	self.th_pain = boss_pain;
 	self.th_die = boss_death1;
 	if (cvar("nomonsters") != 0)
-		self.state = -1;
+		self.lifetime_finished = -1;
 }
 
 //===========================================================================
