@@ -511,10 +511,13 @@ void() door_link =
 				masterdoor.health = self.health;
 			if (self.targetname != string_null)
 			{
-				masterdoor.targetname = self.targetname;
-				self.targetname = string_null;
-				// all the doors in the chain having the same targetname will cause
-				// the whole chain to be triggered once for every door in the chain
+				if (masterdoor.targetname == string_null)
+				{
+					masterdoor.targetname = self.targetname;
+					self.targetname = string_null;
+					// all the doors in the chain having the same targetname will cause
+					// the whole chain to be triggered once for every door in the chain
+				}
 			}
 			SUB_MergeTargets(masterdoor);	// same deal
 			self.target = string_null;
@@ -530,7 +533,11 @@ void() door_link =
 			}
 		}
 		
-		t = find (t, classname, self.classname);	
+		// skip doors with other targetnames to not fold them into the loop
+		do {
+			t = find (t, classname, self.classname);	
+		} while (t && !(masterdoor.targetname == string_null || masterdoor.targetname == t.targetname));
+		
 		if (!t)
 		{
 			self.enemy = masterdoor;		// make the chain a loop
