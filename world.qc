@@ -225,6 +225,8 @@ void() worldspawn =
 	cvar_set("sv_gravity", ftos(self.gravity));
 	self.light_lev = 0;	// shut up FTEQCC warning
 	
+	keyType = "Key";	// default if there are no keys placed in the map
+
 	if (cvar("pr_checkextension"))
 	{
 		if (checkextension("QUAKE_EX"))
