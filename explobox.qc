@@ -156,6 +156,7 @@ void() explobox_setup =
 Large exploding box. 150 damage. 
 will do enough damage to set off other barrels at up to ~172u distance (center to center)
 
+"health"	defaults to 18. -1 will make it immune to damage (trigger only)
 "target"	fires targets when it explodes
 "targetname"	will explode when triggered
 "wait"		will respawn after 'wait' seconds
@@ -189,6 +190,7 @@ void() misc_explobox =
 Smaller exploding box. 100 damage. REGISTERED ONLY
 will do enough damage to set off other barrels at up to ~128u distance (center to center)
 
+"health"	defaults to 18. -1 will make it immune to damage (trigger only)
 "target"	fires targets when it explodes
 "targetname"	will explode when triggered
 "wait"		will respawn after 'wait' seconds
@@ -219,7 +221,7 @@ void() misc_explobox2 =
 Build your own exploding box!
 
 Keyvalues:
-"health"	defaults to 18
+"health"	defaults to 18. -1 will make it immune to damage (trigger only)
 "dmg"		damage to explode with, defaults to 150 if unset. -1 will force 0.
 "target"	fires targets when it explodes
 "targetname"	will explode when triggered
