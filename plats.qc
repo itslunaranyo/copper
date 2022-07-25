@@ -890,11 +890,15 @@ void() func_bobbing =
 	
 	self.length = min(0.1, self.wait / 6);
 	
+	train_sounds();
+	
 	self.state = self.spawnflags & 1;
 	if (!(self.state))
-		self.nextthink = self.ltime + self.length;
-	
-	train_sounds();
+	{
+		self.nextthink = 0.2;	// wait for items and monsters to rest on it
+		if (self.noise1 != string_null)		// make move sound right away
+			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+	}
 	
 	precache_model_safe(self.model);
 	setmodel (self, self.model);
