@@ -14,7 +14,7 @@ float	ITEM_SUSPENDED = 4;
 @baseclass base(Appearflags, Target, Targetname) = Item
 [
 	message(string) : "Message"
-	wait(string) : "Respawn time" : 0
+	wait(string) : "Respawn time" : "0"
 	count(integer) : "Respawn count" : 0
 	spawnflags(flags) = 
 	[

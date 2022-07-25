@@ -36,7 +36,7 @@ string light_off = "a";
 @baseclass base() color(255 255 40) size(-8 -8 -8, 8 8 8) = Light [
 	light(integer) : "Brightness" : 300
 	_color(string) : "Color" : "1 1 1"
-	wait(string) : "Fade distance multiplier" : 1
+	wait(string) : "Fade distance multiplier" : "1"
 	mangle(string) : "Spotlight aim (yaw pitch roll, neg. pitch is down)"
 	angle(integer) : "Spotlight cone angle"
 	_softangle(integer) : "Spotlight inner cone angle"
