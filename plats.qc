@@ -474,6 +474,7 @@ void() flytrain_stop =
 	dmg(integer) : "Damage on block" : 2
 	noise(string) : "Override stop sound"
 	noise1(string) : "Override move sound"
+	pausetime(string) : "Default wait time" : "0.1"
 ]
 */
 
