@@ -847,7 +847,7 @@ START_OFF	start off
 CRUSHER		don't reverse when blocked
 */
 /*FGD
-@baseclass base(Targetname, TrainSounds, Angle) = Bob
+@baseclass base(Appearflags, Targetname, TrainSounds, Angle) = Bob
 [
 	spawnflags(flags) = [
 		1 : "Start off" : 0
