@@ -44,7 +44,7 @@ entity(string gibname, float dm) ThrowGib =
 	local entity gib;
 
 	// gibs have to be thinking ballistic projectiles to pass through monsterclip/notrace :(
-	gib = toss_projectile(self.origin, GibVelocityForHealth(dm), "gib");
+	gib = toss_projectile(self.origin, GibVelocityForHealth(max(-96, dm)), "gib");
 	MakeGib(gib, gibname);
 	
 	return gib;
