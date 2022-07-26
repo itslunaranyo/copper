@@ -303,6 +303,7 @@ void() boss_awake =
 	if (self.spawnflags & 1)
 	{
 		self.takedamage = DAMAGE_AIM;
+		self.flags |= FL_MONSTER;
 		self.health = zeroconvertdefault(self.health, 1000);
 		self.max_health = self.health;
 	}

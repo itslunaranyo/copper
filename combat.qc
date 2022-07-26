@@ -32,8 +32,9 @@ void(entity targ, entity attacker) Killed =
 		self.health = -99;		// don't let sbar look bad (or throw gibs with crazy speed)
 
 	if (self.movetype == MOVETYPE_PUSH || // doors, triggers, etc
-		(self.movetype == MOVETYPE_NONE && self.classname != "player")) 
+		(self.movetype == MOVETYPE_NONE && self.classname != "player" && !(self.flags & FL_MONSTER))) 
 		// players are movetype none while hanging out in a void pit waiting to die
+		// and monsters may be movetype_none (shootable chthons)
 	{
 		//self.enemy = attacker;	// why did you do this lunaran
 		self.th_die ();
