@@ -200,6 +200,7 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 {
 	vector vdir;
 	float flash = 3;	// 1 = @org, 2 = @dest, 3 = both
+	entity t;
 
 	// telefrag protection in /*no-friendly-fire*/ coop
 	if (coop)// && teamplay)
@@ -243,28 +244,26 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 
 	if (tfog)
 	{
-		entity tport;
-		
 		if (flash & 1)
 			SUB_CallAsSelf(teleport_flash, traveler);	// flash at departure point
 		
 		if (flash & 2)
 		{
-			tport = spawn();
+			t = spawn();
 			
 			// teleport controller's origin is desired teleport flash location on arrival
 			if (traveler.classname == "player")
 			{
 				makevectors (vdir);
-				setorigin(tport, dst.origin + v_forward * 16);
+				setorigin(t, dst.origin + v_forward * 16);
 			}	
 			else
 			{
-				setorigin(tport, dst.origin);
+				setorigin(t, dst.origin);
 			}
 		
-			tport.think = teleport_flasher;
-			tport.nextthink = time + 0.05;
+			t.think = teleport_flasher;
+			t.nextthink = time + 0.05;
 		}
 	}
 
@@ -285,7 +284,11 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 		fog_setFromEnt(traveler, dst);
 		traveler.fixangle = 1;		// turn this way immediately
 		makevectors (vdir);
-		SUB_UseEntTargets(dst);
+		t = self;
+		self = dst;
+		activator = traveler;
+		SUB_UseTargets();
+		self = t;
 		
 		if (nofwd)
 		{
