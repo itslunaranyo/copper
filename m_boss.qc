@@ -160,6 +160,16 @@ void() boss_shockc10 =[	$shockc10, boss_death1 ] {
 void() boss_death1 = [$death1, boss_death2] {
 	self.takedamage = DAMAGE_NO;
 	sound (self, CHAN_VOICE, "boss1/death.wav", 1, ATTN_NORM);
+	if (self.health < -9000)	// telefragged or crushed or something
+	{
+		ThrowGib ("progs/gib1.mdl", 256);
+		ThrowGib ("progs/gib2.mdl", 256);
+		ThrowGib ("progs/gib3.mdl", 256);
+		ThrowGib ("progs/gib1.mdl", 128);
+		ThrowGib ("progs/gib2.mdl", 128);
+		ThrowGib ("progs/gib3.mdl", 128);
+		self.solid = SOLID_NOT;
+	}
 }
 void() boss_death2 = [$death2, boss_death3] {}
 void() boss_death3 = [$death3, boss_death4] {}
