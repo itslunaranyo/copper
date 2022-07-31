@@ -23,7 +23,7 @@ def addSkillFlags(deftxt):
 	
 	deflines[0] = " ".join(initbits)
 	deftxt = "\n".join(deflines)
-	return deftxt
+	return deftxt.expandtabs(4)
 
 def getQuakeds(qc):
 	deftxt = ""
