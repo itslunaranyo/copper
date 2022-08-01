@@ -14,14 +14,17 @@ than fall through grates (also they look too big)
 
 vector(float dm) GibVelocityForHealth =
 {
-	local vector v;
-	local float	voom;
+	vector v;
+	float dm_lim;
+	float	voom;
+
+	dm_lim = min(99, fabs(dm));
 
 	v_x = 150 * crandom();
 	v_y = 150 * crandom();
 	v_z = 150 + 150 * random();
 
-	voom = max(1, min(10, dm * dm / 5000));
+	voom = max(1, min(8, dm * dm / 5000));
 	
 	return v * voom;
 }
@@ -44,7 +47,7 @@ entity(string gibname, float dm) ThrowGib =
 	local entity gib;
 
 	// gibs have to be thinking ballistic projectiles to pass through monsterclip/notrace :(
-	gib = toss_projectile(self.origin, GibVelocityForHealth(max(-96, dm)), "gib");
+	gib = toss_projectile(self.origin, GibVelocityForHealth(dm), "gib");
 	MakeGib(gib, gibname);
 	
 	return gib;
