@@ -433,11 +433,13 @@ Flags:
    
 Keys:
 "map" set to name of next map (e.g. e1m1) if no map is set, the current map will restart
+"message" ONE page of intermission text to display
 */
 /*FGD
 @SolidClass base(Trigger) = trigger_changelevel : "Trigger: Change level"
 [
 	map(string) : "Next map"
+	message(string) : "Intermission text"
 	spawnflags(flags) =
 	[
 		1: "No intermission" : 0
@@ -458,11 +460,15 @@ void() trigger_changelevel =
 When the player triggers this by any means, he gets sent to the map listed in the "map" variable.  
 Spawnflags:
 NO_INTERMISSION: the view will not go to the info_intermission spot and display stats
+Keys:
+"map" set to name of next map (e.g. e1m1) if no map is set, the current map will restart
+"message" ONE page of intermission text to display
 */
 /*FGD
 @PointClass base(Appearflags, Targetname) = target_changelevel : "Target: Change level"
 [
 	map(string) : "Next map"
+	message(string) : "Intermission text"
 	spawnflags(flags) =
 	[
 		1: "No intermission" : 0
