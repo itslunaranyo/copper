@@ -576,9 +576,9 @@ void() PutClientInServer =
 	
 	// yet another thing that doesn't work on the first frame
 	if (spot.fog_density)
-		fog_save(self,spot.fog_density,spot.fog_color);
+		fog_save(self,spot.fog_density,spot.fog_color,spot.fog_sky);
 	else if (world.fog_density)
-		fog_save(self,world.fog_density,world.fog_color);
+		fog_save(self,world.fog_density,world.fog_color,spot.fog_sky);
 	cleanUpClientShit = 2;
 
 // oh, this is a hack!
@@ -1937,7 +1937,7 @@ void() ClientObituary =
 The normal starting point for a level. Only one is allowed. Will fire its targets when a player is spawned here, with player as activator.
 
 "angle" viewing angle when spawning
-"fog_color"/"fog_density" set the fog when spawning at this spot
+"fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
 */
 /*FGD
 @PointClass base(PlayerClass) = info_player_start : "Player 1 start" []
@@ -1946,6 +1946,7 @@ void() info_player_start =
 {
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);	// for telefrag testing
 	self.mangle = self.angles;
+	fog_fixKeys();
 }
 
 
@@ -1953,7 +1954,7 @@ void() info_player_start =
 Only used on start map for the return point from an episode. Will fire its targets when a player is spawned here, with player as activator.
 
 "angle" viewing angle when spawning
-"fog_color"/"fog_density" set the fog when spawning at this spot
+"fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
 */
 /*FGD
 @PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" []
@@ -1962,6 +1963,7 @@ void() info_player_start2 =
 {
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);	// for telefrag testing
 	self.mangle = self.angles;
+	fog_fixKeys();
 }
 
 
@@ -1969,7 +1971,7 @@ void() info_player_start2 =
 Debug starting point for a level.  Overrides info_player_start if present and 'USE' is checked, does nothing if 'USE' is not checked. Will fire its targets when a player is spawned, here with player as activator.
 
 "angle" viewing angle when spawning
-"fog_color"/"fog_density" set the fog when spawning at this spot
+"fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
 */
 /*FGD
 @PointClass base(PlayerClass) = info_player_start_test : "Developer-only spawn point" [
@@ -1986,6 +1988,7 @@ void() info_player_start_test =
 		return;
 	}
 	self.mangle = self.angles;
+	fog_fixKeys();
 }
 void() testplayerstart = {info_player_start_test();}	// back compat with old editors that use regioned compiles
 
@@ -1993,13 +1996,14 @@ void() testplayerstart = {info_player_start_test();}	// back compat with old edi
 potential spawning position for deathmatch games
 
 "angle" viewing angle when spawning
-"fog_color"/"fog_density" set the fog when spawning at this spot
+"fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
 */
 /*FGD
 @PointClass base(PlayerClass) = info_player_deathmatch : "Deathmatch start" []
 */
 void() info_player_deathmatch =
 {
+	fog_fixKeys();
 }
 
 void() coop_enable =
@@ -2012,7 +2016,7 @@ void() coop_enable =
 Potential spawning position(s) for coop games. Will fire its targets when a player is spawned here, with player as activator.
 
 "angle" viewing angle when spawning
-"fog_color"/"fog_density" set the fog when spawning at this spot
+"fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
 
 TRIGGER_FIRST - this start won't be used to spawn coop players until triggered, so respawning players don't have to walk all the way back to the action
 */
@@ -2031,5 +2035,6 @@ void() info_player_coop =
 		self.classname = "info_player_coop_notyet";
 		self.use = coop_enable;
 	}
+	fog_fixKeys();
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);	// for telefrag testing
 }

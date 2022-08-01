@@ -472,14 +472,15 @@ Keys:
 void() info_teleport_destination =
 {
 	if (!SUB_ShouldSpawn()) return;
+	if (!self.targetname)
+		objerror ("no targetname");
 
 	self.mangle = self.angles;
 	self.angles = '0 0 0';
 	self.model = string_null;
 	self.origin = self.origin + '0 0 27';
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);
-	if (!self.targetname)
-		objerror ("no targetname");
+	fog_fixKeys();
 }
 
 // --------------------------------
@@ -550,14 +551,15 @@ Keys:
 void() info_teleport_target =
 {
 	if (!SUB_ShouldSpawn()) return;
+	if (self.targetname == string_null)
+		objerror ("no targetname");
 	self.mangle = self.angles;
 	self.angles = '0 0 0';
 	setorigin(self, self.origin + '0 0 16'); // 
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);
-	if (self.targetname == string_null)
-		objerror ("no targetname");
 	self.count = zeroconvertdefault(self.count, -1);
 	self.use = teleport_target_use;
+	fog_fixKeys();
 }
 
 

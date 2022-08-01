@@ -387,6 +387,8 @@ string	keyType;
 .float light_lev = bubble_count;	// shuts up a stupid stupid warning
 .vector rmovedir = finaldest;
 .float version = worldtype;
+.float fog_sky = length;
+.float fog_sky2 = width;
 
 
 //===========================================================================

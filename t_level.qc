@@ -504,6 +504,7 @@ Keys:
 void() info_intermission =
 {
 	if (!SUB_ShouldSpawn()) return;
+	fog_fixKeys();
 }
 
 
