@@ -35,6 +35,11 @@ float FOG_INTERVAL = 0.05; //1/20;
 
 void() fog_fixKeys =
 {
+	if (self.fog_color_x > 1 || self.fog_color_y > 1 || self.fog_color_z > 1)
+		self.fog_color /= 255;
+	if (self.fog_color2_x > 1 || self.fog_color2_y > 1 || self.fog_color2_z > 1)
+		self.fog_color2 /= 255;
+
 	if (self.fog_sky == -1)
 		self.fog_sky = 0;
 	else if (self.fog_sky == 0)
