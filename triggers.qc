@@ -20,7 +20,7 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 [
 	sounds(choices) : "Sounds" : 0 =
 	[
-		0 : "None"
+		-1 : "None"
 		1 : "secret"
 		2 : "beep beep"
 		3 : "large switch"
