@@ -1043,7 +1043,7 @@ Flags:
 
 Keys:
 "angle" direction of push (-2 is down, -1 up)
-"mangle" specify a more exact direction (yaw pitch roll, positive pitch is down)
+"angles" specify a more exact direction (pitch yaw roll, positive pitch is down)
 "speed" speed of push (default: 1000)
 "speed2" in ADD_VEL
 "noise" replace default wind blow sound
@@ -1060,7 +1060,7 @@ Keys:
 	speed(integer) : "Speed" : 1000
 	speed2(integer) : "Speed Limit" : 0
 	noise(string) : "Looping sound" : "ambience/windfly.wav"
-	mangle(string) : "Specific vector direction" : "0 0 0"
+	angles(string) : "Specific direction (p y r)" : "0 0 0"
 ]
 */
 void() trigger_push =
