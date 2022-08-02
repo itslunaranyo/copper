@@ -476,6 +476,24 @@ void(vector cmins, vector cmaxs) door_finalize =
 	self.trigger_field = door_spawn_field(cmins, cmaxs);
 }
 
+float(entity door, entity master) door_can_link =
+{
+	if (door == master) return TRUE;	// first door
+	if (door.enemy) return FALSE;	// already linked
+	if (door.spawnflags & DOOR_DONT_LINK) return FALSE;	// will finalize itself later
+
+	if (door.health != 0 && master.health == 0)
+		master.health = door.health;
+
+	if (door.targetname != string_null && master.targetname != string_null && master.targetname != door.targetname)
+		return FALSE;	// part of different systems, might only touch coincidentally
+	
+	if (door.items && master.items && !(master.items & door.items))
+		return FALSE;	// different items requirements
+	
+	return TRUE;
+}
+
 /*
 =============
 door_link
@@ -483,8 +501,8 @@ door_link
 */
 void() door_link =
 {
-	local entity	t, masterdoor;
-	local vector	cmins, cmaxs;
+	entity	t, masterdoor;
+	vector	cmins, cmaxs;
 
 	if (self.enemy)
 		return;		// already linked by another door
@@ -504,39 +522,32 @@ void() door_link =
 	do
 	{
 		self.owner = masterdoor;
-
+		
 		if (self != masterdoor)
 		{
-			if (self.health)
-				masterdoor.health = self.health;
-			if (self.targetname != string_null)
+			if (self.targetname != string_null && masterdoor.targetname == string_null)
 			{
-				if (masterdoor.targetname == string_null)
-				{
-					masterdoor.targetname = self.targetname;
-					self.targetname = string_null;
-					// all the doors in the chain having the same targetname will cause
-					// the whole chain to be triggered once for every door in the chain
-				}
+				// all the doors in the chain having the same targetname will cause
+				// the whole chain to be triggered once for every door in the chain
+				masterdoor.targetname = self.targetname;
+				self.targetname = string_null;
 			}
-			SUB_MergeTargets(masterdoor);	// same deal
+			masterdoor.items |= self.items;
+
+			SUB_MergeTargets(masterdoor);
 			self.target = string_null;
 			self.target2 = string_null;
 			self.target3 = string_null;
 			self.target4 = string_null;
 			self.killtarget = string_null;
-			if (self.message != string_null)
+			if (self.message != string_null && masterdoor.message == string_null)
 				masterdoor.message = self.message;
-			if (self.items)
-			{
-				masterdoor.items |= self.items;
-			}
 		}
-		
+
 		// skip doors with other targetnames to not fold them into the loop
 		do {
 			t = find (t, classname, self.classname);	
-		} while (t && !(masterdoor.targetname == string_null || masterdoor.targetname == t.targetname));
+		} while (t && !door_can_link(t,masterdoor));
 		
 		if (!t)
 		{
@@ -548,7 +559,7 @@ void() door_link =
 			return;
 		}
 
-		if (EntitiesTouching(self,t) && !(t.spawnflags & DOOR_DONT_LINK))
+		if (EntitiesTouching(self,t))
 		{
 			if (t.enemy)
 				objerror ("cross connected doors");
@@ -563,7 +574,7 @@ void() door_link =
 			cmaxs_y = max(t.maxs_y, cmaxs_y);
 			cmaxs_z = max(t.maxs_z, cmaxs_z);
 		}
-	} while (1);
+	} while (t);
 }
 
 void() LinkDoors = {door_link();}
