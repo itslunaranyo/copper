@@ -41,21 +41,62 @@ void() bmodel_appear =
 
 void() bmodel_vanish =
 {
-	self.solid = SOLID_NOT;
 	self.state = STATE_TOP;
 	self.modelindex = 0;
 	bmodel_lightstyle(self,"m");
 	//self.alpha = -1;
 	
-	// drop things that are sitting on the bmodel:
-	//force_retouch = 2;	// nope
-	entity drop;
-	drop = world;
-	do {
-		drop = nextent(drop);
-		if (drop.flags & FL_ONGROUND && EntitiesTouching(self,drop))
-			drop.flags = not(drop.flags, FL_ONGROUND);
-	} while (drop);
+	if (self.solid != SOLID_NOT)
+		wall_spawn_tdrop();
+	self.solid = SOLID_NOT;
+}
+
+/*
+quake doesn't catch when a bmodel turns nonsolid while it is the groundentity for 
+other entities, so those entities stay floating in the air if they're at rest or
+the 'wrong' movetype. it does catch when an entity's groundentity is removed, but
+since a toggleable wall would be gone once killtargeted and thus not able to be
+toggled actually, it's time for 
+
+A STUPID HACK:
+
+spawn an invisible duplicate of the bmodel with a tiny bit of velocity to give 
+everybody resting on it a wee nudge so they forget their old groundentity, then 
+kill the duplicate. :(
+
+the older, worse solution was to just nextent() through the entire level and check
+whose bounds overlapped the wall's bounds, in a loop that was guaranteed to limit 
+the size of the level to however many entities could be checked before tripping 
+the runaway progs loop protection crash.
+
+other things that didn't work, for future reference:
+- spawn a teledeath-style trigger around the wall that ~s FL_ONGROUND in .touch:
+	not everything touches triggers (namely dead monsters), even after
+	a force_retouch 2
+- maintain a linked list of entities that have ever touched the func_wall in its
+	.touch so there's a much shorter list of things to have to check: if a backpack
+	falls on the wall, gets put in the chain, and is then picked up, the rest of 
+	the chain is orphaned
+- do that but it's a doubly-linked list: now every entity that could possibly
+	be removed for any reason (and thx to killtarget that's everything) has to 
+	have extra code handle its own position in the list when it is removed on 
+	behalf of func_walls
+*/
+void() wall_spawn_tdrop =
+{
+	entity t = spawn();
+	t.owner = self;
+	t.solid = SOLID_BSP;
+	t.movetype = MOVETYPE_PUSH;
+	setorigin (t, self.origin);	
+	setmodel (t, self.model);
+	t.alpha = -1;
+	
+	// this could be less aggressive but somehow doesn't work if the wall is made of skip
+	t.velocity = '0 0 2';
+	
+	t.think = SUB_Remove;
+	t.nextthink = self.ltime + 0.1;
 }
 
 // ==========================================
