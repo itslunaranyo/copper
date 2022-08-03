@@ -75,11 +75,15 @@ void() misc_model_use =
 		if (self.state)
 		{
 			self.modelindex = self.oldstyle;
+			setmodel (self, self.model);
+			setsize(self, '-16 -16 -16', '16 16 16');
+			self.nextthink = time + self.speed;
 		}
 		else
 		{
 			self.oldstyle = self.modelindex;
 			self.modelindex = 0;
+			self.nextthink = 0;
 		}
 		//tmp = self.oldstyle;
 		//self.oldstyle = self.alpha;
