@@ -57,7 +57,7 @@ void() door_hit_top =
 void() door_hit_bottom =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-	self.frame = !self.frame;
+	self.frame = self.skin;
 	self.state = STATE_BOTTOM;
 }
 
@@ -88,7 +88,7 @@ void() door_go_up =
 	sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	self.state = STATE_UP;
 	SUB_CalcMove (self.pos2, self.speed, door_hit_top);
-	self.frame = !self.frame;
+	self.frame = !self.skin;
 
 	SUB_UseTargetsSilent();	// door messages are for when they *don't* open
 }
@@ -1253,5 +1253,5 @@ void () func_door_secret =
 
 	self.dest1 = self.origin + firstmove * self.t_width;
 	self.dest2 = self.dest1 + secondmove * self.t_length;
-	
+	self.skin = self.frame;
 }
