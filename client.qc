@@ -600,6 +600,9 @@ void() PutClientInServer =
 	DecodeLevelParms();
 	SetChangeParms();
 	W_ResetWeaponState();
+	
+	// put global key type in the high bits so the CSQC hud gets to see it :/
+	self.worldtype = (self.worldtype & 255) + world.worldtype * 256;
 
 	// we respawned with keys not taken away, make sure .items reflects this
 	if (self.worldtype & 15) self.items |= IT_KEY1;

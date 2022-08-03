@@ -234,6 +234,9 @@ void() worldspawn =
 
 	if (cvar("pr_checkextension"))
 	{
+		//if (checkextension("EXT_CSQC"))
+			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
+			clientstat(STAT_MAXHEALTH, 2, max_health);	// for nightmare
 		if (checkextension("QUAKE_EX"))
 			isKex = TRUE;
 	}

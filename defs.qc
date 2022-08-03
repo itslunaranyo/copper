@@ -213,6 +213,7 @@ void		end_sys_fields;			// flag for structure dumping
 */
 
 // globals
+#pragma noref 1
 
 float	gameover;		// set when a rule exits
 
@@ -246,7 +247,6 @@ float	trace_debug;
 
 // moved from ai.qc or maybe combat.qc - used for target finding
 float	enemy_vis, enemy_range;//, enemy_infront;
-float	enemy_yaw();
 
 // when a monster becomes angry at a player, that monster will be used
 // as the sight target the next frame so that monsters near that one
@@ -506,7 +506,7 @@ void(entity e) setspawnparms		= #78;		// set parm1... to the
 												// for coop respawn
 
 float(string s) checkextension		= #99;		// check cvar("pr_checkextension") before calling
-
+void(float num, float type, .__variant fld) clientstat = #232;
 //================================================
 
 /*FGD
@@ -559,4 +559,7 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 		16384 : "Alt Target Pattern" : 0
 	]
 ]
+=======
 */
+
+#pragma noref 0
