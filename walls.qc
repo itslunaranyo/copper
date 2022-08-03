@@ -209,7 +209,7 @@ void() func_wall =
 	}
 }
 
-/*QUAKED func_wall_point (0 .5 .8) (-8 -8 -8) (8 8 8) NONSOLID
+/*QUAKED func_wall_point (0 .5 .8) (-8 -8 -8) (8 8 8) NONSOLID TOGGLE_VIS START_INVIS 
 This is just a solid wall if not inhibited.  Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
 
 Keys:
