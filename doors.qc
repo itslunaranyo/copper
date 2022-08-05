@@ -482,9 +482,6 @@ float(entity door, entity master) door_can_link =
 	if (door.enemy) return FALSE;	// already linked
 	if (door.spawnflags & DOOR_DONT_LINK) return FALSE;	// will finalize itself later
 
-	if (door.health != 0 && master.health == 0)
-		master.health = door.health;
-
 	if (door.targetname != string_null && master.targetname != string_null && master.targetname != door.targetname)
 		return FALSE;	// part of different systems, might only touch coincidentally
 	
@@ -533,6 +530,8 @@ void() door_link =
 				self.targetname = string_null;
 			}
 			masterdoor.items |= self.items;
+			if (self.health != 0 && masterdoor.health == 0)
+				masterdoor.health = self.health;
 
 			SUB_MergeTargets(masterdoor);
 			self.target = string_null;
@@ -547,7 +546,7 @@ void() door_link =
 		// skip doors with other targetnames to not fold them into the loop
 		do {
 			t = find (t, classname, self.classname);	
-		} while (t && !door_can_link(t,masterdoor));
+		} while (t && (!door_can_link(t,masterdoor) || !EntitiesTouching(self,t)));
 		
 		if (!t)
 		{
@@ -559,21 +558,15 @@ void() door_link =
 			return;
 		}
 
-		if (EntitiesTouching(self,t))
-		{
-			if (t.enemy)
-				objerror ("cross connected doors");
-			
-			self.enemy = t;
-			self = t;
+		self.enemy = t;
+		self = t;
 
-			cmins_x = min(t.mins_x, cmins_x);
-			cmins_y = min(t.mins_y, cmins_y);
-			cmins_z = min(t.mins_z, cmins_z);
-			cmaxs_x = max(t.maxs_x, cmaxs_x);
-			cmaxs_y = max(t.maxs_y, cmaxs_y);
-			cmaxs_z = max(t.maxs_z, cmaxs_z);
-		}
+		cmins_x = min(t.mins_x, cmins_x);
+		cmins_y = min(t.mins_y, cmins_y);
+		cmins_z = min(t.mins_z, cmins_z);
+		cmaxs_x = max(t.maxs_x, cmaxs_x);
+		cmaxs_y = max(t.maxs_y, cmaxs_y);
+		cmaxs_z = max(t.maxs_z, cmaxs_z);
 	} while (t);
 }
 
