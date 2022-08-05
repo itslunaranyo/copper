@@ -25,8 +25,11 @@ void() bmodel_appear =
 	// ***
 	// IN THIS ORDER
 	// ***
-	self.solid = SOLID_BSP;
-	self.movetype = MOVETYPE_PUSH;
+	if (!(self.spawnflags & 1))
+	{
+		self.solid = SOLID_BSP;
+		self.movetype = MOVETYPE_PUSH;
+	}
 	setorigin (self, self.origin);	
 	setmodel (self, self.model);
 	//self.alpha = 1;
@@ -135,8 +138,6 @@ void() func_wall_flip =
 		if (self.state == STATE_TOP)
 		{
 			bmodel_appear();
-			if (self.spawnflags & 1)
-				self.solid = SOLID_NOT;
 		}
 		else
 		{
