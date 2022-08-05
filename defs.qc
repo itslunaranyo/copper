@@ -535,7 +535,7 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 ]
 
 @baseclass = Deathtype [ deathtype(string) : "Obituary message" ]
-@baseclass = Bounds [ mangle(string) : "Bounds size, centered (x y z)" ]
+@baseclass = Bounds [ size(string) : "Bounds size, centered (x y z)" ]
 
 @baseclass = Phong [
 	_phong(integer) : "Use phong smoothing" : 0

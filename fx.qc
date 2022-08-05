@@ -247,7 +247,7 @@ void(float num) particlefield_burst =
 	{
 		num -= 1;
 		org = Vector(crandom(), crandom(), crandom());
-		org2 = vec_scale(org, self.mangle);
+		org2 = vec_scale(org, self.size);
 		
 		particle (org2 + self.origin, particlefield_dir(org), self.health, self.speed2);
 	}
@@ -351,7 +351,7 @@ Color Reference:
 /*QUAKED misc_particlefield_box (0 .6 1) (-8 -8 -8) (8 8 8) START_ON INWARD OUTWARD BURST
 Makes dots appear continuously within its bounds. Trigger to toggle on or off. 
 
-"mangle" dimensions of sparkly zone
+"size" dimensions of sparkly zone
 "speed" number of clumps per second, default 10
 "speed2" number of dots per clump, default 16
 "health" color index (0-255). quake will use every color in the row (each row is 16 colors)
@@ -396,7 +396,15 @@ void() misc_particlefield_box =
 	if (!self.wait)
 		self.wait = 0.1;
 	
-	self.mangle = self.mangle * 0.5;
+	if (self.size == '0 0 0')
+	{
+		if (self.mangle != '0 0 0')
+			self.size = self.mangle;
+		else
+			self.size = '64 64 64';
+	}
+	setsize(self, -self.size * 0.5, self.size * 0.5);	// set all values so we can see the field with r_showbboxes
+	self.size = self.size * 0.5;
 	
 	self.finaldest = self.velocity;
 	if (self.finaldest != VEC_ORIGIN)
@@ -413,20 +421,20 @@ void() misc_particlefield_box =
 			if (y < x)
 			{	// sweeping down x
 				self.worldtype = 0;
-				self.dest = Vector(self.mangle_y, self.mangle_z, self.mangle_x);
+				self.dest = Vector(self.size_y, self.size_z, self.size_x);
 				self.pos1 = Vector(self.finaldest_y, self.finaldest_z, self.finaldest_x);
 			}
 			else
 			{	// sweeping down y
 				self.worldtype = 1;
-				self.dest = Vector(self.mangle_x, self.mangle_z, self.mangle_y);
+				self.dest = Vector(self.size_x, self.size_z, self.size_y);
 				self.pos1 = Vector(self.finaldest_x, self.finaldest_z, self.finaldest_y);
 			}
 		}
 		else
 		{	// already z
 			self.worldtype = 2;	
-			self.dest = self.mangle;
+			self.dest = self.size;
 			self.pos1 = self.finaldest;
 		}
 	}
@@ -475,11 +483,11 @@ Color Reference:
 void() misc_particlefield =
 {
 	setmodel(self,self.model);
-	self.mangle = self.size;
+	//self.mangle = self.size;
 	setorigin(self,(self.absmin + self.absmax) * 0.5);
 	self.modelindex = 0;
 	self.model = string_null;
-	self.mins = self.maxs = self.size = VEC_ORIGIN;
+	self.mins = self.maxs = VEC_ORIGIN;
 	misc_particlefield_box();
 }
 

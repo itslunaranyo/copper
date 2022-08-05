@@ -130,8 +130,13 @@ void() InitTriggerBounds =
 		self.solid = SOLID_TRIGGER;
 	setorigin (self, self.origin);
 	
-	setsize (self, self.mangle * -0.5, self.mangle * 0.5);
-	self.mangle = '0 0 0';	// so setMoveDir doesn't think our mangle is our angle
+	if (self.size != '0 0 0')
+		setsize (self, self.size * -0.5, self.size * 0.5);
+	else if (self.mangle != '0 0 0')
+	{
+		setsize (self, self.mangle * -0.5, self.mangle * 0.5);
+		self.mangle = '0 0 0';	// so setMoveDir doesn't think our mangle is our angle
+	}
 	
 	if (self.angles != '0 0 0')
 		SetMovedir ();
