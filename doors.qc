@@ -81,6 +81,8 @@ void() door_go_up =
 
 	if (self.state == STATE_TOP)
 	{	// reset top wait time
+		if (self.spawnflags & DOOR_TOGGLE)
+			return;		// don't come down automatically
 		self.nextthink = self.ltime + self.wait;
 		return;
 	}
@@ -109,8 +111,6 @@ void() door_fire =
 	if (self.owner != self)
 		objerror ("door_fire: self.owner != self");
 
-	//dprint("door firing\n");
-		
 	// play use key sound
 	if (self.items)
 		sound (self, CHAN_BODY, self.noise4, 1, ATTN_NORM);	// was chan_voice, door move sound was cutting it off
@@ -119,33 +119,19 @@ void() door_fire =
 	{
 		self.message = string_null;		// no more message
 	}
-	else
-	{
-		oself = self;
-		if (self.state == STATE_TOP || self.state == STATE_UP )
-		{
-			starte = self;
-			do
-			{
-				if (self.classname == "shadowmonitor")
-					door_shadowmonitor_go();
-				else
-					door_go_down ();
-				self = self.enemy;
-			} while ( (self != starte) && (self != world) );
-			self = oself;
-			return;
-		}
-	}
 	
-// trigger all paired doors
+	// trigger all paired doors
 	starte = self;
-	if ( !( self.spawnflags & DOOR_TOGGLE ) || ( self.spawnflags & DOOR_TOGGLE && self.state == STATE_BOTTOM) )
 	do {
 		if (self.classname == "shadowmonitor")
 			door_shadowmonitor_go();
 		else
-			door_go_up ();
+		{
+			if (self.state == STATE_TOP || self.state == STATE_UP )
+				door_go_down ();
+			else
+				door_go_up ();
+		}
 		self = self.enemy;
 	} while ( (self != starte) && (self != world) );
 	self = oself;
@@ -444,16 +430,6 @@ void(vector cmins, vector cmaxs) door_finalize =
 	{
 		door_key_init();
 		return;
-
-		/*
-		t = self;
-		do {
-			//self.items = t.items;
-			door_key_init();
-			self = self.enemy;
-		} while (t != self);
-		return;
-		*/
 	}
 
 	t = self;
@@ -522,7 +498,8 @@ void() door_link =
 		
 		if (self != masterdoor)
 		{
-			if (self.targetname != string_null && masterdoor.targetname == string_null)
+			if ((self.targetname != string_null && masterdoor.targetname == string_null) ||
+				self.targetname == masterdoor.targetname)
 			{
 				// all the doors in the chain having the same targetname will cause
 				// the whole chain to be triggered once for every door in the chain
