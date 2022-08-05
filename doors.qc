@@ -57,7 +57,7 @@ void() door_hit_top =
 void() door_hit_bottom =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-	self.frame = self.skin;
+	self.frame = !self.frame;
 	self.state = STATE_BOTTOM;
 }
 
@@ -81,8 +81,6 @@ void() door_go_up =
 
 	if (self.state == STATE_TOP)
 	{	// reset top wait time
-		if (self.spawnflags & DOOR_TOGGLE)
-			return;		// don't come down automatically
 		self.nextthink = self.ltime + self.wait;
 		return;
 	}
@@ -90,7 +88,7 @@ void() door_go_up =
 	sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	self.state = STATE_UP;
 	SUB_CalcMove (self.pos2, self.speed, door_hit_top);
-	self.frame = !self.skin;
+	self.frame = !self.frame;
 
 	SUB_UseTargetsSilent();	// door messages are for when they *don't* open
 }
@@ -111,6 +109,8 @@ void() door_fire =
 	if (self.owner != self)
 		objerror ("door_fire: self.owner != self");
 
+	//dprint("door firing\n");
+		
 	// play use key sound
 	if (self.items)
 		sound (self, CHAN_BODY, self.noise4, 1, ATTN_NORM);	// was chan_voice, door move sound was cutting it off
@@ -119,19 +119,33 @@ void() door_fire =
 	{
 		self.message = string_null;		// no more message
 	}
+	else
+	{
+		oself = self;
+		if (self.state == STATE_TOP || self.state == STATE_UP )
+		{
+			starte = self;
+			do
+			{
+				if (self.classname == "shadowmonitor")
+					door_shadowmonitor_go();
+				else
+					door_go_down ();
+				self = self.enemy;
+			} while ( (self != starte) && (self != world) );
+			self = oself;
+			return;
+		}
+	}
 	
-	// trigger all paired doors
+// trigger all paired doors
 	starte = self;
+	if ( !( self.spawnflags & DOOR_TOGGLE ) || ( self.spawnflags & DOOR_TOGGLE && self.state == STATE_BOTTOM) )
 	do {
 		if (self.classname == "shadowmonitor")
 			door_shadowmonitor_go();
 		else
-		{
-			if (self.state == STATE_TOP || self.state == STATE_UP )
-				door_go_down ();
-			else
-				door_go_up ();
-		}
+			door_go_up ();
 		self = self.enemy;
 	} while ( (self != starte) && (self != world) );
 	self = oself;
@@ -430,6 +444,16 @@ void(vector cmins, vector cmaxs) door_finalize =
 	{
 		door_key_init();
 		return;
+
+		/*
+		t = self;
+		do {
+			//self.items = t.items;
+			door_key_init();
+			self = self.enemy;
+		} while (t != self);
+		return;
+		*/
 	}
 
 	t = self;
@@ -452,21 +476,6 @@ void(vector cmins, vector cmaxs) door_finalize =
 	self.trigger_field = door_spawn_field(cmins, cmaxs);
 }
 
-float(entity door, entity master) door_can_link =
-{
-	if (door == master) return TRUE;	// first door
-	if (door.enemy) return FALSE;	// already linked
-	if (door.spawnflags & DOOR_DONT_LINK) return FALSE;	// will finalize itself later
-
-	if (door.targetname != string_null && master.targetname != string_null && master.targetname != door.targetname)
-		return FALSE;	// part of different systems, might only touch coincidentally
-	
-	if (door.items && master.items && !(master.items & door.items))
-		return FALSE;	// different items requirements
-	
-	return TRUE;
-}
-
 /*
 =============
 door_link
@@ -474,8 +483,8 @@ door_link
 */
 void() door_link =
 {
-	entity	t, masterdoor;
-	vector	cmins, cmaxs;
+	local entity	t, masterdoor;
+	local vector	cmins, cmaxs;
 
 	if (self.enemy)
 		return;		// already linked by another door
@@ -495,36 +504,33 @@ void() door_link =
 	do
 	{
 		self.owner = masterdoor;
-		
+
 		if (self != masterdoor)
 		{
-			if ((self.targetname != string_null && masterdoor.targetname == string_null) ||
-				self.targetname == masterdoor.targetname)
+			if (self.health)
+				masterdoor.health = self.health;
+			if (self.targetname != string_null)
 			{
-				// all the doors in the chain having the same targetname will cause
-				// the whole chain to be triggered once for every door in the chain
 				masterdoor.targetname = self.targetname;
 				self.targetname = string_null;
+				// all the doors in the chain having the same targetname will cause
+				// the whole chain to be triggered once for every door in the chain
 			}
-			masterdoor.items |= self.items;
-			if (self.health != 0 && masterdoor.health == 0)
-				masterdoor.health = self.health;
-
-			SUB_MergeTargets(masterdoor);
+			SUB_MergeTargets(masterdoor);	// same deal
 			self.target = string_null;
 			self.target2 = string_null;
 			self.target3 = string_null;
 			self.target4 = string_null;
 			self.killtarget = string_null;
-			if (self.message != string_null && masterdoor.message == string_null)
+			if (self.message != string_null)
 				masterdoor.message = self.message;
+			if (self.items)
+			{
+				masterdoor.items |= self.items;
+			}
 		}
-
-		// skip doors with other targetnames to not fold them into the loop
-		do {
-			t = find (t, classname, self.classname);	
-		} while (t && (!door_can_link(t,masterdoor) || !EntitiesTouching(self,t)));
 		
+		t = find (t, classname, self.classname);	
 		if (!t)
 		{
 			self.enemy = masterdoor;		// make the chain a loop
@@ -535,16 +541,22 @@ void() door_link =
 			return;
 		}
 
-		self.enemy = t;
-		self = t;
+		if (EntitiesTouching(self,t) && !(t.spawnflags & DOOR_DONT_LINK))
+		{
+			if (t.enemy)
+				objerror ("cross connected doors");
+			
+			self.enemy = t;
+			self = t;
 
-		cmins_x = min(t.mins_x, cmins_x);
-		cmins_y = min(t.mins_y, cmins_y);
-		cmins_z = min(t.mins_z, cmins_z);
-		cmaxs_x = max(t.maxs_x, cmaxs_x);
-		cmaxs_y = max(t.maxs_y, cmaxs_y);
-		cmaxs_z = max(t.maxs_z, cmaxs_z);
-	} while (t);
+			cmins_x = min(t.mins_x, cmins_x);
+			cmins_y = min(t.mins_y, cmins_y);
+			cmins_z = min(t.mins_z, cmins_z);
+			cmaxs_x = max(t.maxs_x, cmaxs_x);
+			cmaxs_y = max(t.maxs_y, cmaxs_y);
+			cmaxs_z = max(t.maxs_z, cmaxs_z);
+		}
+	} while (1);
 }
 
 void() LinkDoors = {door_link();}
@@ -1223,5 +1235,5 @@ void () func_door_secret =
 
 	self.dest1 = self.origin + firstmove * self.t_width;
 	self.dest2 = self.dest1 + secondmove * self.t_length;
-	self.skin = self.frame;
+	
 }

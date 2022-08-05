@@ -107,10 +107,10 @@ void() monster_spawnsetup_go =
 	{
 		if (!SUB_VerifyTriggerable())
 		{
-			bprint4("WARNING: removed triggered-spawn ", self.classname,
+			dprint4("WARNING: triggered-spawn ", self.classname,
 				" with unmatched targetname '", self.targetname);
-			bprint3("' at ", vtos(self.origin), "\n");
-			remove(self);
+			dprint3("' at ", vtos(self.origin), "\n");
+			//remove(self);
 			return;
 		}
 	}
