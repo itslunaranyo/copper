@@ -76,13 +76,6 @@ ambience/
 [
 	noise(string) : "path to .wav"
 	volume(string) : "Volume" : "1"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_sound =
@@ -109,13 +102,6 @@ good old suck wind
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_suck_wind : "Wind sound" [
 	volume(string) : "Volume" : "1"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_suck_wind =
@@ -137,13 +123,6 @@ more of a throb, really
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_drone : "Engine/machinery sound" [
 	volume(string) : "Volume" : "0.55"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_drone =
@@ -165,13 +144,6 @@ zaps and sparks
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_flouro_buzz : "Fluorescent buzzing sound" [
 	volume(string) : "Volume" : "1"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_flouro_buzz =
@@ -192,13 +164,6 @@ drip drip
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_drip : "Dripping sound" [
 	volume(string) : "Volume" : "0.75"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_drip =
@@ -219,13 +184,6 @@ bleeps and bloops
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_comp_hum : "Computer background sounds" [
 	volume(string) : "Volume" : "1"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_comp_hum =
@@ -246,13 +204,6 @@ what
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_thunder : "Thunder sound" [
 	volume(string) : "Volume" : "0.5"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_thunder =
@@ -273,13 +224,6 @@ gentle lamp hum
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_light_buzz : "Buzzing sound from light" [
 	volume(string) : "Volume" : "0.85"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_light_buzz =
@@ -300,13 +244,6 @@ swamp
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_swamp1 : "Frogs croaking" [
 	volume(string) : "Volume" : "0.75"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_swamp1 =
@@ -327,13 +264,6 @@ same as swamp1
 /*FGD
 @PointClass base(Ambient) color(150 0 150) = ambient_swamp2 : "Frogs croaking B" [
 	volume(string) : "Volume" : "0.5"
-	distance(choices) : "Range" : 0 =
-	[
-		0 : "Ambient"
-		1 : "Monster Idle"
-		2 : "Monster Bark"
-		3 : "Global"
-	]
 ]
 */
 void() ambient_swamp2 =
