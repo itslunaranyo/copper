@@ -1184,11 +1184,12 @@ void() trigger_monsterjump_touch =
 	if (self.wait == -1)
 	{
 		SUB_RemoveSoon();
-		return;
 	}
-	
-	self.dmgtime = time;
-	self.attack_finished = time + self.wait;
+	else
+	{
+		self.dmgtime = time;
+		self.attack_finished = time + self.wait;
+	}
 	// set XY even if not on ground, so the jump will clear lips
 	if (self.spawnflags & SPAWN_MJUMP_ADDVEL)
 	{
