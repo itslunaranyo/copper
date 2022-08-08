@@ -1162,8 +1162,8 @@ void() trigger_monsterjump_touch =
 	if (self.include == string_null || 
 		(other.classname != self.include && other.targetname != self.include))	// always allow this class/tname
 	{
-		if (self.spawnflags & SPAWN_MJUMP_NOLARGE && other.maxs_x == 32) return;
-		if (self.spawnflags & SPAWN_MJUMP_NOSMALL && other.maxs_x == 16) return;
+		if (self.spawnflags & SPAWN_MJUMP_NOLARGE && other.maxs_x >= 24) return;
+		if (self.spawnflags & SPAWN_MJUMP_NOSMALL && other.maxs_x < 24) return;
 		if (self.spawnflags & SPAWN_MJUMP_MELEES && !(other.customflags & CFL_MELEEONLY)) return;
 		
 		if (self.exclude != string_null)
