@@ -1246,6 +1246,7 @@ Keys:
 "include" allow this classname of monster, or monsters with this targetname, no matter what
 "exclude" exclude this classname of monster, or monsters with this targetname, no matter what
 "wait" don't allow a jump touch more often than this many seconds (-1 for once only)
+"distance" width of cone (in degrees) that counts as 'in front' if ONLY_FRONT checked
 */
 /*FGD
 @baseclass base(TriggerNoTargets, Angle) = Monsterjump [
@@ -1262,8 +1263,13 @@ Keys:
 	height(integer) : "Jump Height" : 200
 	include(string) : "Allow this classname of monster, or monsters with this targetname, no matter what"
 	exclude(string) : "Ignore this classname of monster, or monsters with this targetname, no matter what"
+	distance(integer) : "Width of facing cone (in degrees) if 'only in front' is set" : 120
 ]
-@SolidClass base(Monsterjump) = trigger_monsterjump : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions." []
+@SolidClass base(Monsterjump) = trigger_monsterjump : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions.
+
+Use the 'Only if target in front'/'below' spawnflags to prevent monsters from being thrown off of ledges away from the player after the player has climbed up there.
+
+Use the 'no large monsters', 'no small monsters', and 'only melee monsters' spawnflags to fine-tune which monsters jump and which don't if necessary. If this isn't fine-grained enough, the 'include' and 'exclude' keys can be set to specific monster classnames, or targetnames, to exempt matching monsters from those rules. If that isn't fine-grained enough, consider two overlapping monsterjumps with different, more specific rules." []
 */
 void() trigger_monsterjump =
 {
@@ -1298,6 +1304,10 @@ Keys:
 */
 /*FGD
 @PointClass base(Monsterjump, Bounds) = trigger_monsterjump_box : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions.
+
+Use the 'Only if target in front'/'below' spawnflags to prevent monsters from being thrown off of ledges away from the player after the player has climbed up there. 
+
+Use the 'no large monsters', 'no small monsters', and 'only melee monsters' spawnflags to fine-tune which monsters jump and which don't if necessary. If this isn't fine-grained enough, the 'include' and 'exclude' keys can be set to specific monster classnames, or targetnames, to exempt matching monsters from those rules. If that isn't fine-grained enough, consider two overlapping monsterjumps with different, more specific rules.
 
 Quoth2-style edict-saving bounding box trigger: define bounds size with 'size' - trigger volume will be centered on the trigger's origin." []
 */
