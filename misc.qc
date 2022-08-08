@@ -3,7 +3,8 @@
 Used as a positional target for spotlights, etc. Not present in game.
 */
 /*FGD
-@PointClass base(Targetname) size(8 8 8) color(200 150 150) = info_null : "info_null (spotlight target)" []
+@PointClass base(Targetname) size(8 8 8) color(200 150 150) = info_null : "info_null (spotlight target)
+Not present in game." []
 */
 void() info_null =
 {
@@ -109,7 +110,7 @@ float SPAWN_MODEL_STARTINVIS = 2;
 float SPAWN_MODEL_ANIMONCE = 4;
 
 /*QUAKED misc_model (0.6 0.7 0.8) (-8 -8 -8) (8 8 8) TOGGLE_VIS START_INVIS ANIM_ONCE
-display a model. will not be solid! for a misc_model which can be toggled on or off, use a func_wall_point with a targetname.
+Display a model. Will not be solid! Use clip to block players/monsters, or a func_wall made of skip to block weapons.
 
 "model" filename of model to stand in for this entity. can be a bsp or an mdl. 
 "mangle" exact orientation of the model, values are 'pitch yaw roll', positive pitch is down
@@ -137,13 +138,12 @@ deathe: 102 (on side)
     "skin": skin,
     "frame": frame
 }) = misc_model : 
-"Display a model. Not solid.
-for a misc_model which can be toggled on or off, use a func_wall_point with a targetname."
+"Display a model. Will not be solid! Use clip to block players/monsters, or a func_wall made of skip to block weapons."
 [
 	spawnflags(flags) = [
 		1 : "Trigger Visibility" : 0
 		2 : "Start Invisible" : 0
-		4 : "2nd anim once" : 0	
+		4 : "Play 2nd anim once" : 0	
 	]
 	model(string) : "Filename of model (mdl or bsp)"
 	mangle(string) : "Orientation (pitch yaw roll, positive pitch is down)"
@@ -151,6 +151,10 @@ for a misc_model which can be toggled on or off, use a func_wall_point with a ta
 	skin(integer) : "skin of mdl to display" : 0
 	pos1(string) : "override frame with an animation (firstframe startframe lastframe)"
 	pos2(string) : "if triggerable, second animation to toggle to"
+	ideal_yaw(choices) : "Randomize orientation" = [
+		0 : "Set Orientation"
+		1 : "Random yaw"
+	]
 ]
 */
 void() misc_model = 
@@ -314,20 +318,23 @@ Keyvalues:
   "max_health" if auto, never set count to heal *target* above this much
 */
 /*FGD
-@Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(32 32 32) = target_heal : 
-"Heals targets when triggered, or activator if no targets set" 
+@Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(32 32 32) = target_heal : "Target : Heal.
+Heals activator for 'healamount' when triggered. Use for healing pools, first aid dispensers, etc.
+If it has any targets, it heals them instead, even doors and buttons. This will not reset 'dead' doors or buttons with a wait of -1.
+
+If 'trigger first' and 'auto set count' are set, will choose 'count' based on how much health the activator needs when first triggered, for dirty lazy automatic game balance. Use 'lip' and 'max_health' to constrain this." 
 [
 	spawnflags(flags) = [
-		1 : "ignore max_health" : 0
-		2 : "ignore non-clients" : 0
-		4 : "first trigger activates" : 0
-		8 : "auto-set count on trigger-first" : 0
+		1 : "Overheal (ignore max)" : 0
+		2 : "Ignore non-players" : 0
+		4 : "First trigger activates" : 0
+		8 : "Auto-set 'count' on trigger-first" : 0
 	]
-	healamount(integer) : "heal per use" : 5
-	count(integer) : "lifetime limit" : -1
-	strength(string) : "scale auto-limit" : "1.0"
-	lip(integer) : "minimum for auto-limit"
-	max_health(integer) : "max target health for auto-limit"
+	healamount(integer) : "Healing per use" : 5
+	count(integer) : "Lifetime healing limit" : -1
+	strength(string) : "Scale auto-limit (-4 to scale by number of clients)" : "1"
+	lip(integer) : "Minimum target health for auto-limit"
+	max_health(integer) : "Maximum target health for auto-limit"
 ]
 */
 void() target_heal =
@@ -399,7 +406,7 @@ Kills ALL of its targets (1-4) as well as killtargets when triggered. for target
 */
 /*FGD
 @Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_kill : 
-"Removes all targets when triggered." []
+"Removes all targets when triggered. for targets you really don't like." []
 */
 void() target_kill =
 {
@@ -466,7 +473,8 @@ void() target_autosave_use =
 }
 
 /*QUAKED target_autosave (1 .0 .5) (-8 -8 -8) (8 8 8)
-Saves the game when triggered by a player. Never appears in multiplayer. the bprint tends to stomp any other prints on screen in most quake clients, so use a delayed trigger_relay if you fire this from an important pickup/trigger_counter/something else that puts text on screen more important than the autosave blurb.
+Saves the game when triggered by a player. Never appears in multiplayer. 
+the bprint tends to stomp any other prints on screen in most quake clients, so use a delayed trigger_relay if you fire this from an important pickup/trigger_counter/something else that puts text on screen more important than the autosave blurb.
 
 Keys:
 "message" change save file name, defaults to 'auto'
@@ -558,7 +566,7 @@ void() lavaball_idle =
 }
 
 /*QUAKED misc_fireball (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF BURST EXPLODE
-LavA_Ballz
+Lavaball Launcher.
 Fires randomly. Trigger to turn on/off. 
 
 "wait" min pause between balls
@@ -574,7 +582,8 @@ BURST fires "delay" seconds after being triggered
 EXPLODE blow up on contact, does 'dmg' damage (default 20)
 */
 /*FGD
-@PointClass base(Appearflags, Targetname) model({ "path": ":progs/lavaball.mdl" }) = misc_fireball : "Lavaball Launcher. Trigger to toggle on/off." 
+@PointClass size(16 16 16) color(160 80 0) base(Appearflags, Targetname) model({ "path": ":progs/lavaball.mdl" }) = misc_fireball : "Lavaball Launcher. 
+Fires randomly. Trigger to toggle on/off." 
 [
 	spawnflags(flags) = [
 		1 : "Start off" : 0
@@ -663,7 +672,7 @@ void() target_multiprint_use =
 }
 
 /*QUAKED target_multiprint (.5 .5 .5) (-8 -8 -8) (8 8 8) SILENT
-This entity will print a different string every time it"s triggered.  Prints "message", 
+This entity will print a different string every time it's triggered.  Prints "message", 
 "noise", "noise1", "noise2", "noise3", then "noise4."  Once all strings are used up, it will 
 fire its targets instead (so several of these can be chained if you really need that 
 many prints in a row).
@@ -671,9 +680,10 @@ many prints in a row).
 SILENT: Don't play the beep wav when triggered.
 */
 /*FGD
-@PointClass base(Appearflags, Targetname, Target) color(128 128 128) = target_multiprint : 
+@PointClass color(128 128 128) size(16 16 16) base(Appearflags, Targetname, Target) color(128 128 128) = target_multiprint : 
 "Target : Multiprint
-Prints a different string every time it's triggered, or fires its targets if it ran out."
+This entity will print a different string every time it's triggered.  Prints 'message', 'noise', 'noise1', 'noise2', 'noise3', then 'noise4.'  Once all strings are used up, it will fire its targets instead (so several of these can be chained if you really need that 
+many prints in a row)."
 [
 	spawnflags(flags) = [
 		1 : "Silent" : 0

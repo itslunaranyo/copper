@@ -511,7 +511,10 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 //================================================
 
 /*FGD
-@baseclass = Angle [ angle(integer) : "Direction" ]
+@baseclass = Angle [ 
+	angle(integer) : "Direction (0-360 yaw, or -1 for up/-2 for down)"
+	angles(string) : "Direction, specifically (pitch yaw roll)"
+]
 @baseclass = Appearflags [
 	spawnflags(Flags) =
 	[
@@ -526,16 +529,16 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 
 @baseclass = Targetname [ targetname(target_source) : "Name" ]
 @baseclass = Target [ 
-	target(target_destination) : "Target" 
-	target2(target_destination) : "Target" 
-	target3(target_destination) : "Target" 
-	target4(target_destination) : "Target" 
-	killtarget(target_destination) : "Killtarget"
-	delay(string) : "Delay before firing targets" : "0"
+	target(target_destination) : "Target: activate anything with a matching targetname" 
+	target2(target_destination) : "Target 2: activate anything with a matching targetname" 
+	target3(target_destination) : "Target 3: activate anything with a matching targetname" 
+	target4(target_destination) : "Target 4: activate anything with a matching targetname" 
+	killtarget(target_destination) : "Killtarget: REMOVE anything with a matching targetname"
+	delay(string) : "Delay before activating targets" : "0"
 ]
 
-@baseclass = Deathtype [ deathtype(string) : "Obituary message" ]
-@baseclass = Bounds [ size(string) : "Bounds size, centered (x y z)" ]
+@baseclass = Deathtype [ deathtype(string) : "Obituary message. Printed after dead player's name, so format accordingly (ie 'was burnt to a crisp')" ]
+@baseclass size(16 16 16) = Bounds [ size(string) : "Bounds size, centered (x y z)" ]
 
 @baseclass = Phong [
 	_phong(integer) : "Use phong smoothing" : 0

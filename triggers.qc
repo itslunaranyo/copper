@@ -18,7 +18,7 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 /*FGD
 @baseclass = TriggerSounds
 [
-	sounds(choices) : "Sounds" : 0 =
+	sounds(choices) : "Sounds" : 2 =
 	[
 		-1 : "None"
 		1 : "secret"
@@ -43,10 +43,12 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 @baseclass base(Trigger, TriggerSounds, Angle) = TriggerMulti
 [
 	health(integer) : "solid, must be killed to activate"
-	distance(string) : "dot product result to compare 'angle' against"
+	angle(integer) : "Direction player must be facing to trigger (0-360 yaw, or -1 for up/-2 for down)"
+	angles(string) : "Direction player must be facing to trigger, specifically (pitch yaw roll)"
+	distance(string) : "Width of tolerance cone if angle or angles is set"
 	spawnflags(Flags) = [
-		1 : "notouch" : 0
-		8 : "monsters will fire" : 0
+		1 : "No touch" : 0
+		8 : "Monsters Will Fire" : 0
 	]
 ]
 */
@@ -358,7 +360,7 @@ Keys:
 "angle" the trigger will only fire when someone is facing the direction of the angle, use 360 for angle 0.
 "distance" dot product result to compare "angle" against. 0 is 90 degrees off (default), 0.7 is ~45 degrees.
 "delay" delay before firing (after trigger)
-"health" button must be killed to activate
+"health" solid, must be killed to activate
 "message" message to display when triggered
 "sounds"
     1 = secret
@@ -372,9 +374,16 @@ Keys:
 "wait" delay between triggerings (default: 0.2) (NOTE: wait -1 with all_clients will not work like you think.)
 */
 /*FGD
-@SolidClass base(TriggerMulti) = trigger_multiple : "Trigger: Activate multiple" 
+@SolidClass base(TriggerMulti) = trigger_multiple : "Trigger multiple. Variable sized repeatable trigger.
+Must be targeted at one or more entities.
+
+Spawnflags:
+'No Touch': only triggered by other entities, not by touching (legacy; just use a trigger relay)
+'All Clients': will trigger once per client touching it on the same frame before waiting (default behavior is to trigger only for the first touch event, ie the lowest-numbered client). use if you want to trigger a target_items or target_heal and have every client in the trigger affected by the result.
+'Trigger First': won't be touchable until triggered once by something else
+'Monsters Will Activate': monsters will fire this trigger (and count as activator, so be careful)" 
 [
-	wait(string) : "Wait before reset" : "0.2"
+	wait(string) : "Retriggering Interval" : "0.2"
 ]
 */
 void() trigger_multiple =
@@ -389,7 +398,9 @@ void() trigger_multiple =
 
 
 /*QUAKED trigger_multiple_box (.5 .5 0) (-8 -8 -8) (8 8 8) ? ? TRIGGER_FIRST MONSTERS ALL_CLIENTS
-Quoth2-style cache-saving bounding box triggers: define size with "mangle", as total dimensions in xyz - trigger volume will be that size centered on the trigger_multiple_box's origin.  otherwise acts like a normal trigger.
+Trigger multiple. Variable sized repeatable trigger. Must be targeted at one or more entities.
+
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
 
 Flags:
 "all_clients" will trigger once per client touching it on the same frame before waiting (default behavior is to trigger only for the first touch event, ie the lowest-numbered client). use if you want to trigger a target_items or target_heal and have every client in the trigger affected by the result.
@@ -414,9 +425,18 @@ Keys:
 "wait" delay between triggerings (default: 0.2) (NOTE: wait -1 with all_clients will not work like you think.)
 */
 /*FGD
-@PointClass base(TriggerMulti, Bounds) = trigger_multiple_box : "Trigger: Activate multiple" 
+@PointClass base(TriggerMulti, Bounds) = trigger_multiple_box : "Trigger multiple. Variable sized repeatable trigger.
+Must be targeted at one or more entities.
+
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
+
+Spawnflags:
+'No Touch': only triggered by other entities, not by touching (legacy; just use a trigger relay)
+'All Clients': will trigger once per client touching it on the same frame before waiting (default behavior is to trigger only for the first touch event, ie the lowest-numbered client). use if you want to trigger a target_items or target_heal and have every client in the trigger affected by the result.
+'Trigger First': won't be touchable until triggered once by something else
+'Monsters Will Activate': monsters will fire this trigger (and count as activator, so be careful)"
 [
-	wait(string) : "Wait before reset" : "0.2"
+	wait(string) : "Retriggering Interval" : "0.2"
 ]
 */
 void() trigger_multiple_box =
@@ -458,7 +478,15 @@ Keys:
 "targetname"  entity name
 */
 /*FGD
-@SolidClass base(TriggerMulti) = trigger_once : "Trigger: Activate once" []
+@SolidClass base(TriggerMulti) = trigger_once : "Trigger multiple. Variable sized trigger.
+Must be targeted at one or more entities. Wait is always -1: removes itself after one use.
+
+Spawnflags:
+'No Touch': only triggered by other entities, not by touching (legacy; just use a trigger relay)
+'All Clients': will trigger once per client touching it on the same frame before waiting (default behavior is to trigger only for the first touch event, ie the lowest-numbered client). use if you want to trigger a target_items or target_heal and have every client in the trigger affected by the result.
+'Trigger First': won't be touchable until triggered once by something else
+'Monsters Will Activate': monsters will fire this trigger (and count as activator, so be careful)"
+[]
 */
 void() trigger_once =
 {
@@ -471,6 +499,8 @@ void() trigger_once =
 Quoth2-style cache-saving bounding box triggers: define size with "mangle", as total dimensions in xyz - trigger volume will be that size centered on the trigger_multiple_box's origin.  otherwise acts like a normal trigger.
 
 Wait is always -1.
+
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
 
 Flags:
 "trigger_first" won't be touchable until triggered once by something else
@@ -493,7 +523,17 @@ Keys:
 "targetname"  entity name
 */
 /*FGD
-@PointClass base(TriggerMulti, Bounds) = trigger_once_box : "Trigger: Activate once" []
+@PointClass base(TriggerMulti, Bounds) = trigger_once_box : "Trigger multiple. Variable sized trigger.
+Must be targeted at one or more entities. Wait is always -1: removes itself after one use.
+
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
+
+Spawnflags:
+'No Touch': only triggered by other entities, not by touching (legacy; just use a trigger relay)
+'All Clients': will trigger once per client touching it on the same frame before waiting (default behavior is to trigger only for the first touch event, ie the lowest-numbered client). use if you want to trigger a target_items or target_heal and have every client in the trigger affected by the result.
+'Trigger First': won't be touchable until triggered once by something else
+'Monsters Will Activate': monsters will fire this trigger (and count as activator, so be careful)"
+[]
 */
 void() trigger_once_box =
 {
@@ -593,9 +633,9 @@ void() target_secret_check =
 }
 
 /*QUAKED target_secret (.5 .0 .5) (-8 -8 -8) (8 8 8) ? SUPERSECRET
-Secret counter trigger.  Player gets a secret credit when triggered.  Note when using a target_secret: if the item can't be picked up (because of health/armor/ammo limits already being met, etc), it won't fire its targets and thus the target_secret won't give credit. Use a trigger in that case.
+Secret counter trigger.  Player gets a secret credit when triggered.  Note when using a target_secret: if triggered by touching an item, and the item can't be picked up (because of health/armor/ammo limits already being met, etc), it won't fire its targets and thus the target_secret won't give credit. Use a trigger in that case.
 
-Set "SUPERSECRET" to hide its existence in the total until it's found.
+Set "SUPERSECRET" to hide its existence in the total until it's found. Think very carefully if you actually want to use this.
 Keys:
 "message" message to display when triggered
 "sounds"
@@ -607,8 +647,9 @@ Keys:
 "noise"	choose your own .wav
 */
 /*FGD
-@PointClass base(Secret) = target_secret : "Target : Secret
-Counts as a secret, trigger to give credit" []
+@PointClass base(Secret) = target_secret : "Secret counter trigger.  Player gets a secret credit when triggered.  Note when using a target_secret: if triggered by touching an item, and the item can't be picked up (because of health/armor/ammo limits already being met, etc), it won't fire its targets and thus the target_secret won't give credit. Use a trigger in that case.
+
+Set the 'supersecret' spawnflag to hide its existence in the total until it's found. Think very carefully if you actually want to use this." []
 */
 void() target_secret =
 {
@@ -638,8 +679,7 @@ Flags:
 "trigger_first" won't be touchable until triggered once by something else
 */
 /*FGD
-@SolidClass base(Trigger, Secret) = trigger_secret : "Trigger : Secret
-Counts as a secret, trigger to give credit" []
+@SolidClass base(Trigger, Secret) = trigger_secret : "Secret counter trigger. Player gets a secret credit when touched." []
 */
 void() trigger_secret =
 {
@@ -653,7 +693,7 @@ void() trigger_secret =
 /*QUAKED trigger_secret_box (.5 .0 .5) (-8 -8 -8) (8 8 8) ? SUPERSECRET TRIGGER_FIRST
 Secret counter trigger.  Player gets a secret credit when touched.  Set "SUPERSECRET" to hide its existence in the total until found.
 
-Quoth2-style edict-saving bounding box trigger: define size with "mangle", trigger volume will be that size centered on the trigger_secret_box's origin.
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
 
 Keys:
 "message" message to display when triggered
@@ -910,16 +950,16 @@ void() hurt_touch =
 /*FGD
 @baseclass base(TriggerNoTargets) = Hurt [
 	spawnflags(flags) = [
-		1 : "Kill" : 0
-		2 : "Biosuit Immune" : 0
-		8 : "Won't Hurt Monsters" : 0
+		1 : "Just Kill Them" : 0
+		2 : "Biosuits are Immune" : 0
+		8 : "Don't Hurt Monsters" : 0
 	]
 	dmg(integer) : "Damage" : 5
-	delay(string) : "Interval" : "1"
+	delay(string) : "Interval (seconds)" : "1"
 ]
 */
 
-/*QUAKED trigger_hurt (.5 .0 .5) ? KILL NO_BIOSUIT TRIGGER_FIRST NO_MONSTERS
+/*QUAKED trigger_hurt (.5 .0 .5) ? KILL BIOSUIT TRIGGER_FIRST NO_MONSTERS
 any entity touching this will be hurt / to see if it still feels
 
 Keys:
@@ -928,12 +968,13 @@ Keys:
 
 Flags:
 "kill" always do enough damage to kill instantly
-"no_biosuit" the biosuit protects against this trigger
+"biosuit" the biosuit protects against this trigger
 "trigger_first" won't be touchable until triggered once by something else
 "no_monsters" trigger will only hurt players
 */
 /*FGD
-@SolidClass base(Hurt) = trigger_hurt : "Trigger: Hurt" []
+@SolidClass base(Hurt) = trigger_hurt : "Trigger: Hurt. Any creature touching this will be damaged.
+Resist the urge to put a tiny one of these on every light_flame." []
 */
 void() trigger_hurt =
 {
@@ -946,8 +987,8 @@ void() trigger_hurt =
 }
 
 /*QUAKED trigger_hurt_box (.5 .0 .5) (-8 -8 -8) (8 8 8) ? ? TRIGGER_FIRST
-Any object touching this will be hurt.
-Quoth2-style edict-saving bounding box trigger: define bounds size with "mangle" - trigger volume will be centered on the trigger_hurt_box's origin.
+Any creature touching this will be damaged.
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
 Resist the urge to put a tiny one of these on every light_flame.
 
 Keys:
@@ -958,7 +999,9 @@ Flags:
 "trigger_first" won't be touchable until triggered once by something else
 */
 /*FGD
-@PointClass base(Hurt,Bounds) = trigger_hurt_box : "Trigger: Hurt bounds" []
+@PointClass base(Hurt,Bounds) = trigger_hurt_box : "Trigger: Hurt. Any creature touching this will be damaged.
+Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
+Resist the urge to put a tiny one of these on every light_flame." []
 */
 void() trigger_hurt_box =
 {
@@ -1038,7 +1081,7 @@ void() trigger_push_touch =
 
 
 /*QUAKED trigger_push (.5 .0 .5) ? PUSH_ONCE ADD_VEL TRIGGER_FIRST TUNNEL
-Pushes the player and Grenades.
+Pushes the player, grenades, and gibs.
 
 Flags:
 "push_once" removes itself after firing
@@ -1054,18 +1097,22 @@ Keys:
 "noise" replace default wind blow sound
 */
 /*FGD
-@SolidClass base(Angle, TriggerNoTargets) = trigger_push : "Trigger: Push"
+@SolidClass base(Angle, TriggerNoTargets) = trigger_push : "Trigger: Push.
+Entities that come in contact with this are pushed. 
+
+The 'Add Velocity' spawnflag will add to the player's velocity rather than overriding it (like wind tunnels do), so the player can still move around and push against the current. Good for flowing water. Players will not be accelerated faster than 'speed2' if it is set.
+The 'Tunnel Center' spawnflag will suck players towards the center of the brush in the direction of travel to avoid them getting hung up on corners."
 [
 	spawnflags(flags) = [
 		1: "Push once" : 0
 		2: "Add Velocity" : 0
 		4: "Trigger First" : 0
-		8: "Tunnel" : 0
+		8: "Tunnel Center" : 0
 	]
-	speed(integer) : "Speed" : 1000
+	speed(integer) : "Speed (will be divided by 10, sorry, blame id software)" : 1000
 	speed2(integer) : "Speed Limit" : 0
 	noise(string) : "Looping sound" : "ambience/windfly.wav"
-	angles(string) : "Specific direction (p y r)" : "0 0 0"
+	angles(string) : "Specific direction (pitch yaw roll)" : "0 0 0"
 ]
 */
 void() trigger_push =
@@ -1168,7 +1215,7 @@ void() trigger_monsterjump_init =
 }
 
 /*QUAKED trigger_monsterjump (.5 .0 .5) ? NO_LARGE NO_SMALL TRIGGER_FIRST ONLY_MELEES ONLY_FRONT ONLY_BELOW ADD_VEL
-Walking monsters that touch this will jump in the direction of the trigger's angle.
+Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions.
 
 Flags:
 NO_LARGE only monsters with 32x32 bounds
@@ -1200,10 +1247,10 @@ Keys:
 	]
 	speed(integer) : "Jump Speed" : 200
 	height(integer) : "Jump Height" : 200
-	include(string) : "allow this classname of monster no matter what"
-	exclude(string) : "exclude this classname of monster no matter what"
+	include(string) : "Allow this classname of monster no matter what"
+	exclude(string) : "Ignore this classname of monster no matter what"
 ]
-@SolidClass base(Monsterjump) = trigger_monsterjump : "Trigger: Monster jump" []
+@SolidClass base(Monsterjump) = trigger_monsterjump : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions." []
 */
 void() trigger_monsterjump =
 {
@@ -1214,8 +1261,9 @@ void() trigger_monsterjump =
 
 
 /*QUAKED trigger_monsterjump_box (.5 .0 .5) (-8 -8 -8) (8 8 8) NO_LARGE NO_SMALL TRIGGER_FIRST ONLY_MELEES ONLY_FRONT ONLY_BELOW ADD_VEL
-Walking monsters that touch this will jump in the direction of the trigger's angle.
-Quoth2-style edict-saving bounding box trigger: define bounds size with "mangle" - trigger volume will be centered on the trigger_monsterjump_box's origin.
+Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions.
+
+Quoth2-style edict-saving bounding box trigger: define bounds size with 'size' - trigger volume will be centered on the trigger's origin.
 
 Flags:
 NO_LARGE only monsters with 32x32 bounds
@@ -1236,7 +1284,9 @@ Keys:
 "exclude" exclude this classname of monster no matter what
 */
 /*FGD
-@PointClass base(Monsterjump, Bounds) = trigger_monsterjump_box : "Trigger: Monster jump bounds" []
+@PointClass base(Monsterjump, Bounds) = trigger_monsterjump_box : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions.
+
+Quoth2-style edict-saving bounding box trigger: define bounds size with 'size' - trigger volume will be centered on the trigger's origin." []
 */
 void() trigger_monsterjump_box =
 {

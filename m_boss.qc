@@ -343,18 +343,24 @@ void() boss_awake =
 
 
 /*QUAKED monster_boss (1 0 0) (-128 -128 -24) (128 128 256) SHOOTABLE
-Chthon. requires event_lightning to kill but that's the oldest quake mapping tutorial on the internet, you can find it
+Ch'thon. Throws lava bombs until electrocuted to death.
+The more health he's lost, and the higher the skill level the player is on, the more accurately he leads his shots.
+The E1M7 boss fight requires an event_lightning.
 
-SPAWNFLAGS
-"Shootable" if you can't find the tutorial and just want a chthon you can blast. 'health' defaults to 1000.
+If 'SHOOTABLE' is set, he'll bleed when shot, and die the old-fashioned way when shot enough. Can even be telefragged. 'Health' defaults to 1000.
 */
 /*FGD
-@PointClass base(Angle, Appearflags, Target, Targetname, Deathtype) size(-128 -128 -24, 128 128 256) color(0 0 220) model({ "path": ":progs/boss.mdl" }) = monster_boss : "Chthon" [
+@PointClass base(Angle, Appearflags, Target, Targetname, Deathtype) size(-128 -128 -24, 128 128 256) color(0 0 220) model({ "path": ":progs/boss.mdl" }) = monster_boss : "Ch'thon. Throws lava bombs until electrocuted to death.
+The more health he's lost, and the higher the skill level the player is on, the more accurately he leads his shots.
+The E1M7 boss fight requires an event_lightning.
+
+If 'shootable' is set, he'll bleed when shot, and die the old-fashioned way when shot enough. Can even be telefragged. Health defaults to 1000."
+[
 	spawnflags(Flags) =
 	[
 		1 : "Shootable" : 0
 	]
-	health(integer) : "hit points, if shootable"
+	health(integer) : "Hit points, if shootable" : 1000
 ]
 */
 void() monster_boss =
@@ -490,7 +496,8 @@ Just for boss level. Fires targets on a successful zap.
 */
 /*FGD
 @PointClass base(Appearflags, Target, Targetname) =
-	event_lightning : "Chthon lightning. Fires targets on a successful zap." []
+	event_lightning : "Chthon lightning. Fires targets on a successful zap.
+Setup is weird and special: it must find two func_doors each with a 'target' (not targetname) of 'lightning', and it will branch the lightning between the bottom center of each door. If both doors are closed it won't hurt Ch'thon, but if both are open, it will, and otherwise lightning won't happen at all. Lightning doesn't actually have to go through Ch'thon." []
 */
 void() event_lightning =
 {

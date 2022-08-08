@@ -368,7 +368,8 @@ Spawnflags:
 "ON_PLAYER"	use activating player as source of sound
 */
 /*FGD
-@PointClass base(Ambient, Targetname) color(150 0 150) = target_sound : "Custom triggered sound"
+@PointClass base(Ambient, Targetname) color(150 0 150) = target_sound : "Custom triggered sound. Will play one sound every time it is triggered.
+You can set up to five sounds on this entity to cycle through in order (or shuffle, with the 'random' spawnflag). They will not cut each other off, so triggering this entity more frequently than the length of the sounds will overlap them."
 [
 	noise(string) : "path to .wav"
 	noise1(string) : "optional additional .wav to cycle"

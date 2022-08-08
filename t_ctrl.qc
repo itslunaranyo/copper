@@ -79,14 +79,15 @@ Spawnflags:
 "RANDOM"	randomly fire one of its targets (and/or kill one of its killtargets) instead of them all
 */
 /*FGD
-@PointClass base(Appearflags, TriggerSounds, Target, Targetname) = trigger_relay : "Trigger: Relay"
+@PointClass size(16 16 16) base(Appearflags, TriggerSounds, Target, Targetname) = trigger_relay : "Trigger: Relay.
+This fixed size trigger cannot be touched, it can only be fired by other events. Target this with a target_lock to selectively disable/reenable it for logic fun."
 [
 	spawnflags(flags) =	[
 		1 : "Only print message once" : 0
 		2 : "Choose one target at random" : 0
 	]
 	message(string) : "Print when triggered"
-	count(integer) : "Limit uses" : 0
+	count(integer) : "Limit uses (then self destruct)" : 0
 ]
 */
 void() trigger_relay =
@@ -155,7 +156,7 @@ void() target_state_use =
 }
 
 /*QUAKED target_state (.5 .0 .5) (-8 -8 -8) (8 8 8) RELAY INVERSE 
-Numeric variable. set 'state' to initial value. triggering this will cycle the value (swapping 0 and 1).
+Holds a numeric variable, or tests other entities for theirs before firing targets. Set 'state' to initial value. triggering this will cycle the value (swapping 0 and 1).
 
 If "RELAY" is checked, it acts as a relay instead of holding state. It fires its targets based on the value of the 'state' member of another entity, specified by setting 'state' to the value it has to match and 'include' to that entity's targetname. This can be another target_state, or any other entity which has a 'state', such as doors or plats.
 	0: off (lights/etc)/top (plats)/open (doors)/pushed (buttons)
@@ -179,15 +180,32 @@ Spawnflags:
 "INVERSE"	if RELAY, will fire if state is anything other than a match. otherwise, will decrement when triggered instead of increment
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) = target_state : "Target : State. Holds a numeric variable, or tests other entities for theirs before firing targets."
+@PointClass size(16 16 16) color(255 0 255) base(Appearflags, Target, Targetname) = target_state : "Target : State. 
+Holds a numeric variable, or tests other entities for theirs before firing targets. 
+Set 'state' to initial value. triggering this will cycle the value (swapping 0 and 1).
+
+If 'Relay' spawnflag is checked, it acts as a relay instead of holding state. It fires its targets based on the value of the 'state' member of another entity, specified by setting 'state' to the value it has to match and 'include' to that entity's targetname. This can be another target_state, or any other entity which has a 'state', such as doors or plats.
+  0: off (lights/etc)/top (plats)/open (doors)/pushed (buttons)
+  1: on (lights/etc)/bottom (plats)/closed (doors)/unpushed (buttons)
+  2: going up (plats)/opening (doors)/pushing (buttons)
+  3: going down (plats)/closing (doors)/unpushing (buttons)
+A trigger_counter's 'state' is its current trigger count.
+If 'Inverse' spawnflag is set, will decrement when triggered instead of increment. If both 'Relay' and 'Inverse', will fire targets if the state of 'include' is anything other than a match."
 [
 	spawnflags(flags) =	[
 		1 : "Relay" : 0
 		2 : "Inverse" : 0
 	]
-	include(target_destination) : "Entity to monitor"
-	count(integer) : "Max state to cycle to"
-	state(integer) : "State to monitor"
+	style(choices) : "Comparison operator for relay" = [
+		1 : "self = include"
+		2 : "self < include"
+		3 : "self <= include"
+		4 : "self > include"
+		5 : "self >= include"
+	]
+	include(target_destination) : "Targetname of entity to monitor"
+	count(integer) : "Max state value to cycle to. if > 1, state will be incremented on each trigger to a maximum of 'count' before cycling to 0." : 1
+	state(integer) : "Value"
 ]
 */
 void() target_state =
@@ -282,11 +300,11 @@ void() target_lock_use =
 
 /*QUAKED target_lock (0 .5 .8) (-8 -8 -8) (8 8 8) START_LOCKED LOCK_ONLY UNLOCK_ONLY
 Locks and unlocks targeted entities independent of their toggle/start_open/etc states.  Works on various entities:
-- A locked func_door won't respond to touches or triggers. Use this for doors behind temporary bars.
-- A locked func_plat behaves as an unreleased LOW_TRIGGER plat
-- A locked trigger_relay will not fire or evaluate at all
-- Locked path_corners are not considered valid patrol/train destinations
-- Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered
+  - A locked func_door won't respond to touches or triggers. Use this for doors behind temporary bars.
+  - A locked func_plat behaves as an unreleased LOW_TRIGGER plat
+  - A locked trigger_relay will not fire or evaluate at all
+  - Locked path_corners are not considered valid patrol/train destinations
+  - Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered
 
 Spawnflags:
 "start_locked"	Targeted entities start out locked. 
@@ -296,11 +314,11 @@ Spawnflags:
 /*FGD
 @Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_lock : 
 "Locks and unlocks targeted entities independent of their toggle/start_open/etc states.  Works on various entities:
-- A locked func_door won't respond to touches or triggers. Use this for doors behind temporary bars.
-- A locked func_plat behaves as an unreleased LOW_TRIGGER plat
-- A locked trigger_relay will not fire or evaluate at all
-- Locked path_corners are not considered valid patrol/train destinations
-- Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered"
+  - A locked func_door won't respond to touches or triggers. Use this for doors behind temporary bars.
+  - A locked func_plat behaves as an unreleased LOW_TRIGGER plat
+  - A locked trigger_relay will not fire or evaluate at all
+  - Locked path_corners are not considered valid patrol/train destinations
+  - Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered"
 [
 	spawnflags(flags) = [
 		1: "Targeted entities start locked" : 0
@@ -406,7 +424,11 @@ Keys:
 "message"	specify text to print on completion (will always print - overrides 'nomessage' on completion)
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) = trigger_counter : "Trigger: Counter" 
+@PointClass size(16 16 16) base(Appearflags, Target, Targetname) = trigger_counter : "Trigger: Counter.
+Acts as an intermediary for an action that takes multiple inputs. 
+If nomessage is not set, it will print '1 more...' etc when triggered and 'sequence complete' when finished. After the counter has been triggered 'count' times, it will fire all of it's targets and remove itself, unless 'repeat' has been set, in which case it resets after 'wait' seconds.
+
+If the 'Eager Reset' spawnflag is set, the relay will reset 'wait' seconds after ANY input, which has the effect of requiring all triggering inputs to happen within a window of 'wait' seconds." 
 [
 	spawnflags(flags) = [ 
 		1: "No Message" : 0
@@ -474,14 +496,15 @@ void() timer_use =
 	timer_think();
 }
 
-/*QUAKED trigger_timer (.5 .5 .5) (-8 -8 -8) (8 8 8) START_ON
+/*QUAKED trigger_timer (.5 .5 .5) (-16 -16 -16) (16 16 16) START_ON
 Fires its targets once every "wait" seconds. If "count" is set, it will only fire that many times and then stop. Set "rand" to add a random extra delay to the wait interval.
 
 SPAWNFLAGS
 START_ON: do not wait until triggered to begin firing
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) = trigger_timer : "Trigger: Timer" 
+@PointClass size(32 32 32) base(Appearflags, Target, Targetname) = trigger_timer : "Trigger: Timer
+Fires its targets once every 'wait' seconds once activated. If 'count' is set, it will only fire that many times and then stop. Set 'rand' to add a random extra delay to the wait interval." 
 [
 	spawnflags(flags) = [ 
 		1: "Start On" : 0
@@ -571,7 +594,12 @@ LT_EQUAL: Fires all targetnames UP TO the current player count (so with four pla
 BY_TWOS: require double the number of players for each threshhold (for scaling up to 8 players)
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) = target_playercount : "Target: Playercount" 
+@PointClass size(16 16 16) color(128 128 128) base(Appearflags, Target, Targetname) = target_playercount : "Target: Playercount.
+Checks the number of players currently connected when triggered, and fires exclusively one of target/2/3/4 depending on the count. If one player is connected, it only fires 'target', if two are connected it fires 'target2', and so on.
+
+If 'Less Or Equal' is set, fires all targetnames UP TO the current player count (so with four players connected, all four targets would fire instead of just target4).
+If 'Two Players Per' is set, requires double the number of players for each threshhold (for scaling up to 8 players).
+" 
 [
 	spawnflags(flags) = [ 
 		1: "Less Or Equal" : 0

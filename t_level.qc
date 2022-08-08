@@ -425,7 +425,7 @@ void() changelevel_touch =
 }
 
 /*QUAKED trigger_changelevel (.5 0 .5) ? no_intermission ? TRIGGER_FIRST
-When the player touches this, he gets sent to the map listed in the "map" variable. The view will go to the info_intermission spot and display stats.
+When the player touches this, he gets sent to the map listed in the 'map' variable. The view will go to the info_intermission spot and display stats.
 
 Flags:
 "no_intermission" bypasses intermission screen
@@ -436,15 +436,17 @@ Keys:
 "message" ONE page of intermission text to display
 */
 /*FGD
-@SolidClass base(Trigger) = trigger_changelevel : "Trigger: Change level"
-[
+@baseclass = ChangeLevel [
 	map(string) : "Next map"
-	message(string) : "Intermission text"
+	message(string) : "Intermission text (limit one page)"
 	spawnflags(flags) =
 	[
 		1: "No intermission" : 0
 	]
 ]
+@SolidClass base(Trigger, ChangeLevel) = trigger_changelevel : "Trigger: Change level.
+When the player touches this, he gets sent to the map listed in the 'map' variable. The view will go to the info_intermission spot and display stats."
+[]
 */
 void() trigger_changelevel =
 {
@@ -465,15 +467,9 @@ Keys:
 "message" ONE page of intermission text to display
 */
 /*FGD
-@PointClass base(Appearflags, Targetname) = target_changelevel : "Target: Change level"
-[
-	map(string) : "Next map"
-	message(string) : "Intermission text"
-	spawnflags(flags) =
-	[
-		1: "No intermission" : 0
-	]
-]
+@PointClass base(Appearflags, Targetname, ChangeLevel) size(32 32 32) = target_changelevel : "Target: Change level.
+When this is triggered, the player is sent to the map listed in the 'map' variable. The view will go to the info_intermission spot and display stats."
+[]
 */
 void() target_changelevel =
 {
@@ -486,19 +482,19 @@ void() target_changelevel =
 
 
 /*QUAKED info_intermission (.75 .25 .25) (-8 -8 -8) (8 8 8)
-This is the camera point for the intermission. Use "mangle" instead of angle, so you can set pitch or roll as well as yaw.
+This is the camera point for the intermission. Use 'angles' instead of angle, so you can set pitch or roll as well as yaw.
 Quake does a random pick if more than one exists.
 If no info_intermission entity is set, Quake uses the player start.
 
 Keys:
-"mangle" set pitch yaw roll, positive pitch is down
+"angles" set pitch yaw roll, positive pitch is down
 "fog_color"/"fog_density" set the fog for the view from this camera
 
 */
 /*FGD
-@PointClass base(Fog, Appearflags) = info_intermission : "Intermission camera" 
+@PointClass size(16 16 16) base(Fog, Appearflags) = info_intermission : "Intermission camera" 
 [
-	mangle(string) : "Camera angle (Pitch Yaw Roll, positive pitch down)"
+	angles(string) : "Camera angle (Pitch Yaw Roll, positive pitch down)"
 ]
 */
 void() info_intermission =

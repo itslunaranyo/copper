@@ -804,7 +804,8 @@ void() path_corner_touch =
 }
 
 /*QUAKED path_corner (0.5 0.3 0) (-8 -8 -8) (8 8 8)
-Monsters will continue walking towards the next target corner.
+Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
+Monsters who wait here will turn to face 'angle'.
 
 Keys:
 "targetname" must be present.  The name of this pathcorner.
@@ -819,8 +820,8 @@ Keys:
 "Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
 Monsters who wait here will turn to face 'angle'."
 [
-	wait(string) : "Wait (seconds)" : "0"
-	speed(string) : "Speed" : "0"
+	wait(string) : "Wait time (seconds)" : "0"
+	speed(string) : "A visiting func_train to change its speed to this. If 'speed' is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner." : "0"
 ]
 */
 void() path_corner =

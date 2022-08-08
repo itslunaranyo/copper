@@ -19,11 +19,12 @@ All things spawning and initializing
 		64 : "Don't Spawn If Would Telefrag" : 0
 		128 : "Spawn Angry" : 0
 	]
-	movedir(string) : "Auto jump velocity on spawn/awaken"
-	rmovedir(string) : "Angle-relative auto jump velocity on spawn/awaken"
-	count(integer) : "Number of times to spawn if triggered (-1 for infinite)"
-	wait(string) : "Pause before spawning if triggered" : "0"
-	rand(string) : "Random extra before spawning if triggered" : "0"
+	movedir(string) : "Auto jump velocity on spawn/awaken (x y z, in worldspace)"
+	rmovedir(string) : "Angle-relative auto jump velocity on spawn/awaken (forward right up)"
+	count(integer) : "If triggered: Number of times a spawn can be triggered before stopping. -1 for infinite spawns, -4 to auto-scale the count to the number of clients in coop."
+	wait(string) : "If triggered: Pause before spawning" : "0"
+	rand(string) : "If triggered: Random extra time before spawning" : "0"
+	netname(string) : "If triggered: Spawned monster(s) will have this targetname"
 ]
 */
 

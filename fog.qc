@@ -241,7 +241,7 @@ The axis of motion on which the blend happens is defined by "angle", pointing to
 	on 'angle' otherwise. this is only useful for diagonal triggers.
 
 CAVEATS:
-- will 'stuffcmd' 2 dozen times per frame so try not to make these huge
+- will 'stuffcmd' up to 20 times per frame so try not to make these huge, but as an optimization, Copper will avoid sending the stuffcmd if it determines that the fog difference frame over frame is not visually significant.
 - a bug in most quake engine ports will reset the eye position smoothing that happens when climbing stairs or riding a plat on every frame that a 'stuffcmd' is sent, so fog transitions during upwards motion will cause noticeable stuttering.
 */
 /*FGD
@@ -250,7 +250,7 @@ CAVEATS:
 Acts as a smoothly blending portal between two zones of different fog. Sets the fog for any client passing through it, blending their global fog settings between start and end values proportional to their position within the trigger.
 fog_sky/fog_sky2 will affect r_skyfog at the same time if both are non-zero. Use -1 if you really want 0.
 
-- will 'stuffcmd' 2 dozen times per frame so try not to make these huge
+- will 'stuffcmd' up to 20 times per frame so try not to make these huge, but as an optimization, Copper will avoid sending the stuffcmd if it determines that the fog difference frame over frame is not visually significant.
 - a bug in most quake engine ports will reset the eye position smoothing that happens when climbing stairs or riding a plat on every frame that a 'stuffcmd' is sent, so fog transitions during upwards motion will cause noticeable stuttering." 
 [
 	distance(integer) : "Length of blend distance (defaults to size of trigger)"
@@ -399,7 +399,7 @@ Set GLOBAL to affect all clients in multiplayer, not just the activator.
 "speed2" - time to spend blending back, if different than "speed". -1 for instant.
 
 CAVEATS:
-- will 'stuffcmd' 2 dozen times per frame so try not to make this take too long
+- will 'stuffcmd' up to 20 times per frame so try not to make this take too long, but as an optimization, Copper will avoid sending the stuffcmd if it determines that the fog difference frame over frame is not visually significant.
 - a bug in most quake engine ports will reset the eye position smoothing that happens when climbing stairs or riding a plat on every frame that a 'stuffcmd' is sent, so fog transitions during upwards motion will cause noticeable stuttering.
 */
 /*FGD
@@ -407,7 +407,7 @@ CAVEATS:
 "Target: Fog Blend
 Activator's fog will be blended over time from start to end values.
 
-- will 'stuffcmd' 2 dozen times per frame so try not to make this take too long
+- will 'stuffcmd' up to 20 times per frame so try not to make this take too long, but as an optimization, Copper will avoid sending the stuffcmd if it determines that the fog difference frame over frame is not visually significant.
 - a bug in most quake engine ports will reset the eye position smoothing that happens when climbing stairs or riding a plat on every frame that a 'stuffcmd' is sent, so fog transitions during upwards motion will cause noticeable stuttering." 
 [
 	spawnflags(flags) = [

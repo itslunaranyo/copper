@@ -467,7 +467,7 @@ Keys:
 "fog_color"/"fog_density" set the fog for anyone teleporting here
 */
 /*FGD
-@PointClass size(-32 -32 0, 32 32 64) base(Appearflags, Angle, Targetname, Fog) model({ "path": ":progs/player.mdl" }) = info_teleport_destination : "Teleporter destination" []
+@PointClass size(-16 -16 0, 16 16 48) base(Appearflags, Angle, Targetname, Fog) model({ "path": ":progs/player.mdl" }) = info_teleport_destination : "Teleporter destination" []
 */
 void() info_teleport_destination =
 {
@@ -525,7 +525,7 @@ void() teleport_target_use =
 }
 
 
-/*QUAKED info_teleport_target (.5 .75 .25) (-8 -8 -8) (8 8 32) PLAYER_ONLY PUSH TRIGGER_FIRST ? NOFLASH MONSTER_ONLY
+/*QUAKED info_teleport_target (.5 .75 .25) (-16 -16 -8) (16 16 40) PLAYER_ONLY PUSH TRIGGER_FIRST ? NOFLASH MONSTER_ONLY
 This is a usable destination marker that acts as its own teleporter.  When triggered, the activator is teleported to this spot.
 
 Flags:
@@ -540,11 +540,12 @@ Keys:
 "count"		remove after this many uses
 */
 /*FGD
-@PointClass size(-32 -32 0, 32 32 64) base(Appearflags, Angle, Fog, Trigger) = info_teleport_target : "Triggerable Teleporter destination" [
+@PointClass size(-16 -16 -8, 16 16 40) base(Appearflags, Angle, Fog, Trigger) = info_teleport_target : "Triggerable Teleporter destination" [
 	spawnflags(flags) = [
 		1 : "Player only" : 0
 		2 : "Push forward" : 0
-		16 : "No tflash" : 0
+		16 : "No teleflash" : 0
+		32 : "Monsters only" : 0
 	]
 ]
 */
@@ -613,16 +614,14 @@ void() trigger_teleport_setup =
 	spawnflags(Flags) =
 	[
 		1 : "Player only" : 0
-		2 : "Silent" : 0
+		2 : "Push forward" : 0
 		8 : "Not triggerable (ignore targetname)" : 0
-		16 : "No tflash" : 0
+		16 : "No teleflash" : 0
 		32 : "Monsters only" : 0
 	]
 	count(integer) : "Limited uses" : -1
 ]
-
 */
-
 /*QUAKED trigger_teleport (.5 .0 .5) ? PLAYER_ONLY SILENT TRIGGER_FIRST NOTRIGGER NOFLASH MONSTER_ONLY
 Any object touching this will be transported to the corresponding info_teleport_destination entity.
 You must set the "target" field, and create an object with a "targetname" field that matches.
@@ -643,7 +642,10 @@ Keys:
 "count" remove after this many uses
 */
 /*FGD
-@SolidClass base(Trigger, Teleport) = trigger_teleport : "Trigger: Teleporter" []
+@SolidClass base(Trigger, Teleport) = trigger_teleport : "Trigger: Teleporter. 
+Any object touching this will be transported to the corresponding info_teleport_destination entity.
+
+The 'Not Triggerable' spawnflag: default behavior for a teleporter with a targetname is to only teleport what's touching it when triggered. this will preserve ordinary no-targetname behavior (if you're using the teleporter's targetname for a killtarget for example)." []
 */
 void() trigger_teleport =
 {
@@ -657,7 +659,7 @@ void() trigger_teleport =
 /*QUAKED trigger_teleport_box (.5 .0 .5) (-8 -8 -8) (8 8 8) PLAYER_ONLY SILENT TRIGGER_FIRST NOTRIGGER
 Any object touching this will be transported to the corresponding info_teleport_destination entity.
 You must set the "target" field, and create an object with a "targetname" field that matches.
-Quoth2-style edict-saving bounding box trigger: define bounds size with "mangle" - trigger volume will be centered on the trigger_teleport_box's origin.
+Quoth2-style edict-saving bounding box trigger: define bounds size with 'size' - trigger volume will be centered on the trigger's origin.
 
 Flags:
 "player_only" only players will teleport
@@ -673,7 +675,12 @@ Keys:
 "targetname" entity name (required)
 */
 /*FGD
-@PointClass base(Trigger, Teleport, Bounds) = trigger_teleport_box : "Trigger: Teleporter bounds" []
+@PointClass base(Trigger, Teleport, Bounds) = trigger_teleport_box : "Trigger: Teleporter.
+Any object touching this will be transported to the corresponding info_teleport_destination entity.
+
+Quoth2-style edict-saving bounding box trigger: define bounds size with 'size' - trigger volume will be centered on the trigger's origin.
+
+The 'Not Triggerable' spawnflag: default behavior for a teleporter with a targetname is to only teleport what's touching it when triggered. this will preserve ordinary no-targetname behavior (if you're using the teleporter's targetname for a killtarget for example)." []
 */
 void() trigger_teleport_box =
 {

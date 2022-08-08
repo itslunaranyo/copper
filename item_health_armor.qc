@@ -94,7 +94,7 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass size(0 0 0, 32 32 56) base(Item) 
+@PointClass size(0 0 0, 32 32 56) color(0 128 128) base(Item) 
 	model(
         {{
             spawnflags & 2 ->   ":maps/b_bh100.bsp",
@@ -102,12 +102,12 @@ Keys:
                                 ":maps/b_bh25.bsp"
         }}
     ) =
-    item_health : "Health pack" 
+    item_health : "Health pack, +25" 
 [
 	spawnflags(flags) = 
 	[
-		1 : "Rotten" : 0
-		2 : "Megahealth" : 0
+		1 : "Small, +15" : 0
+		2 : "Megahealth, +100" : 0
 	]
 ]
 */
@@ -289,8 +289,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass size(-16 -16 0, 16 16 56) base(Item) model({ "path": ":progs/armor.mdl" }) =
-	item_armor1 : "Green armor (100%)" []
+@PointClass size(-16 -16 0, 16 16 56) color(0 180 180) base(Item) model({ "path": ":progs/armor.mdl" }) =
+	item_armor1 : "Green armor (100pts, 30%)" []
 */
 void() item_armor1 = { StartArmor(0,100); }
 
@@ -304,8 +304,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass size(-16 -16 0, 16 16 56) base(Item) model({ "path": ":progs/armor.mdl", "skin": 1 }) =
-	item_armor2 : "Yellow armor (150%)" []
+@PointClass size(-16 -16 0, 16 16 56) color(180 0 180) base(Item) model({ "path": ":progs/armor.mdl", "skin": 1 }) =
+	item_armor2 : "Yellow armor (150pts, 50%)" []
 */
 void() item_armor2 = { StartArmor(1,150); }
 
@@ -319,8 +319,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass size(-16 -16 0, 16 16 56) base(Item) model({ "path": ":progs/armor.mdl", "skin": 2 }) =
-	item_armorInv : "Red armor (200%)" []
+@PointClass size(-16 -16 0, 16 16 56) color(180 0 0) base(Item) model({ "path": ":progs/armor.mdl", "skin": 2 }) =
+	item_armorInv : "Red armor (200pts, 70%)" []
 */
 void() item_armorInv = { StartArmor(2,200); }
 

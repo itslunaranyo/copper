@@ -194,7 +194,7 @@ Keys:
 "A forgotten explorer's backpack. Grants a paltry sum of shells and nails (about half a small pack of each). Grants armor instead of any ammo the player already has maxed."
 [
 	spawnflags(flags) =	[
-		1 : "Big (2x, red, rockets/cells)" : 0
+		1 : "Big (2x, red, +2 rockets/4 cells)" : 0
 	]
 ]
 */

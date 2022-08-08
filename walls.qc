@@ -158,7 +158,7 @@ void() func_wall_flip =
 	]
 	noise(string) : "Sound to play when triggered"
 	wait(string) : "Flip back after this long" : "0"
-	alpha(string) : "Opacity (GLQuake only) (-1 = 0)" : "1"
+	alpha(string) : "Opacity (GLQuake+ only) (-1 = 0)" : "1"
 ]
 */
 
@@ -177,7 +177,12 @@ Keys:
 "wait" will always flip its state back again if set - absorbs repeat triggerings like doors while waiting
 */
 /*FGD
-@SolidClass base(Wall) = func_wall : "Wall, appears/disappears or starts animation when triggered (if supporting texture)" []
+@SolidClass base(Wall) = func_wall : "Wall. Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
+Not static: Use a func_static for inconsequential bmodels.
+
+If 'Illusionary' is set, wall will always be nonsolid.
+If 'Toggle Visibility' is set, will disappear and reappear when triggered instead of flipping texture."
+[]
 */
 void() func_wall =
 {
@@ -220,7 +225,13 @@ Keys:
 "targetname"	entity name
 */
 /*FGD
-@PointClass base(Wall) = func_wall_point : "Wall (point), appears/disappears or starts animation when triggered (if supporting texture)" [
+@PointClass base(Wall) = func_wall_point : "Wall. Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
+Not static: Use a func_static for inconsequential bmodels.
+
+Select a .bsp or .mdl to show with 'model'. 
+
+If 'Illusionary' is set, wall will always be nonsolid. If you use a .mdl you MUST set this flag (or consider a misc_model instead?)
+If 'Toggle Visibility' is set, will disappear and reappear when triggered instead of flipping texture." [
 	model(string) : "External model"
 	mangle(string) : "Orientation of external model"
 ]
@@ -231,7 +242,9 @@ void() func_wall_point = { func_wall(); }
 Like a func_wall but calls makestatic.  Static entities are always nonsolid.
 */
 /*
-@SolidClass base(Appearflags) = func_static : "Nonsolid, untriggerable static wall" []
+@SolidClass base(Appearflags) = func_static : "Nonsolid, untriggerable static wall" [
+	alpha(string) : "Opacity (GLQuake only) (-1 = 0)" : "1"
+]
 */
 void() func_static =
 {
@@ -258,7 +271,7 @@ void() func_static_point = { func_static(); }
 A simple entity that looks solid but lets you walk through it. Functionally identical to a func_static.
 */
 /*FGD
-@SolidClass base(Appearflags) = func_illusionary : "Static nonsolid wall"  [
+@SolidClass base(Appearflags) = func_illusionary : "Nonsolid, untriggerable static wall"  [
 	alpha(string) : "Opacity (GLQuake only) (-1 = 0)" : "1"
 ]
 */

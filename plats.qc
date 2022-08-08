@@ -266,7 +266,7 @@ void(entity p) plat_unlock =
 /*QUAKED func_plat (0 .5 .8) ? PLAT_LOW_TRIGGER
 Plats are always drawn in the extended position, so they will light correctly.
 If the plat is the target of another trigger or button, it will start out disabled in the top position until it is triggered, when it will lower and become a normal plat.
-If the plat targets a trigger once/multiple/multiple_box, it will override the plat's default activation zone.
+If the plat targets a trigger once/multiple/multiple_box, it will override the plat's default activation zone (consuming the trigger).
 
 "PLAT_LOW_TRIGGER" activation zone will only be at the bottom of the movement course, instead of the whole vertical
 
@@ -280,7 +280,14 @@ If the plat targets a trigger once/multiple/multiple_box, it will override the p
 	-1: silent
 */
 /*FGD
-@SolidClass base(Appearflags, Targetname) = func_plat : "Elevator" 
+@SolidClass base(Appearflags, Targetname) = func_plat : "Elevator platform.
+Plats are always drawn in the extended position, so they will light correctly.
+If the plat is the target of another trigger or button, it will start out disabled in the top position until it is triggered, when it will lower and become a normal plat.
+If the plat targets a trigger once/multiple/multiple_box, it will override the plat's default activation zone (consuming the trigger).
+
+By setting 'pos1' & 'pos2' you can directly override the top and bottom positions, allowing the plat to be built anywhere else in the map. This is useful for building a plat where it will be lit the best.
+
+The 'low trigger volume' spawnflag will put the activation zone only at the bottom of the movement course, instead of the whole vertical." 
 [	
 	spawnflags(Flags) =
 	[
@@ -292,9 +299,9 @@ If the plat targets a trigger once/multiple/multiple_box, it will override the p
 	wait(string) : "Apex pause time" : "3"
 	pos1(string) : "Override top position (x y z)"
 	pos2(string) : "Override bottom position (x y z)"
-	sounds(choices) : "Sound" : 1 =
+	sounds(choices) : "Sound" : 2 =
 	[
-		0: "None"
+		-1: "Silent"
 		1: "Base fast"
 		2: "Chain Slow"
 	]
@@ -482,6 +489,8 @@ void() flytrain_stop =
 A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
 If the train is the target of a button or trigger, it will not begin moving until activated.
 
+Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
+
 "sounds"
 0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
 1) ratchet metal
@@ -489,7 +498,9 @@ If the train is the target of a button or trigger, it will not begin moving unti
 */
 /*FGD
 @SolidClass base(Train) = func_flytrain : 
-"A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key." []
+"A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key.
+
+Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it." []
 */
 void() func_flytrain =
 {
@@ -524,6 +535,8 @@ void() func_flytrain =
 A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
 If the train is the target of a button or trigger, it will not begin moving until activated.
 
+Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
+
 "sounds"
 0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
 1) ratchet metal
@@ -531,7 +544,9 @@ If the train is the target of a button or trigger, it will not begin moving unti
 */
 /*FGD
 @PointClass base(Train) size(16 16 16) = func_flytrain_point : 
-"A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key."
+"A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key.
+
+Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it."
 [
 	model(string) : "Model to use"
 ]
@@ -683,10 +698,10 @@ void() func_train_setup =
 }
 
 /*QUAKED func_train (0 .5 .8) ? PATH_SPEED
-Trains are moving platforms that players can ride.
-The targets origin specifies the min point of the train at each corner. The train spawns at the first target it is pointing at.
-If the train is the target of a button or trigger, it will not begin moving until activated.
+Trains are moving platforms that players can ride. Its origin is the min corner of the train. 
+The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
 A train will fire all targets of a pathcorner on arrival.
+
 Keys:
 "speed"	default 100
 "dmg"	default	2
@@ -701,9 +716,14 @@ PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches the
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
 */
 /*FGD
-@SolidClass base(Train) = func_train : "Moving platform.
-Origin is min corner of the train.
-A train will fire all targets of a pathcorner on arrival." [
+@SolidClass base(Train) = func_train : "Moving platform that players can ride. 
+Its origin is the min corner of the train. 
+The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
+A train will fire all targets of a pathcorner on arrival.
+
+If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them.
+If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner."
+[
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
 	]
@@ -739,9 +759,13 @@ Spawnflags:
 PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches them
 */
 /*FGD
-@PointClass base(Train) = func_train_point : "Moving platform.
-Origin is min corner of the train.
-A train will fire all targets of a pathcorner on arrival." 
+@PointClass base(Train) = func_train_point : "Moving platform that players can ride. 
+Its origin is the min corner of the train. 
+The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
+A train will fire all targets of a pathcorner on arrival.
+
+If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them.
+If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner."
 [
 	model(string) : "Model to use"
 	spawnflags(Flags) = [
@@ -829,10 +853,10 @@ void() func_bobbing_think =
 }
 
 /*QUAKED func_bobbing (0 .5 .8) ? START_OFF CRUSHER
-bobbatron 2000. does not need a 'speed' key; specify "wait" for the period and the bobbalondo 9000 does the rest. 
-trigger to freeze in place or reactivate.
+Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
+Trigger to freeze/reactivate.
 
-"angle" set bobaxis
+"angle" set bob axis
 "distance" total distance of bob, will move half this far in either direction
 "pos1"/"pos2" ignore angle/distance and set apex offsets directly
 "wait" wavelength of bob in seconds
@@ -853,16 +877,20 @@ CRUSHER		don't reverse when blocked
 		1 : "Start off" : 0
 		2 : "Crusher (no reverse)" : 0
 	]
-	wait(string) : "period of bob" : "4"
-	distance(integer) : "length of bob" : 64
-	delay(string) : "starting phase offset (0-1)" : "0.0"
-	dmg(integer) : "Damage on block" : 2
+	wait(string) : "Period (Wavelength)" : "4"
+	distance(integer) : "Length (Amplitude)" : 64
+	delay(string) : "Starting offset (0-1) (Phase)" : "0.0"
+	dmg(integer) : "Damage when blocked" : 2
 	noise(string) : "Override stop sound"
 	noise1(string) : "Override move sound"
-	pos1(string) : "Override apex 1"
-	pos2(string) : "Override apex 2"
+	pos1(string) : "Override peak position (relative)"
+	pos2(string) : "Override trough position (relative)"
 ]
-@SolidClass base(Bob) = func_bobbing : "Bobbing platform"  []
+@SolidClass base(Bob) = func_bobbing : "Bobbing platform.
+Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
+Trigger to freeze/reactivate.
+
+Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  []
 */
 void() func_bobbing =
 {
@@ -907,8 +935,8 @@ void() func_bobbing =
 }
 
 /*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER 
-bobbatron 2000. does not need a 'speed' key; specify "wait" for the period and the bobbalondo 9000 does the rest. 
-trigger to freeze in place or reactivate.
+Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
+Trigger to freeze/reactivate.
 
 "angle" set bobaxis
 "distance" total distance of bob, will move half this far in either direction
@@ -925,7 +953,11 @@ START_OFF	start off
 CRUSHER		don't reverse when blocked
 */
 /*FGD
-@PointClass base(Bob) = func_bobbing_point : "Bobbing platform point"  [
+@PointClass size(16 16 16) base(Bob) = func_bobbing_point : "Bobbing platform.
+Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
+Trigger to freeze/reactivate.
+
+Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  [
 	model(string) : "Model to use"
 ]
 */
@@ -1038,17 +1070,21 @@ void() teletrain_find =
 }
 
 /*QUAKED misc_teleporttrain (0 .5 .8) (-16 -16 -16) (16 16 16) START_INVIS CURVY
-This is used for the final boss
+Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
+
+Inherits movement speed from each path_corner's "speed" key. 
 
 Spawnflags
 START_INVIS	Invisible until triggered
-CURVY	behaves like a func_flytrain, following path_corners, waiting at them (a wait of -1 on a path_corner will stop the ball until triggered again), then disappearing at the last path_corner.  Inherits movement speed from each path_corner's "speed" key. movement is smoothed out so it doesn't move in straight lines between waypoints - sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully.
+CURVY	behaves like a func_flytrain, following path_corners, waiting at them (a wait of -1 on a path_corner will stop the ball until triggered again), then disappearing at the last path_corner. Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
 */
 /*FGD
-@PointClass base(Appearflags ) size(16 16 16) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination"
+@PointClass base(Appearflags, Targetname) size(16 16 16) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
+Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
+
+If the 'curving path' spawnflag is set, the teleball behaves like a func_flytrain, smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it."
 [
 	target(string) : "First stop target"
-	targetname(target_source) : "Name" 
 	spawnflags(flags) =
 	[
 		1 : "Start invisible" : 0

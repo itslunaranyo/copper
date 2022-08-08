@@ -182,7 +182,7 @@ Keys:
 	worldtype(choices) : "Key Style" : 0 =
 	[
 		0 : "Medieval"
-		1 : "Metal (runic)"
+		1 : "Runemetal"
 		2 : "Base"
 	]
 	sounds(integer) : "CD track to play" : 0

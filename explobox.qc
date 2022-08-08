@@ -168,8 +168,9 @@ will do enough damage to set off other barrels at up to ~172u distance (center t
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~172u distance (center to center)." 
 [
-	wait(string) : "Respawn delay"
-	count(integer) : "Respawn limit"
+	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
+	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
+	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
 ]
 */
 void() misc_explobox =
@@ -201,8 +202,9 @@ will do enough damage to set off other barrels at up to ~128u distance (center t
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~128u distance (center to center)." 
 [
-	wait(string) : "Respawn delay"
-	count(integer) : "Respawn limit"
+	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
+	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
+	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
 ]
 */
 void() misc_explobox2 =
@@ -232,10 +234,10 @@ Keyvalues:
 @SolidClass base(Appearflags, Target, Targetname) = func_explobox : "Customizable exploding container. 
 Explodes when triggered or shot. Fires targets when it explodes." 
 [
-	health(integer) : "Hit points" : 18
-	dmg(integer) : "Explosion damage" : 150
-	wait(string) : "Respawn delay"
-	count(integer) : "Respawn limit"
+	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
+	dmg(integer) : "Explosion damage (-1 will force 0)" : 150
+	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
+	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
 ]
 */
 void() func_explobox =

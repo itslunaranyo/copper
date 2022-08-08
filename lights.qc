@@ -695,7 +695,9 @@ See 'light' keyvalues/spawnflags for more.
 */
 /*FGD
 @PointClass base(LightTriggerable) size(-4 -4 0, 4 4 16) model({ "path": ":progs/candle2.mdl" }) = 
-	light_candle : "Candle" 
+	light_candle : "Animated candle. Trigger to turn on or off.
+If triggered to turn on and off, all candles with a matching targetname will ignite or go out as well.
+Choose size with 'width' and 'height' (leave either at 0 for random selection)."
 [
 	width(choices) : "Width" : 0 =
 	[

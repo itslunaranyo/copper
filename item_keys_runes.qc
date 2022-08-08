@@ -237,11 +237,12 @@ void() key_setsounds =
 }
 
 /*QUAKED item_key1 (0 .5 .5) (-16 -16 -24) (16 16 32) ? ? SUSPENDED
-Silver key. In order for keys to work you MUST set your maps worldtype (see worldspawn).
+Silver key. Player can carry up to 15. In order for keys to work you MUST set your maps worldtype (see worldspawn).
 
 Keys:
 "target"		fired when picked up
-*//*
+*/
+/*
 "skin"			flavor
 0 = Silver
 2 = Iron
@@ -249,8 +250,8 @@ Keys:
 6 = Lead
 */
 /*FGD
-@PointClass size(-16 -16 -24, 16 16 32) base(Item) model({ "path": ":progs/w_s_key.mdl" }) = 
-	item_key1 : "Silver Key" []
+@PointClass size(-16 -16 -24, 16 16 32) color(0 128 128) base(Item) model({ "path": ":progs/w_s_key.mdl" }) = 
+	item_key1 : "Silver Key. Player can carry up to 15. Remember to set worldtype on worldspawn!" []
 */
 void() item_key1 =
 {
@@ -283,7 +284,7 @@ void() item_key1 =
 }
 
 /*QUAKED item_key2 (.5 .5 0) (-16 -16 -24) (16 16 32) ? ? SUSPENDED
-Gold key. In order for keys to work you MUST set your maps worldtype (see worldspawn).
+Gold key. Player can carry up to 15. In order for keys to work you MUST set your maps worldtype (see worldspawn).
 
 Keys:
 "target"		fired when picked up
@@ -295,8 +296,8 @@ Keys:
 7 = Brass
 */
 /*FGD
-@PointClass size(-16 -16 -24, 16 16 32) base(Item) model({ "path": ":progs/w_g_key.mdl" }) = 
-	item_key2 : "Gold Key" []
+@PointClass size(-16 -16 -24, 16 16 32) color(128 128 0) base(Item) model({ "path": ":progs/w_g_key.mdl" }) = 
+	item_key2 : "Gold Key. Player can carry up to 15. Remember to set worldtype on worldspawn!" []
 */
 void() item_key2 =
 {
@@ -357,7 +358,7 @@ void() sigil_touch =
 
 
 /*QUAKED item_sigil (0 .5 .5) (-16 -16 -24) (16 16 32) E1 E2 E3 E4 SUSPENDED
-End of episode sigil. Can be customized through keyvalue manipulation to serve as any generic cross-map inventory item.
+End of episode rune. Can be customized through keyvalue manipulation to serve as any generic cross-map inventory item.
 
 Flags:
 "E1 -E4" sets episode
@@ -372,9 +373,11 @@ Keys:
 "targetname" entity name
 */
 /*FGD
-@PointClass size(-16 -16 -24, 16 16 32) base(Item) model({ "path": ":progs/end1.mdl" }) = 
-	item_sigil : "End of episode rune"
+@PointClass size(-16 -16 -24, 16 16 32) color(128 0 128) base(Item) model({ "path": ":progs/end1.mdl" }) = 
+	item_sigil : "End of episode rune.  Can be customized through keyvalue manipulation to serve as any generic cross-map inventory item."
 [
+	noise(string) : "Override pickup noise"
+	model(string) : "Override model"
 	spawnflags(Flags) =
 	[
 		1 : "Episode 1" : 1
@@ -382,6 +385,31 @@ Keys:
 		4 : "Episode 3" : 0
 		8 : "Episode 4" : 0
 		16 : "Suspended" : 0
+	]
+	svflags(Flags) =
+	[
+		1		: "Episode 1" : 0
+		2		: "Episode 2" : 0
+		4		: "Episode 3" : 0
+		8		: "Episode 4" : 0
+		16		: "Bit 5" :  0
+		32		: "Bit 6" :  0
+		64		: "Bit 7" :  0
+		128		: "Bit 8" :  0
+		256		: "Bit 9" :  0
+		512		: "Bit 10" : 0
+		1024	: "Bit 11" : 0
+		2048	: "Bit 12" : 0
+		4096	: "Bit 13" : 0
+		8192	: "Bit 14" : 0
+		16384	: "Bit 15" : 0
+		32768	: "Bit 16" : 0
+		65536	: "Bit 17" : 0
+		131072	: "Bit 18" : 0
+		262144	: "Bit 19" : 0
+		524288	: "Bit 20" : 0
+		1048576	: "Bit 21" : 0
+		2097152	: "Bit 22" : 0
 	]
 ]
 */

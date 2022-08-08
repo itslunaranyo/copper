@@ -143,7 +143,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_shotgn.mdl" }) = weapon_shotgun : "Shotgun" []
+@PointClass base(Weapon) model({ "path": ":progs/g_shotgn.mdl" }) = weapon_shotgun : "Shotgun. 
+5 Shells." []
 */
 void() weapon_shotgun =
 {
@@ -158,7 +159,7 @@ void() weapon_shotgun =
 
 
 /*QUAKED weapon_supershotgun (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
-SuperShotgun.
+Double-barreled shotgun.
 
 Keys:
 "target/2/3/4/k" - entity to trigger when picked up
@@ -167,7 +168,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_shot.mdl" }) = weapon_supershotgun : "Double-barreled shotgun" []
+@PointClass base(Weapon) model({ "path": ":progs/g_shot.mdl" }) = weapon_supershotgun : "Double-barreled shotgun.
+10 shells." []
 */
 void() weapon_supershotgun =
 {
@@ -190,7 +192,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_nail.mdl" }) = weapon_nailgun : "Nailgun" []
+@PointClass base(Weapon) model({ "path": ":progs/g_nail.mdl" }) = weapon_nailgun : "Nailgun.
+30 nails." []
 */
 void() weapon_nailgun =
 {
@@ -213,7 +216,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_nail2.mdl" }) = weapon_supernailgun : "Super nailgun" []
+@PointClass base(Weapon) model({ "path": ":progs/g_nail2.mdl" }) = weapon_supernailgun : "Perforator (Super Nailgun).
+30 nails." []
 */
 void() weapon_supernailgun =
 {
@@ -236,7 +240,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_rock.mdl" }) = weapon_grenadelauncher : "Grenade launcher" []
+@PointClass base(Weapon) model({ "path": ":progs/g_rock.mdl" }) = weapon_grenadelauncher : "Grenade launcher.
+5 rockets." []
 */
 void() weapon_grenadelauncher =
 {
@@ -259,7 +264,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_rock2.mdl" }) = weapon_rocketlauncher : "Rocket launcher" []
+@PointClass base(Weapon) model({ "path": ":progs/g_rock2.mdl" }) = weapon_rocketlauncher : "Rocket launcher.
+5 rockets." []
 */
 void() weapon_rocketlauncher =
 {
@@ -283,7 +289,8 @@ Keys:
 "count" - limit number of times to respawn
 */
 /*FGD
-@PointClass base(Weapon) model({ "path": ":progs/g_light.mdl" }) = weapon_lightning : "Thunderbolt" []
+@PointClass base(Weapon) model({ "path": ":progs/g_light.mdl" }) = weapon_lightning : "Thunderbolt.
+12 cells." []
 */
 void() weapon_lightning =
 {
@@ -367,7 +374,7 @@ void() StartAmmo =
 }
 
 /*FGD
-@baseclass size(0 0 0, 32 32 56) color(80 0 200) base(Item) = Ammo [ spawnflags(flags) =  [ 1 : "Large box" : 0 ] ]
+@baseclass size(0 0 0, 32 32 32) color(80 0 200) base(Item) = Ammo [ spawnflags(flags) =  [ 1 : "Large box (2x)" : 0 ] ]
 */
 
 /*QUAKED item_shells (0 .5 .5) (0 0 0) (32 32 32) BIG ? SUSPENDED

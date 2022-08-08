@@ -152,6 +152,7 @@ void(entity b) button_force =
 
 /*QUAKED func_button (0 .5 .8) ? 
 When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
+Acts as if touched when triggered. Will depress itself when locked by a target_lock to look inactive.
 
 "angle"		determines the opening direction
 "target"	all entities with a matching targetname will be used
@@ -169,7 +170,7 @@ When a button is touched, it moves some distance in the direction of its angle, 
 /*FGD
 @SolidClass base(Appearflags,Angle,Target,Targetname) = func_button : 
 "Button. When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
-Acts as if touched when triggered." 
+Acts as if touched when triggered. Depresses itself when locked by a target_lock to look inactive." 
 [
 	speed(integer) : "Speed" : 40
 	health(integer) : "Health (shootable if > 0)"

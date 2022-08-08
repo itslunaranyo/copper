@@ -292,60 +292,57 @@ void() particlefield_use =
 @baseclass = Particlefield [
 	spawnflags(flags) = [
 		1 : "Start on" : 0
-		2 : "Particles are sucked inward" : 0
-		4 : "Particles are blown outward" : 0
-		8 : "Oneshot burst when triggered" : 0
+		2 : "Suck inward" : 0
+		4 : "Blow outward" : 0
+		8 : "Single burst when triggered" : 0
 	]
 	speed(integer) : "Clumps per second" : 10
 	speed2(integer) : "Dots per clump" : 16
-	health(integer) : "Color index (0-255)" : 0
+	health(choices) : "Color" = [
+		0   : "Dark grey"
+		8   : "Light grey"
+		16  : "Dark dirt brown"
+		24  : "Light dirt brown"
+		32  : "Dark sky blue"
+		40  : "Light sky blue"
+		48  : "Dark grass green"
+		56  : "Light grass green"
+		64  : "Dark red"
+		72  : "Red"
+		80  : "Dark green"
+		88  : "Greenish orange "
+		96  : "Copper"
+		104 : "Gold"
+		112 : "Dark flesh"
+		120 : "Light flesh"
+		128 : "Pale purple"
+		136 : "Dull purple"
+		144 : "Reddish purple"
+		152 : "Dark reddish purple"
+		160 : "Eggshell"
+		168 : "Dark eggshell"
+		176 : "Turquoise"
+		184 : "Dark turquoise"
+		192 : "Yellow"
+		200 : "Dark yellow"
+		208 : "Rich blue"
+		216 : "Dark blue"
+		224 : "Deep lava"
+		232 : "Bright lava"
+		240 : "Cyan/yellow/white confetti"
+		248 : "Red/yellow/white confetti"
+	]
 	movedir(string) : "Velocity of particles (x y z)"
 	wait(string) : "Interval" : "0.1"
 	velocity(string) : "Direction of optional sweep effect (x y z)"
-	distance(integer) : "Min player distance for dots"
+	distance(integer) : "Sleep if all players are further than this distance"
 ]
 
 @Pointclass base(Targetname, Appearflags, Bounds, Particlefield) color(0 160 255) size(16 16 16) = misc_particlefield_box : 
-"Makes dots appear continuously within its bounds. Trigger to toggle on/off.
-
-Color Reference:
-0-15 grey (higher = lighter)
-16-31 dirt brown (higher = lighter)
-32-47 sky blue (higher = lighter)
-48-63 grass green (higher = lighter)
-64-79 red (higher = lighter)
-80-95 green/orange (higher = lighter)
-96-111 copper/gold (higher = lighter)
-112-127 flesh tone (higher = lighter)
-128-143 pale purple (higher = darker)
-144-159 reddish purple (higher = darker)
-160-175 pale beige (higher = darker)
-176-191 turquoise (higher = darker)
-192-207 yellow (higher = darker)
-208-223 deep blue (higher = darker)
-224-239 fire/lava (higher = lighter)
-240-255 fullbright mess" []
+"Makes dots appear continuously within its bounds. Trigger to toggle on/off." []
 
 @Solidclass base(Targetname, Appearflags, Particlefield) = misc_particlefield : 
-"Makes dots appear continuously within its bounds. Trigger to toggle on/off.
-
-Color Reference:
-0-15 grey (higher = lighter)
-16-31 dirt brown (higher = lighter)
-32-47 sky blue (higher = lighter)
-48-63 grass green (higher = lighter)
-64-79 red (higher = lighter)
-80-95 green/orange (higher = lighter)
-96-111 copper/gold (higher = lighter)
-112-127 flesh tone (higher = lighter)
-128-143 pale purple (higher = darker)
-144-159 reddish purple (higher = darker)
-160-175 pale beige (higher = darker)
-176-191 turquoise (higher = darker)
-192-207 yellow (higher = darker)
-208-223 deep blue (higher = darker)
-224-239 fire/lava (higher = lighter)
-240-255 fullbright mess" []
+"Makes dots appear continuously within its bounds. Trigger to toggle on/off." []
 
 */
 /*QUAKED misc_particlefield_box (0 .6 1) (-8 -8 -8) (8 8 8) START_ON INWARD OUTWARD BURST
@@ -712,7 +709,7 @@ Keys
 */
 /*FGD
 @Pointclass base(Targetname, Appearflags, Deathtype) color(0 128 224) size(16 16 16) = target_explosion : 
-"Causes explosions, same appearance as a rocket/grenade blast." 
+"Causes one or more explosions when triggered, same appearance as a rocket/grenade blast." 
 [
 	count(integer) : "Repeat count" : 1
 	delay(string) : "Delay before first blast" : "0"
@@ -840,7 +837,7 @@ air bubble emitter. always bubbles.
 "rand" random extra interval, default 0
 */
 /*FGD
-@PointClass base(Appearflags, Targetname) color(0 150 220) = air_bubbles : "Air bubbles" 
+@PointClass base(Appearflags, Targetname) color(0 150 220) = air_bubbles : "Air bubble emitter." 
 [
 	spawnflags(flags) = [
 		1 : "Start off" : 0
