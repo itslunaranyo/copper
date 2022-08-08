@@ -691,12 +691,16 @@ void() target_explosion_use =
 {
 	float i, tnext;
 	entity bewm;
+	vector offset;
+	
 	
 	playercount_convert(count);
 	if (self.count == 1 && self.delay == 0)
 	{
 		bewm = spawn();
-		setorigin(bewm, self.origin);
+		if (self.size != VEC_ORIGIN)
+			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
+		setorigin(bewm, self.origin + offset);
 		bewm.think = target_explosion_go;
 		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time;
@@ -709,7 +713,9 @@ void() target_explosion_use =
 	for (i = 0; i < self.count; i++)
 	{
 		bewm = spawn();
-		setorigin(bewm, self.origin);
+		if (self.size != VEC_ORIGIN)
+			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
+		setorigin(bewm, self.origin + offset);
 		bewm.think = target_explosion_go;
 		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time + tnext;
@@ -729,6 +735,7 @@ Keys
 "rand" Random time to wait before explosions (will sum both)
 "dmg" Do splash damage, default 0
 "deathtype" death message if the player is killed by your horrible trap
+"size" explode somewhere randomly chosen within a box of this size
 */
 /*FGD
 @Pointclass base(Targetname, Appearflags, Deathtype) color(0 128 224) size(16 16 16) = target_explosion : 
@@ -741,6 +748,7 @@ Keys
 	delay(string) : "Delay before first blast" : "0"
 	wait(string) : "Wait between blasts" : "1"
 	rand(string) : "Random extra wait before blasts" : "0"
+	size(string) : "Explode somewhere randomly chosen within a box of this size (x y z)" : "0 0 0"
 	dmg(integer) : "Splash damage" : 0
 ]
 */
@@ -763,11 +771,17 @@ void() target_telefog_use =
 {
 	float i, tnext;
 	entity tfog;
+	vector offset;
 	
 	playercount_convert(count);
 	if (self.count == 1 && self.delay == 0)
 	{
-		teleport_flash();
+		tfog = spawn();
+		if (self.size != VEC_ORIGIN)
+			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
+		setorigin(tfog, self.origin + offset);
+		tfog.think = teleport_flasher;
+		tfog.nextthink = time;
 		return;
 	}
 	
@@ -775,7 +789,9 @@ void() target_telefog_use =
 	for (i = 0; i < self.count; i++)
 	{
 		tfog = spawn();
-		setorigin(tfog, self.origin);
+		if (self.size != VEC_ORIGIN)
+			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
+		setorigin(tfog, self.origin + offset);
 		tfog.think = teleport_flasher;
 		tfog.nextthink = time + tnext;
 		tnext += self.wait + self.rand * random();
@@ -790,6 +806,7 @@ Keys
 "delay" Time to wait before first flash
 "wait" Static ime to wait between flashes
 "rand" Random time to wait before flashes (will sum both)
+"size" Flash somewhere randomly chosen within a box of this size
 */
 /*FGD
 @Pointclass base(Targetname, Appearflags) color(0 128 224) size(16 16 16) = target_telefog : 
@@ -798,6 +815,7 @@ Keys
 	count(integer) : "Repeat count" : 1
 	delay(string) : "Delay before first flash" : "0"
 	wait(string) : "Wait between flashes" : "1"
+	size(string) : "Flash somewhere randomly chosen within a box of this size (x y z)" : "0 0 0"
 	rand(string) : "Random extra before flashes" : "0"
 ]
 */
