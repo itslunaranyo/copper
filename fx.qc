@@ -1005,7 +1005,7 @@ air bubble emitter. always bubbles. trigger to toggle on or off. check BURST to 
 	rand(string) : "Random extra interval" : "1"
 	size(string) : "Emit from random places within a box of this size" : "0 0 0"
 	count(integer) : "Bubbles to emit at once if single burst" : 1
-	distance(integer) : "Sleep if all players are further than this distance" : 1024
+	distance(integer) : "Sleep if all players are further than this distance"
 ]
 */
 void() air_bubbles =
