@@ -668,7 +668,23 @@ void(float attack, float sustain, float release, float str) screenshake_oneshot 
 void() target_explosion_go =
 {
 	if (self.dmg) T_RadiusMultiDamage (self, self, self.dmg, self, 0);
-	BecomeExplosion();
+	
+	if (self.spawnflags & 1)
+	{
+		sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
+
+		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
+		WriteByte (MSG_BROADCAST, TE_TAREXPLOSION);
+		WriteCoord (MSG_BROADCAST, self.origin_x);
+		WriteCoord (MSG_BROADCAST, self.origin_y);
+		WriteCoord (MSG_BROADCAST, self.origin_z);
+		
+		BecomeBlast ();
+	}
+	else
+	{
+		BecomeExplosion();
+	}
 }
 
 void() target_explosion_use =
@@ -679,7 +695,13 @@ void() target_explosion_use =
 	playercount_convert(count);
 	if (self.count == 1 && self.delay == 0)
 	{
-		kaboom(self.origin, self.dmg, self, 0);
+		bewm = spawn();
+		setorigin(bewm, self.origin);
+		bewm.think = target_explosion_go;
+		bewm.spawnflags = self.spawnflags;
+		bewm.nextthink = time;
+		bewm.dmg = self.dmg;
+		bewm.deathtype = self.deathtype;
 		return;
 	}
 	
@@ -689,6 +711,7 @@ void() target_explosion_use =
 		bewm = spawn();
 		setorigin(bewm, self.origin);
 		bewm.think = target_explosion_go;
+		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time + tnext;
 		bewm.dmg = self.dmg;
 		bewm.deathtype = self.deathtype;
@@ -696,8 +719,8 @@ void() target_explosion_use =
 	}
 }
 
-/*QUAKED target_explosion (0 .5 .8) (-8 -8 -8) (8 8 8) 
-Causes explosions, same appearance as a rocket/grenade blast.
+/*QUAKED target_explosion (0 .5 .8) (-8 -8 -8) (8 8 8) TARBABY
+Causes explosions, same appearance as a rocket/grenade blast. Set 'TARBABY' for a purple spawn explosion instead.
 
 Keys
 "count" number of times to explode after triggering, default 1
@@ -711,6 +734,9 @@ Keys
 @Pointclass base(Targetname, Appearflags, Deathtype) color(0 128 224) size(16 16 16) = target_explosion : 
 "Causes one or more explosions when triggered, same appearance as a rocket/grenade blast." 
 [
+	spawnflags(flags) = [
+		1 : "Tarbaby explosion" : 0
+	]
 	count(integer) : "Repeat count" : 1
 	delay(string) : "Delay before first blast" : "0"
 	wait(string) : "Wait between blasts" : "1"
@@ -723,6 +749,8 @@ void() target_explosion =
 	if (!SUB_ShouldSpawn()) return;
 	self.count = zeroconvertdefault(self.count, 1);
 	self.use = target_explosion_use;
+	if (self.spawnflags & 1)
+		precache_sound_safe("blob/death1.wav");
 	if (!self.wait)
 		self.wait = 1;
 	if (self.deathtype == string_null)
