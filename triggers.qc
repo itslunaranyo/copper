@@ -1245,6 +1245,7 @@ Keys:
 "targetname"  entity name
 "include" allow this classname of monster, or monsters with this targetname, no matter what
 "exclude" exclude this classname of monster, or monsters with this targetname, no matter what
+"wait" don't allow a jump touch more often than this many seconds (-1 for once only)
 */
 /*FGD
 @baseclass base(TriggerNoTargets, Angle) = Monsterjump [
@@ -1256,6 +1257,7 @@ Keys:
 		32 : "Only if target below" : 0
 		64 : "Additive push" : 0
 	]
+	wait(string) : "Interval (-1 for once only)" : 0
 	speed(integer) : "Jump Speed" : 200
 	height(integer) : "Jump Height" : 200
 	include(string) : "Allow this classname of monster, or monsters with this targetname, no matter what"
