@@ -1154,17 +1154,22 @@ void() trigger_monsterjump_touch =
 	// this might break a map that tosses monsters into view before they wake up
 	//if (!other.enemy || other.enemy.deadflag || other.enemy.customflags & (CFL_PLUNGE|CFL_KNOCKEDDOWN))
 	//	return;
-	if (time < self.attack_finished)
-		return;
+	if (time != self.dmgtime)
+		if (time < self.attack_finished)
+			return;
 	
 	// filtration
-	if (other.classname != self.include)	// always allow this classname
+	if (self.include == string_null || 
+		(other.classname != self.include && other.targetname != self.include))	// always allow this class/tname
 	{
 		if (self.spawnflags & SPAWN_MJUMP_NOLARGE && other.maxs_x == 32) return;
 		if (self.spawnflags & SPAWN_MJUMP_NOSMALL && other.maxs_x == 16) return;
 		if (self.spawnflags & SPAWN_MJUMP_MELEES && !(other.customflags & CFL_MELEEONLY)) return;
 		
-		if (self.exclude == other.classname) return;	// always exclude this classname
+		if (self.exclude != string_null)
+		{
+			if (self.exclude == other.classname || self.exclude == other.targetname) return; // always exclude this class/tname
+		}
 	}
 	if (self.spawnflags & SPAWN_MJUMP_ONLYBELOW && (other.enemy.absmin_z > (other.absmin_z - 16))) return;
 	if (self.spawnflags & SPAWN_MJUMP_ONLYFRONT)
@@ -1181,6 +1186,8 @@ void() trigger_monsterjump_touch =
 		SUB_RemoveSoon();
 		return;
 	}
+	
+	self.dmgtime = time;
 	self.attack_finished = time + self.wait;
 	// set XY even if not on ground, so the jump will clear lips
 	if (self.spawnflags & SPAWN_MJUMP_ADDVEL)
@@ -1235,8 +1242,8 @@ Keys:
 "speed" the speed thrown forward (default: 200)
 "target"  entity to trigger
 "targetname"  entity name
-"include" allow this classname of monster no matter what
-"exclude" exclude this classname of monster no matter what
+"include" allow this classname of monster, or monsters with this targetname, no matter what
+"exclude" exclude this classname of monster, or monsters with this targetname, no matter what
 */
 /*FGD
 @baseclass base(TriggerNoTargets, Angle) = Monsterjump [
@@ -1250,8 +1257,8 @@ Keys:
 	]
 	speed(integer) : "Jump Speed" : 200
 	height(integer) : "Jump Height" : 200
-	include(string) : "Allow this classname of monster no matter what"
-	exclude(string) : "Ignore this classname of monster no matter what"
+	include(string) : "Allow this classname of monster, or monsters with this targetname, no matter what"
+	exclude(string) : "Ignore this classname of monster, or monsters with this targetname, no matter what"
 ]
 @SolidClass base(Monsterjump) = trigger_monsterjump : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions." []
 */
@@ -1283,8 +1290,8 @@ Keys:
 "speed" the speed thrown forward (default: 200)
 "target"  entity to trigger
 "targetname"  entity name
-"include" allow this classname of monster no matter what
-"exclude" exclude this classname of monster no matter what
+"include" allow this classname of monster, or monsters with this targetname, no matter what
+"exclude" exclude this classname of monster, or monsters with this targetname, no matter what
 */
 /*FGD
 @PointClass base(Monsterjump, Bounds) = trigger_monsterjump_box : "Trigger: Monster jump. Monsters that touch this will 'jump' in the direction of the trigger's angle, if they meet its conditions.
