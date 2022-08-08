@@ -45,7 +45,7 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 	health(integer) : "solid, must be killed to activate"
 	angle(integer) : "Direction player must be facing to trigger (0-360 yaw, or -1 for up/-2 for down)"
 	angles(string) : "Direction player must be facing to trigger, specifically (pitch yaw roll)"
-	distance(string) : "Width of tolerance cone if angle or angles is set"
+	distance(integer) : "Width of facing cone (in degrees) if angle or angles is set" : 180
 	spawnflags(Flags) = [
 		1 : "No touch" : 0
 		8 : "Monsters Will Fire" : 0
@@ -111,6 +111,9 @@ void() InitTrigger =
 		self.think1 = self.use;
 		self.use = trigger_reactivate;
 	}
+
+	if (self.distance > 1)
+		self.distance = cos(self.distance / 2);
 
 	self.modelindex = 0;
 	self.model = string_null;
@@ -358,7 +361,7 @@ Flags:
 
 Keys:
 "angle" the trigger will only fire when someone is facing the direction of the angle, use 360 for angle 0.
-"distance" dot product result to compare "angle" against. 0 is 90 degrees off (default), 0.7 is ~45 degrees.
+"distance" degrees of tolerance on facing angle if 'angle' is set
 "delay" delay before firing (after trigger)
 "health" solid, must be killed to activate
 "message" message to display when triggered
