@@ -834,107 +834,6 @@ void() target_telefog =
 //============================================================================
 
 //	bubbas
-
-entity(vector org) bubble_spawn =
-{
-	entity	bubble;
-
-	bubble = spawn();
-	bubble.watertype = pointcontents(org);
-	setmodel (bubble, "progs/s_bubble.spr");
-	setorigin (bubble, org);
-	bubble.movetype = MOVETYPE_NOCLIP;
-	bubble.solid = SOLID_NOT;
-	setsize (bubble, '-8 -8 -8', '8 8 8');
-	bubble.velocity = '0 0 18';
-	
-	bubble.nextthink = time + 0.25;
-	bubble.think = bubble_bob;
-	bubble.touch = SUB_RemoveSoon;
-	bubble.classname = "bubble";
-	if (random() < 0.2)
-	{
-		bubble.frame = 1;
-		bubble.cnt = 11;
-	}
-	else
-	{
-		bubble.frame = 0;
-		bubble.cnt = 0;
-	}
-	return bubble;
-}
-
-void() air_bubbles_use =
-{
-	self.state = !(self.state);
-	self.think = make_bubbles;
-	if (self.state)
-	{
-		self.nextthink = 0;
-		return;
-	}
-	self.nextthink = time + random() * self.rand + self.wait;
-}
-
-/*QUAKED air_bubbles (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF
-air bubble emitter. always bubbles.
-"wait" bubble interval, default 1
-"rand" random extra interval, default 0
-*/
-/*FGD
-@PointClass base(Appearflags, Targetname) color(0 150 220) = air_bubbles : "Air bubble emitter." 
-[
-	spawnflags(flags) = [
-		1 : "Start off" : 0
-	]
-	wait(string) : "Bubble interval" : "0.5"
-	rand(string) : "Random extra interval" : "1"
-]
-*/
-void() air_bubbles =
-{
-	if (!SUB_ShouldSpawn()) return;
-	if (deathmatch)
-	{
-		remove (self);
-		return;
-	}
-	precache_model ("progs/s_bubble.spr");
-	self.wait = zeroconvertdefault(self.wait, 1);
-	self.rand = zeroconvertdefault(self.rand, 1);
-	
-	self.think = make_bubbles;
-	if (self.targetname != string_null)
-	{
-		self.use = air_bubbles_use;
-		self.state = self.spawnflags & 1;
-		if (self.state)
-			return;
-	}
-	self.nextthink = time + self.wait;
-}
-
-void() make_bubbles =
-{
-	if (self.state)
-		return;
-	
-	// fix for 1000cuts using info_nulls with this as a think instead of just
-	// placing an air_bubbles, skipping the init and causing every one of the
-	// dozens of them to vomit bubbles per frame until the edict limit is hit
-	// and the game crashes:
-	if (!self.wait && !self.rand)
-	{
-		self.wait = zeroconvertdefault(self.wait, 1);
-		self.rand = zeroconvertdefault(self.rand, 1);
-	}
-	
-	bubble_spawn(self.origin);
-	self.nextthink = time + random() * self.rand + self.wait;
-	self.think = make_bubbles;
-}
-
 void() bubble_split =
 {
 	if (pointcontents(self.origin + '0 0 8') != self.watertype)
@@ -964,11 +863,13 @@ void() bubble_bob =
 		return;
 	}
 	
-	self.cnt = self.cnt + 1;
-	if (self.cnt == 10)
-		bubble_split();
-	if (self.cnt >= 20 + random()*5)
+	if (random() < 0.65)
+		self.cnt = self.cnt + 1;
+		
+	if (self.cnt >= 18)
 		remove(self);
+	if (self.cnt == 8)
+		bubble_split();
 
 	rnd1 = self.velocity_x + crandom() * 20;
 	rnd2 = self.velocity_y + crandom() * 20;
@@ -996,3 +897,139 @@ void() bubble_bob =
 	self.nextthink = time + 0.25;
 	self.think = bubble_bob;
 }
+
+entity(vector org) bubble_spawn =
+{
+	entity	bubble;
+
+	bubble = spawn();
+	bubble.watertype = pointcontents(org);
+	setmodel (bubble, "progs/s_bubble.spr");
+	setorigin (bubble, org);
+	bubble.movetype = MOVETYPE_NOCLIP;
+	bubble.solid = SOLID_NOT;
+	setsize (bubble, '-8 -8 -8', '8 8 8');
+	bubble.velocity = '0 0 18';
+	//bubble.alpha = 0.5;
+	
+	bubble.nextthink = time + 0.25;
+	bubble.think = bubble_bob;
+	bubble.touch = SUB_RemoveSoon;
+	bubble.classname = "bubble";
+	if (random() < 0.2)
+	{
+		bubble.frame = 1;
+		bubble.cnt = 11;
+	}
+	else
+	{
+		bubble.frame = 0;
+		bubble.cnt = 0;
+	}
+	return bubble;
+}
+
+//============================================================================
+
+void() air_bubbles_make =
+{
+	vector org;
+	org = self.origin;
+	if (self.size != VEC_ORIGIN)
+		org += Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
+		
+	bubble_spawn(org);
+}
+
+void() air_bubbles_think =
+{
+	if (!self.state)
+		return;
+	
+	if (!self.wait && !self.rand)
+	{
+		// fix for 1000cuts using info_nulls with this as a think instead of just
+		// placing an air_bubbles, skipping the init and causing every one of the
+		// dozens of them to vomit bubbles per frame until the edict limit is hit
+		// and the game crashes:
+		self.wait = zeroconvertdefault(self.wait, 1);
+		self.rand = zeroconvertdefault(self.rand, 1);
+	}
+	
+	if (!particlefield_should_sleep())
+	{
+		air_bubbles_make();
+	}
+	self.nextthink = time + random() * self.rand + self.wait;
+	self.think = air_bubbles_think;
+}
+
+void() air_bubbles_use =
+{
+	if (self.spawnflags & 8)
+	{
+		if (particlefield_should_sleep())
+			return;
+		
+		for (float i = 0; i < self.count; i++)
+		{
+			air_bubbles_make();
+		}
+		return;
+	}
+	self.state = !(self.state);
+	if (self.state)
+	{
+		self.think = air_bubbles_think;
+		self.nextthink = time + random() * self.rand + self.wait;
+	}
+}
+
+/*QUAKED air_bubbles (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF ? ? BURST
+air bubble emitter. always bubbles. trigger to toggle on or off. check BURST to make a one-time triggerable bubbler.
+
+"wait" bubble interval, default 1
+"rand" random extra interval, default 1
+"size" size of random bubble emission zone, default '0 0 0'
+"count" bubbles to emit at once if single burst
+"distance" don't emit bubbles if no players are closer than this distance, default 1024
+*/
+/*FGD
+@PointClass base(Appearflags, Targetname) color(0 150 220) = air_bubbles : "Air bubble emitter." 
+[
+	spawnflags(flags) = [
+		1 : "Start off" : 0
+		8 : "Single burst when triggered" : 0
+	]
+	wait(string) : "Bubble interval" : "1"
+	rand(string) : "Random extra interval" : "1"
+	size(string) : "Emit from random places within a box of this size" : "0 0 0"
+	count(integer) : "Bubbles to emit at once if single burst" : 1
+	distance(integer) : "Sleep if all players are further than this distance" : 1024
+]
+*/
+void() air_bubbles =
+{
+	if (!SUB_ShouldSpawn()) return;
+	if (deathmatch)
+	{
+		remove (self);
+		return;
+	}
+	precache_model ("progs/s_bubble.spr");
+	self.wait = zeroconvertdefault(self.wait, 1);
+	self.rand = zeroconvertdefault(self.rand, 1);
+	
+	self.think = air_bubbles_think;
+	if (self.targetname != string_null)
+	{
+		self.use = air_bubbles_use;
+		self.state = !(self.spawnflags & 1);
+		if (!self.state)
+			return;
+	}
+	if (self.spawnflags & 8)
+		return;
+	self.nextthink = time + self.wait;
+}
+
