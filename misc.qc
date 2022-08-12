@@ -57,7 +57,7 @@ void() misc_model_animate =
 	if (self.frame > anim_z)
 	{
 		self.frame = anim_x;
-		if (self.spawnflags & SPAWN_MODEL_ANIMONCE && self.state)
+		if (self.spawnflags & SPAWN_MODEL_ANIMONCE && !self.state)
 		{
 			self.state = !self.state;
 			self.frame = self.pos1_y;
@@ -78,7 +78,11 @@ void() misc_model_use =
 			self.modelindex = self.oldstyle;
 			setmodel (self, self.model);
 			setsize(self, '-16 -16 -16', '16 16 16');
-			self.nextthink = time + self.speed;
+			if (self.pos1)
+			{
+				self.nextthink = time + self.speed;
+				self.think = misc_model_animate;
+			}
 		}
 		else
 		{
@@ -86,9 +90,6 @@ void() misc_model_use =
 			self.modelindex = 0;
 			self.nextthink = 0;
 		}
-		//tmp = self.oldstyle;
-		//self.oldstyle = self.alpha;
-		//self.alpha = tmp;
 	}
 	else
 	{
@@ -100,8 +101,8 @@ void() misc_model_use =
 		{
 			self.frame = self.pos1_y;
 		}
-		self.think = misc_model_animate;
 		self.nextthink = time + self.speed;
+		self.think = misc_model_animate;
 	}
 }
 
@@ -190,6 +191,7 @@ void() misc_model =
 	if (!self.speed)
 		self.speed = 0.1;
 		
+	self.state = 1;
 	// toggle animation
 	if (self.targetname != string_null)
 	{
@@ -198,8 +200,7 @@ void() misc_model =
 		{
 			self.oldstyle = self.modelindex;
 			self.modelindex = 0;
-			//self.alpha = -1;	
-			self.state = 1;
+			self.state = 0;
 		}
 	}
 	if (self.pos1)
