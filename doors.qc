@@ -119,19 +119,32 @@ void() door_fire =
 	{
 		self.message = string_null;		// no more message
 	}
-	
+	else
+	{
+		oself = self;
+		if (self.state == STATE_TOP || self.state == STATE_UP )
+		{
+			starte = self;
+			do {
+				if (self.classname == "shadowmonitor")
+					door_shadowmonitor_go();
+				else
+					door_go_down ();
+				self = self.enemy;
+			} while ( (self != starte) && (self != world) );
+			self = oself;
+			return;
+		}
+	}
+
 	// trigger all paired doors
 	starte = self;
+	if ( !( self.spawnflags & DOOR_TOGGLE ) || ( self.spawnflags & DOOR_TOGGLE && self.state == STATE_BOTTOM) )
 	do {
 		if (self.classname == "shadowmonitor")
 			door_shadowmonitor_go();
 		else
-		{
-			if (self.state == STATE_TOP || self.state == STATE_UP )
-				door_go_down ();
-			else
-				door_go_up ();
-		}
+			door_go_up ();
 		self = self.enemy;
 	} while ( (self != starte) && (self != world) );
 	self = oself;
