@@ -490,6 +490,43 @@ void() info_teleport_destination =
 // to try and teleport something is inconvenient
 // --------------------------------
 
+float(.string fld) teleport_target_acton =
+{
+	if (self.fld == string_null)
+		return FALSE;
+
+	entity t;
+	float did = FALSE;
+	t = find(world, targetname, self.fld);
+	while (t)
+	{
+		if (teleport_target_check(t))
+		{
+			teleport( t, self, !(self.spawnflags & TELEPORT_NOFLASH), !(self.spawnflags & TELEPORT_PUSH) );
+			t.jump_flag = 0;
+			did = TRUE;
+		}
+		t = find(t, targetname, self.fld);
+	}
+	return did;
+}
+
+float(entity e) teleport_target_check =
+{
+	if (self.spawnflags & TELEPORT_PLAYER_ONLY)
+		if (e.classname != "player")
+			return FALSE;
+	if (self.spawnflags & TELEPORT_MONSTER_ONLY)
+		if (!(e.flags & FL_MONSTER))
+			return FALSE;
+	if (e.movetype == MOVETYPE_NOCLIP)
+		return FALSE;
+	// only teleport living creatures
+	if (e.health <= 0 || e.solid != SOLID_SLIDEBOX)
+		return FALSE;
+	return TRUE;
+}
+
 // teleports the activator to this spot
 void() teleport_target_use =
 {
@@ -499,39 +536,46 @@ void() teleport_target_use =
 		return;
 	}
 	
-	if (self.spawnflags & TELEPORT_PLAYER_ONLY)
-		if (activator.classname != "player")
-			return;
-	if (self.spawnflags & TELEPORT_MONSTER_ONLY)
-		if (!(activator.flags & FL_MONSTER))
-			return;
-	if (activator.movetype == MOVETYPE_NOCLIP)
-		return;
-	// only teleport living creatures
-	if (activator.health <= 0 || activator.solid != SOLID_SLIDEBOX)
-		return;
-
 	playercount_convert(count);
 	if (!self.count) 
 	{
 		SUB_RemoveSoon();
 		return;
 	}
-	else if (self.count > 0)
-		self.count -= 1;
+	
+	if (self.spawnflags & 8)
+	{
+		if (teleport_target_acton(target) ||
+			teleport_target_acton(target2) ||
+			teleport_target_acton(target3) ||
+			teleport_target_acton(target4))	
+		{
+			if (self.count > 0)
+				self.count -= 1;
+		}
+	}
+	else
+	{
+		if (!teleport_target_check(activator))
+			return;
 
-	teleport( activator, self, !(self.spawnflags & TELEPORT_NOFLASH), !(self.spawnflags & TELEPORT_PUSH) );
-	activator.jump_flag = 0;
+		if (self.count > 0)
+			self.count -= 1;
+
+		teleport( activator, self, !(self.spawnflags & TELEPORT_NOFLASH), !(self.spawnflags & TELEPORT_PUSH) );
+		activator.jump_flag = 0;
+	}
 }
 
 
-/*QUAKED info_teleport_target (.5 .75 .25) (-16 -16 -8) (16 16 40) PLAYER_ONLY PUSH TRIGGER_FIRST ? NOFLASH MONSTER_ONLY
+/*QUAKED info_teleport_target (.5 .75 .25) (-16 -16 8) (16 16 40) PLAYER_ONLY PUSH TRIGGER_FIRST ACT_ON_TARGETS NOFLASH MONSTER_ONLY
 This is a usable destination marker that acts as its own teleporter.  When triggered, the activator is teleported to this spot.
 
 Flags:
 PLAYER_ONLY		only players will teleport
 PUSH			chuck the player forward like a trigger_teleport does
 TRIGGER_FIRST	first use turns it on, and every subsequent use teleports
+ACT_ON_TARGETS	teleport its targets intead of firing them and ignore the activator
 NOFLASH			don't spawn telefog or make noise
 MONSTER_ONLY	only monsters will teleport
 
@@ -540,20 +584,42 @@ Keys:
 "count"		remove after this many uses
 */
 /*FGD
-@PointClass size(-16 -16 -8, 16 16 40) base(Appearflags, Angle, Fog, Trigger) = info_teleport_target : "Triggerable Teleporter destination" [
+@PointClass size(-16 -16 8, 16 16 40) base(Appearflags, Angle, Fog, Trigger) = info_teleport_target : "Triggerable Teleporter destination
+This is a usable destination marker that acts as its own teleporter.  When triggered, the activator is teleported to this spot.
+
+If 'Act On Targets' is set, teleports its targets intead of firing them and ignores the activator.
+
+If 'Player only' or 'Monsters only' is checked, this can only be activated by players or monsters respectively.
+Set 'Push forward' if you want the teleport-exit forward velocity effect, or 'No teleflash' to plop an entity here silently.
+
+PLAYER_ONLY		only players will teleport
+PUSH			chuck the player forward like a trigger_teleport does
+TRIGGER_FIRST	first use turns it on, and every subsequent use teleports
+NOFLASH			don't spawn telefog or make noise
+MONSTER_ONLY	only monsters will teleport" 
+[
 	spawnflags(flags) = [
 		1 : "Player only" : 0
 		2 : "Push forward" : 0
+		8 : "Act On Targets" : 0
 		16 : "No teleflash" : 0
 		32 : "Monsters only" : 0
 	]
+	count(integer) : "Remove after this many uses"
 ]
 */
 void() info_teleport_target =
 {
 	if (!SUB_ShouldSpawn()) return;
+	
 	if (self.targetname == string_null)
 		objerror ("no targetname");
+		
+	if ((self.spawnflags & 8) && 
+		(self.target == string_null && self.target2 == string_null && 
+		self.target3 == string_null && self.target4 == string_null))
+		objerror ("act_on_targets with no target set");
+		
 	self.mangle = self.angles;
 	self.angles = '0 0 0';
 	setorigin(self, self.origin + '0 0 16'); // 
