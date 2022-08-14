@@ -27,18 +27,15 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 	]
 	noise(string) : "Choose wav to play"
 ]
-@baseclass base(Appearflags, Target, Targetname) = Trigger 
+@baseclass color(128 128 0) base(Appearflags, Targetname) = TriggerNoTargets
 [
 	spawnflags(Flags) = [
 		4 : "trigger first"
 	]
-	message(string) : "message to display when triggered"
 ]
-@baseclass base(Appearflags, Targetname) = TriggerNoTargets
+@baseclass base(TriggerNoTargets, Target) = Trigger 
 [
-	spawnflags(Flags) = [
-		4 : "trigger first"
-	]
+	message(string) : "message to display when triggered"
 ]
 @baseclass base(Trigger, TriggerSounds, Angle) = TriggerMulti
 [
@@ -635,7 +632,7 @@ void() target_secret_check =
 	}
 }
 
-/*QUAKED target_secret (.5 .0 .5) (-8 -8 -8) (8 8 8) ? SUPERSECRET
+/*QUAKED target_secret (.65 .0 .65) (-8 -8 -8) (8 8 8) ? SUPERSECRET
 Secret counter trigger.  Player gets a secret credit when triggered.  Note when using a target_secret: if triggered by touching an item, and the item can't be picked up (because of health/armor/ammo limits already being met, etc), it won't fire its targets and thus the target_secret won't give credit. Use a trigger in that case.
 
 Set "SUPERSECRET" to hide its existence in the total until it's found. Think very carefully if you actually want to use this.
@@ -650,7 +647,7 @@ Keys:
 "noise"	choose your own .wav
 */
 /*FGD
-@PointClass base(Secret) = target_secret : "Secret counter trigger.  Player gets a secret credit when triggered.  Note when using a target_secret: if triggered by touching an item, and the item can't be picked up (because of health/armor/ammo limits already being met, etc), it won't fire its targets and thus the target_secret won't give credit. Use a trigger in that case.
+@PointClass base(Secret) color(160 0 160) = target_secret : "Secret counter trigger.  Player gets a secret credit when triggered.  Note when using a target_secret: if triggered by touching an item, and the item can't be picked up (because of health/armor/ammo limits already being met, etc), it won't fire its targets and thus the target_secret won't give credit. Use a trigger in that case.
 
 Set the 'supersecret' spawnflag to hide its existence in the total until it's found. Think very carefully if you actually want to use this." []
 */
@@ -794,7 +791,7 @@ void() target_setskill_use
 ]
 */
 
-/*QUAKED target_setskill (.5 .0 .5) (-8 -8 -8) (8 8 8)
+/*QUAKED target_setskill (.65 .0 .65) (-8 -8 -8) (8 8 8)
 Sets skill level to the value of "message". Only used on start map.
 
 Keys:
@@ -806,7 +803,7 @@ Keys:
     3 = nightmare
 */
 /*FGD
-@PointClass base(Setskill, Targetname) = target_setskill : "Target: Set Skill" []
+@PointClass base(Setskill, Targetname) color(160 0 160) = target_setskill : "Target: Set Skill" []
 */
 void() target_setskill =
 {
@@ -872,7 +869,7 @@ void() trigger_onlyregistered_touch =
 	}
 }
 
-/*QUAKED trigger_onlyregistered (.5 .5 .5) ?
+/*QUAKED trigger_onlyregistered (.5 .0 .5) ?
 Only fires if playing the registered version, otherwise prints the message
 */
 /*FGD

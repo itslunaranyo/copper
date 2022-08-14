@@ -280,7 +280,7 @@ If the plat targets a trigger once/multiple/multiple_box, it will override the p
 	-1: silent
 */
 /*FGD
-@SolidClass base(Appearflags, Targetname) = func_plat : "Elevator platform.
+@SolidClass base(Appearflags, Targetname, Func) = func_plat : "Elevator platform.
 Plats are always drawn in the extended position, so they will light correctly.
 If the plat is the target of another trigger or button, it will start out disabled in the top position until it is triggered, when it will lower and become a normal plat.
 If the plat targets a trigger once/multiple/multiple_box, it will override the plat's default activation zone (consuming the trigger).
@@ -475,7 +475,7 @@ void() flytrain_stop =
 		2: "Base Lift"
 	]
 ]
-@baseclass base(Appearflags, Targetname, TrainSounds) = Train [
+@baseclass base(Appearflags, Targetname, TrainSounds, Func) = Train [
 	speed(integer) : "Speed (units per second)" : 64
 	target(target_source) : "Target to start at"
 	dmg(integer) : "Damage on block" : 2
@@ -871,7 +871,7 @@ START_OFF	start off
 CRUSHER		don't reverse when blocked
 */
 /*FGD
-@baseclass base(Appearflags, Targetname, TrainSounds, Angle) = Bob
+@baseclass base(Appearflags, Targetname, TrainSounds, Angle, Func) = Bob
 [
 	spawnflags(flags) = [
 		1 : "Start off" : 0
@@ -1079,7 +1079,7 @@ START_INVIS	Invisible until triggered
 CURVY	behaves like a func_flytrain, following path_corners, waiting at them (a wait of -1 on a path_corner will stop the ball until triggered again), then disappearing at the last path_corner. Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
 */
 /*FGD
-@PointClass base(Appearflags, Targetname) size(16 16 16) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
+@PointClass base(Appearflags, Targetname) size(16 16 16) color(0 128 200) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
 Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
 
 If the 'curving path' spawnflag is set, the teleball behaves like a func_flytrain, smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it."

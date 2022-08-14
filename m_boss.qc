@@ -350,7 +350,7 @@ The E1M7 boss fight requires an event_lightning.
 If 'SHOOTABLE' is set, he'll bleed when shot, and die the old-fashioned way when shot enough. Can even be telefragged. 'Health' defaults to 1000.
 */
 /*FGD
-@PointClass base(Angle, Appearflags, Target, Targetname, Deathtype) size(-128 -128 -24, 128 128 256) color(0 0 220) model({ "path": ":progs/boss.mdl" }) = monster_boss : "Ch'thon. Throws lava bombs until electrocuted to death.
+@PointClass base(Angle, Appearflags, Target, Targetname, Deathtype) size(-128 -128 -24, 128 128 256) color(240 0 0) model({ "path": ":progs/boss.mdl" }) = monster_boss : "Ch'thon. Throws lava bombs until electrocuted to death.
 The more health he's lost, and the higher the skill level the player is on, the more accurately he leads his shots.
 The E1M7 boss fight requires an event_lightning.
 
@@ -495,8 +495,7 @@ void() lightning_use =
 Just for boss level. Fires targets on a successful zap.
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) =
-	event_lightning : "Chthon lightning. Fires targets on a successful zap.
+@PointClass base(Appearflags, Target, Targetname) color(0 255 255) = event_lightning : "Chthon lightning. Fires targets on a successful zap.
 Setup is weird and special: it must find two func_doors each with a 'target' (not targetname) of 'lightning', and it will branch the lightning between the bottom center of each door. If both doors are closed it won't hurt Ch'thon, but if both are open, it will, and otherwise lightning won't happen at all. Lightning doesn't actually have to go through Ch'thon." []
 */
 void() event_lightning =

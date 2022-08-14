@@ -150,7 +150,7 @@ void() func_wall_flip =
 }
 
 /*FGD
-@baseclass base(Appearflags, Targetname) = Wall [
+@baseclass base(Appearflags, Targetname, Func) = Wall [
 	spawnflags(flags) = [
 		1 : "Illusionary" : 0
 		2 : "Toggle Visible+Solid" : 0
@@ -242,7 +242,7 @@ void() func_wall_point = { func_wall(); }
 Like a func_wall but calls makestatic.  Static entities are always nonsolid.
 */
 /*
-@SolidClass base(Appearflags) = func_static : "Nonsolid, untriggerable static wall" [
+@SolidClass base(Appearflags, Func) = func_static : "Nonsolid, untriggerable static wall" [
 	alpha(string) : "Opacity (GLQuake only) (-1 = 0)" : "1"
 ]
 */
@@ -259,7 +259,7 @@ Like a func_wall but calls makestatic.  Static entities are always nonsolid.
 "model"		filename of model to stand in for this entity. can be bsp or mdl.
 */
 /*
-@PointClass base(Appearflags) = func_static_point : "Static (untriggerable) nonsolid model (point)" [
+@PointClass base(Appearflags, Func) = func_static_point : "Static (untriggerable) nonsolid model (point)" [
 	model(string) : "External model"
 	mangle(string) : "Orientation of external model"
 ]
@@ -271,7 +271,7 @@ void() func_static_point = { func_static(); }
 A simple entity that looks solid but lets you walk through it. Functionally identical to a func_static.
 */
 /*FGD
-@SolidClass base(Appearflags) = func_illusionary : "Nonsolid, untriggerable static wall"  [
+@SolidClass base(Appearflags, Func) = func_illusionary : "Nonsolid, untriggerable static wall"  [
 	alpha(string) : "Opacity (GLQuake only) (-1 = 0)" : "1"
 ]
 */
@@ -294,7 +294,7 @@ This bmodel will appear if the episode has already been completed, so players ca
 If it does spawn, it fires its targets immediately.
 */
 /*FGD
-@SolidClass base(Appearflags, Target) = func_episodegate : 
+@SolidClass base(Appearflags, Target, Func) = func_episodegate : 
 "Episode Gate. 
 If players have completed the episode, it fires its targets.
 If players have NOT completed the episode, it self-removes."
@@ -331,7 +331,7 @@ This bmodel does not spawn unless players have all of the episode sigils.
 If it does spawn, it fires its targets immediately.
 */
 /*FGD
-@SolidClass base(Appearflags, Target) = func_bossgate : 
+@SolidClass base(Appearflags, Target, Func) = func_bossgate : 
 "Boss Gate. 
 If players have NOT completed all episodes, it fires its targets.
 If players have completed all episodes, it self-removes." 
@@ -359,22 +359,24 @@ void() func_bossgate =
 // ==========================================
 
 
-/*QUAKED func_group (0.6 0.7 0.8) ?
+/*QUAKED func_group (0.3 0.6 0.8) ?
 groups brushes into a group that may or may not be easier to work with
 */
-/*QUAKED func_detail (0.2 .5 .6) ?
+/*QUAKED func_detail (0.3 0.6 0.8) ?
 Apparently this behaves like a detail brush. Doesn't seal against leaks.
 */
-/*QUAKED func_detail_wall (0.2 .5 .6) ?
+/*QUAKED func_detail_wall (0.3 0.6 0.8) ?
 Apparently this behaves like a detail brush. Doesn't seal against leaks. Doesn't cut geometry it touches.
 */
-/*QUAKED func_detail_illusionary (0.2 .5 .6) ?
+/*QUAKED func_detail_illusionary (0.3 0.6 0.8) ?
 Apparently this behaves like a detail brush. Doesn't seal against leaks. Doesn't cut geometry it touches. Non-solid.
 */
 /*FGD
-@SolidClass base(Phong) = func_group : "Group of brushes for in-editor use" []
-@SolidClass base(Phong) = func_detail : "Group of brushes which aren't abusive to bsp" []
-@SolidClass base(Phong) = func_detail_wall : "Group of brushes which aren't abusive to bsp or geometry" []
-@SolidClass base(Phong) = func_detail_illusionary : "Group of brushes which aren't solid, or abusive to bsp or geometry" []
-@SolidClass base(Phong) = func_detail_fence : "Group of brushes which aren't solid, or abusive to bsp or geometry, and are two-sided" []
+@baseclass base(Phong) color(72 144 200) = FuncOffline []
+
+@SolidClass base(FuncOffline) = func_group : "Group of brushes for in-editor use" []
+@SolidClass base(FuncOffline) = func_detail : "Group of brushes which aren't abusive to bsp" []
+@SolidClass base(FuncOffline) = func_detail_wall : "Group of brushes which aren't abusive to bsp or geometry" []
+@SolidClass base(FuncOffline) = func_detail_illusionary : "Group of brushes which aren't solid, or abusive to bsp or geometry" []
+@SolidClass base(FuncOffline) = func_detail_fence : "Group of brushes which aren't solid, or abusive to bsp or geometry, and are two-sided" []
 */

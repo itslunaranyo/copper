@@ -458,7 +458,7 @@ void() teleport_touch =
 // ================================================================
 
 
-/*QUAKED info_teleport_destination (.75 .25 .85) (-16 -16 0) (16 16 48)
+/*QUAKED info_teleport_destination (.8 0 .9) (-16 -16 0) (16 16 48)
 This is the destination marker for a teleporter.
 
 Keys:
@@ -467,7 +467,7 @@ Keys:
 "fog_color"/"fog_density" set the fog for anyone teleporting here
 */
 /*FGD
-@PointClass size(-16 -16 0, 16 16 48) base(Appearflags, Angle, Targetname, Fog) model({ "path": ":progs/player.mdl" }) = info_teleport_destination : "Teleporter destination" []
+@PointClass size(-16 -16 0, 16 16 48) color(240 0 255) base(Appearflags, Angle, Targetname, Fog) model({ "path": ":progs/player.mdl" }) = info_teleport_destination : "Teleporter destination" []
 */
 void() info_teleport_destination =
 {

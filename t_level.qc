@@ -458,7 +458,7 @@ void() trigger_changelevel =
 	self.touch = changelevel_touch;
 }
 
-/*QUAKED target_changelevel (1 1 0.5) (-16 -16 -16) (16 16 16) NO_INTERMISSION
+/*QUAKED target_changelevel (0.65 0 0.65) (-16 -16 -16) (16 16 16) NO_INTERMISSION
 When the player triggers this by any means, he gets sent to the map listed in the "map" variable.  
 Spawnflags:
 NO_INTERMISSION: the view will not go to the info_intermission spot and display stats
@@ -467,7 +467,7 @@ Keys:
 "message" ONE page of intermission text to display
 */
 /*FGD
-@PointClass base(Appearflags, Targetname, ChangeLevel) size(32 32 32) = target_changelevel : "Target: Change level.
+@PointClass base(Appearflags, Targetname, ChangeLevel) color(160 0 160) size(32 32 32) = target_changelevel : "Target: Change level.
 When this is triggered, the player is sent to the map listed in the 'map' variable. The view will go to the info_intermission spot and display stats."
 []
 */
@@ -492,7 +492,7 @@ Keys:
 
 */
 /*FGD
-@PointClass size(16 16 16) base(Fog, Appearflags) = info_intermission : "Intermission camera" 
+@PointClass size(16 16 16) color(192 64 64) base(Fog, Appearflags) = info_intermission : "Intermission camera" 
 [
 	angles(string) : "Camera angle (Pitch Yaw Roll, positive pitch down)"
 ]

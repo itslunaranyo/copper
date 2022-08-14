@@ -544,4 +544,6 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 	_phong(integer) : "Use phong smoothing" : 0
 	_phong_angle(integer) : "Phong angle" : 88
 ]
+
+@baseclass base(Phong) color(0 120 180) = Func []
 */

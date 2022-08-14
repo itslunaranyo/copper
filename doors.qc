@@ -713,7 +713,7 @@ Key doors are always wait -1.
 6) base secret door
 */
 /*FGD
-@SolidClass base(Angle, Appearflags, Targetname, Target) = func_door : 
+@SolidClass base(Angle, Appearflags, Targetname, Target, Func) = func_door : 
 "Door. Opens; closes. 
 If two doors touch, they are assumed to be connected and operate as a unit. Targets, targetnames, and the Crusher and Toggle spawnflags are safely shared between linked doors automatically.
 Doors will not link if either has the 'don't link' spawnflag, if they have different targetnames, or different key requirements." 
@@ -1088,7 +1088,7 @@ Keys:
 "wait"  # of seconds before coming back, default 5
 */
 /*FGD
-@SolidClass base(Appearflags, Targetname, Target) = func_door_secret : 
+@SolidClass base(Appearflags, Targetname, Target, Func) = func_door_secret : 
 "Secret door. Slides back, then to the side. 
 
 There are three ways to configure how this door moves:

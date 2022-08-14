@@ -6,6 +6,14 @@ EXPLOBOXES
 ==============================================================================
 */
 
+/*FGD
+@baseclass base(Appearflags, Target, Targetname) color(210 40 0) = Explobox [
+	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
+	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
+	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
+]
+*/
+
 void() explobox_respawn =
 {
 	entity who = find_touching(FALSE);
@@ -152,7 +160,7 @@ void() explobox_setup =
 	setorigin(self, bottom);
 }
 
-/*QUAKED misc_explobox (0 .5 .8) (0 0 0) (32 32 64)
+/*QUAKED misc_explobox (.8 .2 0) (0 0 0) (32 32 64)
 Large exploding box. 150 damage. 
 will do enough damage to set off other barrels at up to ~172u distance (center to center)
 
@@ -163,15 +171,11 @@ will do enough damage to set off other barrels at up to ~172u distance (center t
 "count"		will only respawn 'count' times
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) size(0 0 0, 32 32 64) model({ "path": ":maps/b_explob.bsp" }) = misc_explobox : 
+@PointClass base(Explobox) size(0 0 0, 32 32 64) model({ "path": ":maps/b_explob.bsp" }) = misc_explobox : 
 "Large exploding container, 150 damage. 
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~172u distance (center to center)." 
-[
-	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
-	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
-	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
-]
+[]
 */
 void() misc_explobox =
 {
@@ -186,7 +190,6 @@ void() misc_explobox =
 	explobox_setup();
 }
 
-
 /*QUAKED misc_explobox2 (0 .5 .8) (0 0 0) (32 32 32)
 Smaller exploding box. 100 damage. REGISTERED ONLY
 will do enough damage to set off other barrels at up to ~128u distance (center to center)
@@ -198,14 +201,10 @@ will do enough damage to set off other barrels at up to ~128u distance (center t
 "count"		will only respawn 'count' times
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) size(0 0 0, 32 32 32) model({ "path": ":maps/b_exbox2.bsp" }) = misc_explobox2 : "Small exploding container, 100 damage. 
+@PointClass base(Explobox) size(0 0 0, 32 32 32) model({ "path": ":maps/b_exbox2.bsp" }) = misc_explobox2 : "Small exploding container, 100 damage. 
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~128u distance (center to center)." 
-[
-	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
-	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
-	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
-]
+[]
 */
 void() misc_explobox2 =
 {
@@ -219,7 +218,7 @@ void() misc_explobox2 =
 	explobox_setup();
 }
 
-/*QUAKED func_explobox (0 .5 .8) ?
+/*QUAKED func_explobox (.8 .2 0) ?
 Build your own exploding box!
 
 Keyvalues:
@@ -231,13 +230,10 @@ Keyvalues:
 "count"		will only respawn 'count' times
 */
 /*FGD
-@SolidClass base(Appearflags, Target, Targetname) = func_explobox : "Customizable exploding container. 
+@SolidClass base(Explobox) = func_explobox : "Customizable exploding container. 
 Explodes when triggered or shot. Fires targets when it explodes." 
 [
-	health(integer) : "Hit points (-1 to be immune and trigger-only)" : 18
 	dmg(integer) : "Explosion damage (-1 will force 0)" : 150
-	wait(string) : "Respawn interval. Default 0 is never respawn." : "0"
-	count(integer) : "Respawn count. Default 0 is respawn forever (if 'wait' is set). -4 will auto-scale the count to the number of clients in coop." : 0
 ]
 */
 void() func_explobox =

@@ -3,7 +3,7 @@
 Used as a positional target for spotlights, etc. Not present in game.
 */
 /*FGD
-@PointClass base(Targetname) size(8 8 8) color(200 150 150) = info_null : "info_null (spotlight target)
+@PointClass base(Targetname) size(8 8 8) color(0 150 0) = info_null : "info_null (spotlight target)
 Not present in game." []
 */
 void() info_null =
@@ -15,7 +15,7 @@ void() info_null =
 Used as a positional target for lighting. Present in game.
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) size(8 8 8) color(200 150 150) = info_notnull : "Wildcard entity" // I love you too
+@PointClass base(Appearflags, Target, Targetname) size(8 8 8) color(0 150 0) = info_notnull : "Wildcard entity" // I love you too
 [
 	use(string) : "self.use"
 	think(string) : "self.think"
@@ -38,7 +38,7 @@ void() info_notnull =
 "_external_map_scale"		Scale factor for the prefab, defaults to 1. Either specify a single value or three scales, "x y z".
 */
 /*FGD
-@PointClass = misc_external_map : "Put another map in your map" [
+@PointClass color(160 180 200) = misc_external_map : "Put another map in your map" [
 	_external_map(string) : "Filename of .map to import"
 	_external_map_classname(string) : "Classname to turn imported worldspawn into"
 	_external_map_angles(string) : "Rotation (pitch yaw roll, negative pitch is up)"

@@ -364,7 +364,7 @@ Keyvalues:
 "strength" number of hits to take before exploding, defaults to 3
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname, Angle) size(-128 -128 -24, 128 128 256) model({ "path": ":progs/oldone.mdl" }) = monster_oldone : 
+@PointClass base(Appearflags, Target, Targetname, Angle) color(220 0 0) size(-128 -128 -24, 128 128 256) model({ "path": ":progs/oldone.mdl" }) = monster_oldone : 
 "Shubby
 can be killed by traditional telefrag or in several new ways:
 - being triggered 'strength' times

@@ -79,7 +79,7 @@ Spawnflags:
 "RANDOM"	randomly fire one of its targets (and/or kill one of its killtargets) instead of them all
 */
 /*FGD
-@PointClass size(16 16 16) base(Appearflags, TriggerSounds, Target, Targetname) = trigger_relay : "Trigger: Relay.
+@PointClass size(16 16 16) color(160 0 160) base(Appearflags, TriggerSounds, Target, Targetname) = trigger_relay : "Trigger: Relay.
 This fixed size trigger cannot be touched, it can only be fired by other events. Target this with a target_lock to selectively disable/reenable it for logic fun."
 [
 	spawnflags(flags) =	[
@@ -424,7 +424,7 @@ Keys:
 "message"	specify text to print on completion (will always print - overrides 'nomessage' on completion)
 */
 /*FGD
-@PointClass size(16 16 16) base(Appearflags, Target, Targetname) = trigger_counter : "Trigger: Counter.
+@PointClass size(16 16 16) color(160 0 160) base(Appearflags, Target, Targetname) = trigger_counter : "Trigger: Counter.
 Acts as an intermediary for an action that takes multiple inputs. 
 If nomessage is not set, it will print '1 more...' etc when triggered and 'sequence complete' when finished. After the counter has been triggered 'count' times, it will fire all of it's targets and remove itself, unless 'repeat' has been set, in which case it resets after 'wait' seconds.
 
@@ -503,7 +503,7 @@ SPAWNFLAGS
 START_ON: do not wait until triggered to begin firing
 */
 /*FGD
-@PointClass size(32 32 32) base(Appearflags, Target, Targetname) = trigger_timer : "Trigger: Timer
+@PointClass size(32 32 32) color(160 0 160) base(Appearflags, Target, Targetname) = trigger_timer : "Trigger: Timer
 Fires its targets once every 'wait' seconds once activated. If 'count' is set, it will only fire that many times and then stop. Set 'rand' to add a random extra delay to the wait interval." 
 [
 	spawnflags(flags) = [ 

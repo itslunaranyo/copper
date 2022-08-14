@@ -176,7 +176,7 @@ Keys:
 "_dirtgain" Exponent used in dirt calculation, default 1 (lower is darker)
 */
 /*FGD
-@SolidClass = worldspawn : "World entity"
+@SolidClass color(240 240 240) = worldspawn : "World entity"
 [
 	message(string) : "Map name"
 	worldtype(choices) : "Key Style" : 0 =

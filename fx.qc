@@ -289,7 +289,7 @@ void() particlefield_use =
 
 
 /*FGD
-@baseclass = Particlefield [
+@baseclass color(0 128 224) = Particlefield [
 	spawnflags(flags) = [
 		1 : "Start on" : 0
 		2 : "Suck inward" : 0
@@ -338,7 +338,7 @@ void() particlefield_use =
 	distance(integer) : "Sleep if all players are further than this distance"
 ]
 
-@Pointclass base(Targetname, Appearflags, Bounds, Particlefield) color(0 160 255) size(16 16 16) = misc_particlefield_box : 
+@Pointclass base(Targetname, Appearflags, Bounds, Particlefield) size(16 16 16) = misc_particlefield_box : 
 "Makes dots appear continuously within its bounds. Trigger to toggle on/off." []
 
 @Solidclass base(Targetname, Appearflags, Particlefield) = misc_particlefield : 
