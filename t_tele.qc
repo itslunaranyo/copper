@@ -536,6 +536,13 @@ void() teleport_target_use =
 		return;
 	}
 	
+	// trigger first
+	if (self.spawnflags & 4)
+	{
+		self.spawnflags -= 4;
+		return;
+	}
+	
 	playercount_convert(count);
 	if (!self.count) 
 	{
