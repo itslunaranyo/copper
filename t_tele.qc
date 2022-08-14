@@ -575,7 +575,7 @@ void() teleport_target_use =
 }
 
 
-/*QUAKED info_teleport_target (.5 .75 .25) (-16 -16 8) (16 16 40) PLAYER_ONLY PUSH TRIGGER_FIRST ACT_ON_TARGETS NOFLASH MONSTER_ONLY
+/*QUAKED info_teleport_target (.5 .75 .25) (-16 -16 -8) (16 16 40) PLAYER_ONLY PUSH TRIGGER_FIRST ACT_ON_TARGETS NOFLASH MONSTER_ONLY
 This is a usable destination marker that acts as its own teleporter.  When triggered, the activator is teleported to this spot.
 
 Flags:
@@ -591,7 +591,7 @@ Keys:
 "count"		remove after this many uses
 */
 /*FGD
-@PointClass size(-16 -16 8, 16 16 40) base(Appearflags, Angle, Fog, Trigger) = info_teleport_target : "Triggerable Teleporter destination
+@PointClass size(-16 -16 -8, 16 16 40) base(Appearflags, Angle, Fog, Trigger) = info_teleport_target : "Triggerable Teleporter destination
 This is a usable destination marker that acts as its own teleporter.  When triggered, the activator is teleported to this spot.
 
 If 'Act On Targets' is set, teleports its targets intead of firing them and ignores the activator.
