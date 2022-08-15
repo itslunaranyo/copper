@@ -173,6 +173,22 @@ void() BackpackAutoTouch =
 	
 	self.armorvalue = floor(self.armorvalue / 2);
 	BackpackTouch();
+	
+	if (self.wait > 0)
+	{
+		// reset all the values we may have just vandalized
+		self.ammo_shells = floor(3 * random() + 6);
+		self.ammo_nails = floor(5 * random() + 12);
+		if (self.spawnflags & 1)
+		{
+			self.ammo_shells *= 2;
+			self.ammo_nails *= 2;
+			
+			self.ammo_rockets = 2;
+			self.ammo_cells = 3;
+			self.skin = 2;
+		}
+	}
 }
 
 /*QUAKED item_backpack (0 .5 .5) (-16 -16 0) (16 16 40) BIG ? SUSPENDED -
