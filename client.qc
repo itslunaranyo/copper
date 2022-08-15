@@ -567,7 +567,10 @@ void() PutClientInServer =
 // paustime is set by teleporters to keep the player from moving a while
 	self.pausetime = 0;
 	
-//	spot = SelectSpawnPoint ();
+	self.dmg_take = 0;
+	self.dmg_save = 0;
+	self.dmg_inflictor = world;
+	self.velocity = VEC_ORIGIN;
 
 	self.origin = spot.origin + '0 0 1';
 	self.v_angle = self.angles = spot.angles;
