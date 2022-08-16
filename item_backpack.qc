@@ -188,6 +188,7 @@ void() BackpackAutoTouch =
 			self.ammo_cells = 3;
 			self.skin = 2;
 		}
+		self.armorvalue = 0;
 	}
 }
 
