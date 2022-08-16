@@ -1079,7 +1079,7 @@ START_INVIS	Invisible until triggered
 CURVY	behaves like a func_flytrain, following path_corners, waiting at them (a wait of -1 on a path_corner will stop the ball until triggered again), then disappearing at the last path_corner. Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
 */
 /*FGD
-@PointClass base(Appearflags, Targetname) size(16 16 16) color(0 128 200) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
+@PointClass base(Appearflags, Targetname) size(32 32 32) color(0 128 200) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
 Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
 
 If the 'curving path' spawnflag is set, the teleball behaves like a func_flytrain, smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it."

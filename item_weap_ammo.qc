@@ -133,7 +133,7 @@ void() StartWeapon =
 */
 
 
-/*QUAKED weapon_shotgun (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_shotgun (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Shotgun.
 
 Keys:
@@ -158,7 +158,7 @@ void() weapon_shotgun =
 }
 
 
-/*QUAKED weapon_supershotgun (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_supershotgun (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Double-barreled shotgun.
 
 Keys:
@@ -182,7 +182,7 @@ void() weapon_supershotgun =
 	StartWeapon();
 }
 
-/*QUAKED weapon_nailgun (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_nailgun (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Nailgun.
 
 Keys:
@@ -206,7 +206,7 @@ void() weapon_nailgun =
 	StartWeapon();
 }
 
-/*QUAKED weapon_supernailgun (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_supernailgun (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Perforator (Super Nailgun).
 
 Keys:
@@ -230,7 +230,7 @@ void() weapon_supernailgun =
 	StartWeapon();
 }
 
-/*QUAKED weapon_grenadelauncher (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_grenadelauncher (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Grenade Launcher.
 
 Keys:
@@ -254,7 +254,7 @@ void() weapon_grenadelauncher =
 	StartWeapon();
 }
 
-/*QUAKED weapon_rocketlauncher (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_rocketlauncher (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Rocket Launcher.
 
 Keys:
@@ -279,7 +279,7 @@ void() weapon_rocketlauncher =
 }
 
 
-/*QUAKED weapon_lightning (0 0 1) (-16 -16 0) (16 16 32) ? ? SUSPENDED
+/*QUAKED weapon_lightning (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
 Thunderbolt Cannon.
 
 Keys:
@@ -374,7 +374,7 @@ void() StartAmmo =
 }
 
 /*FGD
-@baseclass size(0 0 0, 32 32 32) color(80 0 200) base(Item) = Ammo [ spawnflags(flags) =  [ 1 : "Large box (2x)" : 0 ] ]
+@baseclass size(0 0 0, 32 32 32) color(0 160 160) base(Item) = Ammo [ spawnflags(flags) =  [ 1 : "Large box (2x)" : 0 ] ]
 */
 
 /*QUAKED item_shells (0 .5 .5) (0 0 0) (32 32 32) BIG ? SUSPENDED

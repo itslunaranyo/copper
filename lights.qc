@@ -33,7 +33,7 @@ string light_off = "a";
 
 
 /*FGD
-@baseclass base() color(255 255 40) size(-8 -8 -8, 8 8 8) = Light [
+@baseclass base() color(255 255 80) size(-8 -8 -8, 8 8 8) = Light [
 	light(integer) : "Brightness" : 300
 	_color(string) : "Color" : "1 1 1"
 	wait(string) : "Fade distance multiplier" : "1"
@@ -405,7 +405,7 @@ void() light_fluorospark =
 	ambientsound (self.origin, "ambience/buzz1.wav", 0.5, ATTN_STATIC);
 }
 
-/*QUAKED light_globe (1 1 0) (-8 -8 -8) (8 8 8)
+/*QUAKED light_globe (1 1 0) (-12 -12 -12) (12 12 12)
 Sphere globe light.  Can't be triggered.
 
 Keys:
@@ -439,7 +439,7 @@ Keys:
 "message"	override the style string directly for the assigned style (clashes will overwrite each other)
 */
 /*FGD
-@PointClass base(Light) = light_globe : "Globe light" []
+@PointClass base(Light) size(24 24 24) = light_globe : "Globe light" []
 */
 void() light_globe =
 {
