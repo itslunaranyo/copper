@@ -93,7 +93,7 @@ void() old_thrash18	=[	$shake18, old_thrash19	] {lightstyle(0, "j");
 	// the death gurgle is the same sound looped, so stop it by overriding that channel with nothing
 	sound (self, CHAN_VOICE, "misc/null.wav", 1, ATTN_NORM);
 	
-	if (world.model == "maps/end.bsp" && self.health <= 0)
+	if (!(self.spawnflags & 1) && self.health <= 0)
 	{
 		if (self.strength > 0)
 		{
@@ -233,7 +233,8 @@ void() shub_finale_4 =
 	activator = self.enemy;
 	monster_death_use();
 	
-	if (world.model == "maps/end.bsp")
+	// end the level
+	if (!(self.spawnflags & 1))
 	{
 		// do this if we triggered shub to death
 		if (self.health >= 0)
@@ -271,7 +272,7 @@ void() shub_finale_4 =
 		
 		// start the end text
 		WriteByte (MSG_ALL, SVC_FINALE);
-		WriteString (MSG_ALL, "Congratulations, and well done! You have\nbeaten the hideous Shub-Niggurath and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now.\n\nId Software is currently out of the\noffice, but if you leave a message,\nthey will be happy to salute you in\na couple of months.");
+		WriteString (MSG_ALL, self.message);
 
 	// switch cd track
 		WriteByte (MSG_ALL, SVC_CDTRACK);
@@ -318,10 +319,10 @@ void() shub_gibnearby =
 void() shub_die =
 {
 	self.deadflag = DEAD_DYING;
-	if (world.model == "maps/end.bsp")
-		shub_finale_1();
-	else
+	if (self.spawnflags & 1)
 		shub_finale_4();
+	else
+		shub_finale_1();
 }
 
 // rather than a telefrag, shub can be killed by triggering her a
@@ -350,7 +351,7 @@ void (entity attacker, float damage) shub_pain =
 //============================================================================
 
 
-/*QUAKED monster_oldone (1 0 0) (-128 -128 -24) (128 128 256)
+/*QUAKED monster_oldone (1 0 0) (-128 -128 -24) (128 128 256) NO_EXIT
 shubby
 
 explodes in gibs on death. can be killed by traditional telefrag or in several new ways:
@@ -358,7 +359,7 @@ explodes in gibs on death. can be killed by traditional telefrag or in several n
 - being damaged for more than 10000 hp "strength" times
 both of the above cause one thrashy roary anim that flickers the lights and causes a screenshake.
 
-if the map is end.bsp, the finale cutscene will trigger, otherwise shub will just die like any other monster.
+death will trigger the finale cutscene, unless NO_EXIT is checked, in which case Shub will just die like any other monster.
 
 Keyvalues:
 "strength" number of hits to take before exploding, defaults to 3
@@ -370,8 +371,11 @@ can be killed by traditional telefrag or in several new ways:
 - being triggered 'strength' times
 - being damaged for more than 10000 hp 'strength' times
 both of the above cause one thrashy roary anim that flickers the lights and causes a screenshake.
-if the map is end.bsp, the finale cutscene will trigger, otherwise shub will just die like any other monster."
+death will trigger the finale cutscene, unless 'Don't end level' is checked, in which case Shub will just die like any other monster."
 [
+	spawnflags(flags) [
+		1 : "Don't end level" : 0
+	]
 	strength(integer) : "Health, in hits" : 3
 ]
 */
@@ -413,6 +417,9 @@ void() monster_oldone =
 	self.th_pain = shub_pain;
 	self.th_die = shub_die;
 	self.use = shub_use;
+	
+	if (self.message == string_null)
+		self.message = "Congratulations, and well done! You have\nbeaten the hideous Shub-Niggurath and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now.\n\nId Software is currently out of the\noffice, but if you leave a message,\nthey will be happy to salute you in\na couple of months.";
 	
 	total_monsters = total_monsters + 1;
 }
