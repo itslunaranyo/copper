@@ -520,7 +520,10 @@ void() func_flytrain =
 	self.th_stand = SUB_Null;
 	
 	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
-	self.movetype = MOVETYPE_PUSH;
+	if (!self.solid)
+		self.movetype = MOVETYPE_NOCLIP;
+	else
+		self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
 	//self.classname = "train";
 		
@@ -684,7 +687,10 @@ void() func_train_setup =
 
 //	self.cnt = 1;
 	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
-	self.movetype = MOVETYPE_PUSH;
+	if (!self.solid)
+		self.movetype = MOVETYPE_NOCLIP;
+	else
+		self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
 	self.use = train_use;
 	self.classname = "train";
@@ -897,7 +903,10 @@ void() func_bobbing =
 	if (!SUB_ShouldSpawn()) return;
 
 	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
-	self.movetype = MOVETYPE_PUSH;
+	if (!self.solid)
+		self.movetype = MOVETYPE_NOCLIP;
+	else
+		self.movetype = MOVETYPE_PUSH;
 
 	SetMovedir();
 	if (!self.distance)
