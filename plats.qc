@@ -1109,7 +1109,7 @@ void() misc_teleporttrain =
 		objerror("misc_teleporttrain without a target");
 
 	self.solid = SOLID_NOT;
-	self.movetype = MOVETYPE_FLY;
+	self.movetype = MOVETYPE_NOCLIP;
 	self.use = teletrain_use;
 	self.state = 0;
 
