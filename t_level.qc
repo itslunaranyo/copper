@@ -487,7 +487,7 @@ Quake does a random pick if more than one exists.
 If no info_intermission entity is set, Quake uses the player start.
 
 Keys:
-"angles" set pitch yaw roll, positive pitch is down
+"angles" or "mangle" set pitch yaw roll, positive pitch is down
 "fog_color"/"fog_density" set the fog for the view from this camera
 
 */
@@ -495,11 +495,14 @@ Keys:
 @PointClass size(16 16 16) color(192 64 64) base(Fog, Appearflags) = info_intermission : "Intermission camera" 
 [
 	angles(string) : "Camera angle (Pitch Yaw Roll, positive pitch down)"
+	mangle(string) : "Camera angle (Pitch Yaw Roll, positive pitch down)"
 ]
 */
 void() info_intermission =
 {
 	if (!SUB_ShouldSpawn()) return;
+	if (self.mangle == VEC_ORIGIN)
+		self.mangle = self.angles;
 	fog_fixKeys();
 }
 
