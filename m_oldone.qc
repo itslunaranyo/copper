@@ -373,7 +373,7 @@ can be killed by traditional telefrag or in several new ways:
 both of the above cause one thrashy roary anim that flickers the lights and causes a screenshake.
 death will trigger the finale cutscene, unless 'Don't end level' is checked, in which case Shub will just die like any other monster."
 [
-	spawnflags(flags) [
+	spawnflags(flags) = [
 		1 : "Don't end level" : 0
 	]
 	strength(integer) : "Health, in hits" : 3
