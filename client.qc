@@ -1274,7 +1274,7 @@ void() CheckPowerups =
 
 		if (self.invisible_finished < time)
 		{	// just stopped
-			self.items = self.items - IT_INVISIBILITY;
+			self.items = not(self.items, IT_INVISIBILITY);
 			//self.notrace = 0;
 			self.invisible_finished = 0;
 			self.invisible_time = 0;
@@ -1310,7 +1310,7 @@ void() CheckPowerups =
 		
 		if (self.invincible_finished < time)
 		{	// just stopped
-			self.items = self.items - IT_INVULNERABILITY;
+			self.items = not(self.items, IT_INVULNERABILITY);
 			self.invincible_time = 0;
 			self.invincible_finished = 0;
 		}
@@ -1345,7 +1345,7 @@ void() CheckPowerups =
 
 		if (self.super_damage_finished < time)
 		{	// just stopped
-			self.items = self.items - IT_QUAD;
+			self.items = not(self.items, IT_QUAD);
 			self.super_damage_finished = 0;
 			self.super_time = 0;
 		}
