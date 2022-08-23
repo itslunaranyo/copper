@@ -601,7 +601,7 @@ void() train_wait =
 	if (self.wait == -1)
 	{
 		self.state = STATE_OFF;
-		self.use = train_next;
+		self.use = train_use;
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	}
 	else if (self.wait > 0)
