@@ -578,8 +578,26 @@ void() train_blocked =
 
 void() train_use =
 {
-	if (self.state == STATE_ON)
-		return;		// already activated
+	if ((self.spawnflags & 2) && (self.origin + self.mins) != self.enemy.origin)
+	{
+		if (self.state == STATE_ON)
+		{
+			self.state = STATE_OFF;
+			self.velocity = VEC_ORIGIN;
+			self.nextthink = 0;
+			sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+		}
+		else
+		{
+			self.state = STATE_ON;
+			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+			SUB_CalcMove (self.enemy.origin - self.mins, self.speed, train_wait);
+		}
+		return;
+	}
+
+	if (self.state == STATE_ON)	// already activated
+		return;	
 	train_next();
 }
 
@@ -703,7 +721,7 @@ void() func_train_setup =
 
 }
 
-/*QUAKED func_train (0 .5 .8) ? PATH_SPEED
+/*QUAKED func_train (0 .5 .8) ? PATH_SPEED TOGGLE
 Trains are moving platforms that players can ride. Its origin is the min corner of the train. 
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
 A train will fire all targets of a pathcorner on arrival.
@@ -720,6 +738,7 @@ Keys:
 Spawnflags:
 PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches them
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
+TOGGLE: allow starting/stopping motion anywhere on its path (default is to ignore triggerings when in motion)
 */
 /*FGD
 @SolidClass base(Train) = func_train : "Moving platform that players can ride. 
@@ -728,10 +747,12 @@ The train spawns at the first target it is pointing at. If the train is the targ
 A train will fire all targets of a pathcorner on arrival.
 
 If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them.
-If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner."
+If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
+The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion)."
 [
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
+		2 : "Toggle" : 0
 	]
 ]
 */
