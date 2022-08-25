@@ -164,15 +164,32 @@ PLAYER GAME EDGE FUNCTIONS
 =============================================================================
 */
 
+entity() get_closest_client =
+{
+	if (coop == 0 || clients == 1)
+		return nextent(world);
+		
+	entity next, best;
+	float close, dist;
+	close = A_SHITLOAD;
+	next = nextent(world);
+	while (next.flags & FL_CLIENT)
+	{
+		dist = vlen(self.origin - next.origin);
+		if (dist < close)
+		{
+			best = next;
+			close = dist;
+		}
+		next = nextent(next);
+	}
+	return best;
+}
+
 entity(entity start) get_next_client =
 {
-	entity next;
-	/*
-	next = find(start, classname, "player");
-	if (next == world)
-		next = find(world, classname, "player");
-	*/
 	// nice trick from necros: clients are always the first entities after world
+	entity next;
 	next = nextent(start);
 	if (next.flags & FL_CLIENT == 0)
 		next = nextent(world);

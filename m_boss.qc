@@ -329,7 +329,7 @@ void() boss_awake =
 
 	self.enemy = activator;
 	if (self.enemy.classname != "player")
-		self.enemy = nextent(world);	// just get mad at player1 for now
+		self.enemy = get_closest_client();	// just get mad at player1 for now
 
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_LAVASPLASH);

@@ -605,11 +605,8 @@ void() train_wait =
 {
 	// trains now fire their pathcorners' targets on arrival
 	// if a player is riding the train, treat them as activator
-	activator = nextent(world);
-	while (!EntitiesTouching(self,activator) && activator.classname == "player")
-		activator = nextent(activator);
 	if (activator.classname != "player")
-		activator = nextent(world);	// default to player1 wherever they are
+		activator = get_closest_client();
 	SUB_UseEntTargets(self.enemy);
 	
 	// inherit speed from path_corners on arrival

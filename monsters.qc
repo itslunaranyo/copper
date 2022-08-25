@@ -375,11 +375,15 @@ void() monster_death_use =
 	if (!self.target && !self.target2 && !self.target3 && !self.target4 && !self.killtarget)
 		return;
 
-	// try to make player activator even if the monster was killed while infighting
-	if (self.enemy.classname != "player" && self.oldenemy.classname == "player")
-		activator = self.oldenemy;
-	else
-		activator = self.enemy;
+	// make a player activator even if the monster was killed while infighting
+	if (self.enemy.classname != "player")
+	{
+		if (self.oldenemy.classname == "player")
+			activator = self.oldenemy;
+		else
+			activator = get_closest_client();
+	}
+	else activator = self.enemy;
 	
 	SUB_UseTargets ();
 }
