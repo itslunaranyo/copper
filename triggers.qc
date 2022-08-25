@@ -1168,9 +1168,14 @@ void() trigger_monsterjump_touch =
 			if (self.exclude == other.classname || self.exclude == other.targetname) return; // always exclude this class/tname
 		}
 	}
-	if (self.spawnflags & SPAWN_MJUMP_ONLYBELOW && (other.enemy.absmin_z > (other.absmin_z - 16))) return;
+	if (self.spawnflags & SPAWN_MJUMP_ONLYBELOW)
+	{
+		if (!other.enemy) return;
+		if (other.enemy.absmin_z > (other.absmin_z - 16)) return;
+	}
 	if (self.spawnflags & SPAWN_MJUMP_ONLYFRONT)
 	{
+		if (!other.enemy) return;
 		dir = other.enemy.origin - other.origin;
 		dir_z = 0;
 		dir = normalize(dir);
