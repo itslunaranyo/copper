@@ -134,7 +134,7 @@ deathd: 93 (also on face but arms under forehead as if sad)
 deathe: 102 (on side)
 */
 /*FGD
-@PointClass base(Appearflags) size(16 16 16) color(160 192 224) model({ 
+@PointClass base(Appearflags, Targetname) size(16 16 16) color(160 192 224) model({ 
 	"path": model,
     "skin": skin,
     "frame": frame
