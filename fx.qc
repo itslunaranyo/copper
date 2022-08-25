@@ -667,7 +667,7 @@ void(float attack, float sustain, float release, float str) screenshake_oneshot 
 
 void() target_explosion_go =
 {
-	if (self.dmg) T_RadiusMultiDamage (self, self, self.dmg, self, 0);
+	if (self.dmg) T_RadiusMultiDamage (self, self.enemy, self.dmg, self, 0);
 	
 	if (self.spawnflags & 1)
 	{
@@ -693,6 +693,7 @@ void() target_explosion_use =
 	entity bewm;
 	vector offset;
 	
+	self.enemy = activator;
 	
 	playercount_convert(count);
 	if (self.count == 1 && self.delay == 0)
@@ -702,6 +703,7 @@ void() target_explosion_use =
 			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
 		setorigin(bewm, self.origin + offset);
 		bewm.think = target_explosion_go;
+		bewm.enemy = activator;
 		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time;
 		bewm.dmg = self.dmg;
@@ -717,6 +719,7 @@ void() target_explosion_use =
 			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
 		setorigin(bewm, self.origin + offset);
 		bewm.think = target_explosion_go;
+		bewm.enemy = activator;
 		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time + tnext;
 		bewm.dmg = self.dmg;
