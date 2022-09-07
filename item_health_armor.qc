@@ -35,7 +35,7 @@ void() health_touch =
 		}
 	}
 
-	sound(other, CHAN_ITEM2, self.noise, 1, ATTN_NORM);
+	sound(other, CHAN_ITEM, self.noise, 1, ATTN_NORM);
 
 	ItemTouched();
 }	

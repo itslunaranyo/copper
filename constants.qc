@@ -192,7 +192,7 @@ const float	CHAN_WEAPON		= 1;
 const float	CHAN_VOICE		= 2;
 const float	CHAN_ITEM		= 3;
 const float	CHAN_BODY		= 4;
-const float	CHAN_ITEM2		= 5;
+const float	CHAN_POWERUP	= 5;
 const float	CHAN_OTHER		= 6;
 
 const float	ATTN_NONE		= 0;

@@ -1101,7 +1101,7 @@ void() WaterMove =
 			{
 				if (self.jump_flag < -300)
 				{
-					sound (self, CHAN_ITEM2, "misc/w_under2.wav", 1, ATTN_NORM);
+					sound (self, CHAN_OTHER, "misc/w_under2.wav", 1, ATTN_NORM);
 					local float i = 0;
 					local vector b;
 					while(i > self.jump_flag)
@@ -1114,7 +1114,7 @@ void() WaterMove =
 				}
 				else
 				{
-					sound (self, CHAN_ITEM2, "misc/w_under.wav", 1, ATTN_STATIC);
+					sound (self, CHAN_OTHER, "misc/w_under.wav", 1, ATTN_STATIC);
 				}
 			}
 		}
@@ -1267,7 +1267,7 @@ void() CheckPowerups =
 // sound and screen flash when items starts to run out
 		if (self.invisible_sound < time)
 		{
-			sound (self, CHAN_AUTO, "items/inv3.wav", 0.5, ATTN_IDLE);
+			sound (self, CHAN_POWERUP, "items/inv3.wav", 0.5, ATTN_IDLE);
 			self.invisible_sound = time + ((random() * 3) + 1);
 		}
 
@@ -1278,7 +1278,7 @@ void() CheckPowerups =
 			{
 				sprint (self, "Ring of Shadows' magic is fading ...\n");
 				stuffcmd (self, "bf\n");
-				sound (self, CHAN_AUTO, "items/inv2.wav", 1, ATTN_NORM);
+				sound (self, CHAN_POWERUP, "items/inv2.wav", 1, ATTN_NORM);
 				self.invisible_time = time + 1;
 			}
 			
@@ -1314,7 +1314,7 @@ void() CheckPowerups =
 			{
 				sprint (self, "Protection is almost burned out ...\n");
 				stuffcmd (self, "bf\n");
-				sound (self, CHAN_AUTO, "items/protect2.wav", 1, ATTN_NORM);
+				sound (self, CHAN_POWERUP, "items/protect2.wav", 1, ATTN_NORM);
 				self.invincible_time = time + 1;
 			}
 			
@@ -1349,7 +1349,7 @@ void() CheckPowerups =
 			{
 				sprint (self, "Quad damage's power weakens ...\n");
 				stuffcmd (self, "bf\n");
-				sound (self, CHAN_AUTO, "items/damage2.wav", 1, ATTN_NORM);
+				sound (self, CHAN_POWERUP, "items/damage2.wav", 1, ATTN_NORM);
 				self.super_time = time + 1;
 			}	  
 			
@@ -1384,7 +1384,7 @@ void() CheckPowerups =
 			{
 				sprint (self, "Air supply in Biosuit expiring ...\n");
 				stuffcmd (self, "bf\n");
-				sound (self, CHAN_AUTO, "items/suit2.wav", 1, ATTN_NORM);
+				sound (self, CHAN_POWERUP, "items/suit2.wav", 1, ATTN_NORM);
 				self.rad_time = time + 1;
 			}
 			

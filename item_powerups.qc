@@ -68,7 +68,7 @@ void() powerup_touch =
 {
 	if ( !CheckValidTouch() ) return;
 
-	sound (other, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	sound (other, CHAN_POWERUP, self.noise, 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 	other.items = other.items | self.items;
 
