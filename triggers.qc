@@ -20,10 +20,11 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 [
 	sounds(choices) : "Sounds" : 2 =
 	[
-		-1 : "None"
-		1 : "secret"
-		2 : "beep beep"
-		3 : "large switch"
+		0 : "None"
+		1 : "Secret"
+		2 : "Doot doot"
+		3 : "Large switch"
+		-1 : "Force silent print"
 	]
 	noise(string) : "Choose wav to play"
 ]

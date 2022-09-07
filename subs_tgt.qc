@@ -166,8 +166,9 @@ void() SUB_PrintMessage =
 	if (activator.classname == "player")
 	{
 		centerprintlocal(activator, self.message);
+		
 		// non-triggers might play the noise themselves (buttons, etc)
-		if (self.noise == string_null && (self.solid == SOLID_TRIGGER || self.solid == SOLID_NOT))
+		if (self.noise == string_null && (self.solid == SOLID_TRIGGER || self.solid == SOLID_NOT) && self.sounds != -1)
 			sound (activator, CHAN_VOICE, "misc/talk.wav", 1, ATTN_NORM);
 	}
 	else
