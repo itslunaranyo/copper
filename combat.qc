@@ -26,9 +26,7 @@ void(entity targ, entity attacker) Killed =
 	oself = self;
 	self = targ;
 	
-	//bprint4(self.classname, " died with ", ftos(self.health), " hp\n");
-	
-	if (self.classname == "player" && self.health < -99)
+	if (self.health < -99)
 		self.health = -99;		// don't let sbar look bad
 
 	if (self.movetype == MOVETYPE_PUSH || // doors, triggers, etc
