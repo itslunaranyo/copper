@@ -963,7 +963,7 @@ void() PlayerJump =
 	{
 		if (!(self.flags & FL_ONGROUND)) return;
 		if ( !(self.flags & FL_JUMPRELEASED) ) return;		// don't pogo stick
-		sound (self, CHAN_BODY, "player/plyrjmp8.wav", 1, ATTN_NORM);	// h00rt
+		sound (self, CHAN_VOICE, "player/plyrjmp8.wav", 1, ATTN_NORM);	// h00rt
 	}
 	
 //	self.flags = self.flags - (self.flags & FL_JUMPRELEASED);
