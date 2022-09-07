@@ -67,15 +67,20 @@ void() f_walk18 =[	$swim18, f_walk1 ] {ai_walk(6);}
 void() f_run1 =[	$swim1, f_run2 ] {ai_run(12);
 	if (random() < 0.5)
 		sound (self, CHAN_VOICE, "fish/idle.wav", 1, ATTN_NORM);
+	fish_check_attack();	// calling this after ai_run is such a hack
+							// but i don't want to load down calls to visible()
+							// with exceptions for a fish deciding the player is
+							// technically visible even though their eyes are
+							// above water
 }
-void() f_run2 =[	$swim3, f_run3 ] {ai_run(14);}
-void() f_run3 =[	$swim5, f_run4 ] {ai_run(16);}
-void() f_run4 =[	$swim7, f_run5 ] {ai_run(14);}
-void() f_run5 =[	$swim9, f_run6 ] {ai_run(12);}
-void() f_run6 =[	$swim11, f_run7 ] {ai_run(14);}
-void() f_run7 =[	$swim13, f_run8 ] {ai_run(16);}
-void() f_run8 =[	$swim15, f_run9 ] {ai_run(14);}
-void() f_run9 =[	$swim17, f_run1 ] {ai_run(12);}
+void() f_run2 =[	$swim3, f_run3 ] {ai_run(14); fish_check_attack();}
+void() f_run3 =[	$swim5, f_run4 ] {ai_run(16); fish_check_attack();}
+void() f_run4 =[	$swim7, f_run5 ] {ai_run(14); fish_check_attack();}
+void() f_run5 =[	$swim9, f_run6 ] {ai_run(12); fish_check_attack();}
+void() f_run6 =[	$swim11, f_run7 ] {ai_run(14); fish_check_attack();}
+void() f_run7 =[	$swim13, f_run8 ] {ai_run(16); fish_check_attack();}
+void() f_run8 =[	$swim15, f_run9 ] {ai_run(14); fish_check_attack();}
+void() f_run9 =[	$swim17, f_run1 ] {ai_run(12); fish_check_attack();}
 
 void() fish_melee =
 {
@@ -255,6 +260,33 @@ void() fish_die =
 	f_death1();
 }
 
+// fish need their own checkattack because CheckClearAttack() considers the
+// attack not to be clear if the sight line crosses a liquid boundary, which
+// can happen if the player is treading water with fish around his feet (thx 4LT)
+float() fish_check_attack =
+{
+	if (enemy_range > RANGE_MELEE) return FALSE;
+	if (self.enemy.customflags & (CFL_PLUNGE|CFL_LIMBO) || self.enemy.deadflag == DEAD_SPECTATING)
+		return FALSE;
+	
+	vector tgt = self.enemy.origin - self.origin;
+	tgt_z *= 0.75;	// fish can bite from above or below
+	
+	if (vlen((tgt)) > 60) return FALSE;
+	
+	if (pointcontents(self.origin) == CONTENT_EMPTY)	// airfish
+	{
+		if (self.enemy.waterlevel >= WL_EYES) return FALSE;	// enemy is in a liquid and i'm not
+	}
+	else	// seafish
+	{
+		if (self.enemy.waterlevel <= WL_FEET) return FALSE;	// enemy is out of liquid
+	}
+	
+	self.th_melee();
+	return TRUE;
+}
+
 void() monster_fish_spawn =
 {
 	self.classname = "monster_fish";
@@ -276,7 +308,7 @@ void() monster_fish_spawn =
 	self.th_pain = fish_pain;
 	self.th_melee = f_attack;
 	//self.th_missile = f_dash;
-	self.th_checkattack = CheckAttack;
+	self.th_checkattack = fish_check_attack;
 
 	if (self.deathtype == string_null)
 		self.deathtype = "was fed to the Rotfish";
