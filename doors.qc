@@ -288,9 +288,9 @@ void(entity d) door_lock =
 	}
 	else
 	{
-		if (d.owner.trigger_field == world && !d.owner.items && !(d.spawnflags & DOOR_TOGGLE))
+		/*if (d.owner.trigger_field == world && !d.owner.items && !(d.spawnflags & DOOR_TOGGLE))
 			objerror("door being locked doesn't have a trigger");
-		else if (d.owner.trigger_field)
+		else*/ if (d.owner.trigger_field)
 			d.owner.trigger_field.touch = SUB_Null;
 	}
 }
@@ -309,9 +309,9 @@ void(entity d) door_unlock =
 	}
 	else
 	{
-		if (d.owner.trigger_field == world && !d.owner.items && !(d.spawnflags & DOOR_TOGGLE))
+		/*if (d.owner.trigger_field == world && !d.owner.items && !(d.spawnflags & DOOR_TOGGLE))
 			objerror("door being unlocked doesn't have a trigger");
-		else if (d.owner.trigger_field)
+		else*/ if (d.owner.trigger_field)
 			d.owner.trigger_field.touch = door_trigger_touch;
 	}
 }
