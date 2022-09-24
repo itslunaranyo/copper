@@ -35,11 +35,12 @@ $frame shockc1 shockc2 shockc3 shockc4 shockc5 shockc6 shockc7 shockc8
 $frame shockc9 shockc10
 
 void() boss_rise1	=[	$rise1, boss_rise2 ] {
-self.pain_finished = time + 2;
-sound (self, CHAN_WEAPON, "boss1/out1.wav", 1, ATTN_NORM);
+	self.pain_finished = time + 3;
+	self.dmgtime = time + 3;
+	sound (self, CHAN_WEAPON, "boss1/out1.wav", 1, ATTN_NORM);
 }
 void() boss_rise2	=[	$rise2, boss_rise3 ] {
-sound (self, CHAN_VOICE, "boss1/sight1.wav", 1, ATTN_NORM);
+	sound (self, CHAN_VOICE, "boss1/sight1.wav", 1, ATTN_NORM);
 }
 void() boss_rise3	=[	$rise3, boss_rise4 ] {}
 void() boss_rise4	=[	$rise4, boss_rise5 ] {}
@@ -96,6 +97,7 @@ void() boss_missile1	=[	$attack1, boss_missile2 ] {
 		return;
 	}
 	ai_face();
+	if (!enemy_alive()) self.enemy = get_closest_client();	// break out of infights with dead monsters
 	if (random() < 0.66) ReprioritizeEnemy();
 }
 void() boss_missile2	=[	$attack2, boss_missile3 ] {ai_face();}
@@ -108,7 +110,11 @@ void() boss_missile8	=[	$attack8, boss_missile9 ] {boss_missile('100 -100 200');
 void() boss_missile9	=[	$attack9, boss_missile10 ] {ai_face();}
 void() boss_missile10	=[	$attack10, boss_missile11 ] {ai_face();}
 void() boss_missile11	=[	$attack11, boss_missile12 ] {ai_face();}
-void() boss_missile12	=[	$attack12, boss_missile13 ] {ai_face();if (random() < 0.66) ReprioritizeEnemy();}
+void() boss_missile12	=[	$attack12, boss_missile13 ] {
+	ai_face();
+	if (!enemy_alive()) self.enemy = get_closest_client();	// break out of infights with dead monsters
+	if (random() < 0.66) ReprioritizeEnemy();
+}
 void() boss_missile13	=[	$attack13, boss_missile14 ] {ai_face();}
 void() boss_missile14	=[	$attack14, boss_missile15 ] {ai_face();}
 void() boss_missile15	=[	$attack15, boss_missile16 ] {ai_face();}
@@ -267,10 +273,15 @@ void(vector p) boss_missile =
 	// check for dead enemy
 	if (!enemy_alive())
 	{
-		if (!coop || (coop == 1 && !clientsAlive))
-			boss_idle1 ();
+		if (self.enemy.classname == "player")
+		{
+			if (!coop || (coop == 1 && !clientsAlive))
+				boss_idle1 ();
+			else
+				ReprioritizeEnemy();
+		}
 		else
-			ReprioritizeEnemy();
+			self.enemy = get_closest_client();	// break out of infights with dead monsters
 	}
 }
 
@@ -395,6 +406,11 @@ void() monster_boss =
 	self.use = boss_awake;
 	self.th_pain = boss_pain;
 	self.th_die = boss_death1;
+	self.th_run = boss_missile1;
+	
+	self.th_stand = boss_missile1;
+	self.th_walk = boss_missile1;
+	
 	if (cvar("nomonsters") != 0)
 		self.lifetime_finished = -1;
 }
