@@ -79,7 +79,13 @@ void() Cheat_Genocide =
 	while(t != world)
 	{
 		if(t.flags & FL_MONSTER)
-			T_Damage(t, self, self, t.health);		// waurgh
+		{
+			// don't forget monsters on the verge of spawning
+			if (t.think == mon_spawner_tryspawn || t.modelindex == 0 || t.classname == string_null )
+				remove(t);
+			else
+				T_Damage(t, self, self, t.health);		// waurgh
+		}
 		t = nextent(t);
 	}
 }

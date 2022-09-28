@@ -240,6 +240,7 @@ entity( void() spawnthink ) mon_spawner_use =
 	// hack for QSS lerpmodels problems: force entity to move clientside for 
 	//	at least one frame before spawning to flush old lerp position
 	mon.movetype = MOVETYPE_TOSS;
+	mon.flags |= FL_MONSTER;
 	mon.oldorigin = self.origin;
 	
 	setorigin(mon, self.origin);
