@@ -308,7 +308,7 @@ void() shub_gibnearby =
 		head = head.chain;
 	}
 	
-	head = findradiusplus(self.origin, 272, classname, "item_backpack");
+	head = findradiusplus(self.origin, 272, model, "progs/backpack.mdl");
 	while (head)
 	{
 		remove(head);
