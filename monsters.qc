@@ -237,16 +237,11 @@ entity( void() spawnthink ) mon_spawner_use =
 	
 	mon = spawn();
 	
-	// hack for QSS lerpmodels problems: force entity to move clientside for 
-	//	at least one frame before spawning to flush old lerp position
-	mon.movetype = MOVETYPE_TOSS;
 	mon.flags |= FL_MONSTER;
-	mon.oldorigin = self.origin;
-	
 	setorigin(mon, self.origin);
 	mon.angles = self.angles;
 	
-	pause = max(0.01, self.wait) + random() * max(self.rand, 0.05);
+	pause = self.wait + random() * self.rand;
 	mon.nextthink = time + pause;
 	mon.spawnflags = self.spawnflags;
 	mon.movedir = self.movedir;
@@ -400,8 +395,8 @@ Common monster starts
 
 void() monster_start =
 {
-	if (self.oldorigin == VEC_ORIGIN)
-		self.oldorigin = self.origin;
+	//if (self.oldorigin == VEC_ORIGIN)
+	//	self.oldorigin = self.origin;
 	
 	if (self.rmovedir != VEC_ORIGIN)
 	{
@@ -508,8 +503,8 @@ void() walkmonster_start_go =
 {
 	self.movetype = MOVETYPE_STEP;
 	// fix monsters being stuck in floor because of QSS fix
-	if (self.oldorigin != VEC_ORIGIN)
-		setorigin(self,self.oldorigin);
+	//if (self.oldorigin != VEC_ORIGIN)
+	//	setorigin(self,self.oldorigin);
 	
 	if (self.rmovedir != VEC_ORIGIN)
 	{
