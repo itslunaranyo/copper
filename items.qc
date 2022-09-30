@@ -592,13 +592,6 @@ float(entity e) target_items_takeinv =
 		if (!target_items_testinv(e)) return FALSE;
 	}
 	
-	if (self.health > 0)
-	{
-		e.health = max(0, e.health - self.health);
-		if (e.health <= 0)
-			Killed(e, self);
-	}
-		
 	if (self.armorvalue)
 	{
 		e.armorvalue = max(0, e.armorvalue - self.armorvalue);
@@ -677,6 +670,14 @@ float(entity e) target_items_takeinv =
 	}
 	
 	SUB_CallAsSelf(W_ResetWeaponState, e);
+	
+	if (self.health > 0)
+	{
+		e.deathtype = "noarmor"; // terrible
+		T_Damage(e, self, activator, min(e.health, self.health));
+		e.deathtype = string_null;
+	}
+		
 	return TRUE;
 }
 
