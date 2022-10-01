@@ -1539,6 +1539,9 @@ void(float dist) ai_run =
 	
 	if (enemy_vis && !(self.enemy.customflags & (CFL_PLUNGE|CFL_LIMBO)))
 	{
+		if (enemy_range == RANGE_MELEE)
+			self.attack_finished = 0;
+	
 		if (self.th_checkattack())
 		{
 			if (self.attack_state == AS_MISSILE)
