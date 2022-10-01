@@ -222,6 +222,8 @@ void() ShalHome =
 		self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate);
 	}
 	
+	self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
+	
 	// go faster at long distance to close the gap, so snipey vores have a better presence
 	dist = vlen(self.enemy.origin - self.origin);
 	dist = saturate( (dist-120) / 512 );
