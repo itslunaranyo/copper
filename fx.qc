@@ -36,30 +36,35 @@ void()	s_explode4	=	[3,		s_explode5] {}
 void()	s_explode5	=	[4,		s_explode6] {}
 void()	s_explode6	=	[5,		SUB_Remove] {}
 
-void() BecomeBlast = 
-{
-	self.movetype = MOVETYPE_NONE;
-	self.velocity = '0 0 0';
-	self.touch = SUB_Null;
-	if (other.classname == "monster_shambler")
-		setmodel (self, "progs/s_explo2.spr");
-	else
-		setmodel (self, "progs/s_explod.spr");
-	self.solid = SOLID_NOT;
-	self.nextthink = time + 0.5;
-	self.think = SUB_Remove;
-	s_explode1 ();
-}
-
-void() BecomeExplosion =
+// 0: original
+// 1: grape
+// 2: marshmallow
+void(float blasttype) BecomeBlast = 
 {
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_EXPLOSION);
+	if (blasttype == 1)
+		WriteByte (MSG_BROADCAST, TE_TAREXPLOSION);
+	else
+		WriteByte (MSG_BROADCAST, TE_EXPLOSION);
 	WriteCoord (MSG_BROADCAST, self.origin_x);
 	WriteCoord (MSG_BROADCAST, self.origin_y);
 	WriteCoord (MSG_BROADCAST, self.origin_z);
-	BecomeBlast();
+	
+	if (blasttype == 2)
+		setmodel (self, "progs/s_explo2.spr");
+	else
+		setmodel (self, "progs/s_explod.spr");
+	
+	self.movetype = MOVETYPE_NONE;
+	self.velocity = '0 0 0';
+	self.touch = SUB_Null;
+	self.solid = SOLID_NOT;
+	s_explode1 ();
 }
+
+void() BecomeExplosion = { BecomeBlast(0); }
+void() BecomeTarExplosion = { BecomeBlast(1); }
+void() BecomeWeakExplosion = { BecomeBlast(2); }
 
 void() fx_explode =
 {
@@ -87,24 +92,9 @@ entity(vector org, float damg, entity parent, float multi) kaboom =
 	return boom;
 }
 
-void()	shockwave1	=[	0,	shockwave2	] {self.skin = 0; self.nextthink = time + 0.05;}
-void()	shockwave2	=[	1,	shockwave3	] {self.skin = 1; self.nextthink = time + 0.05;}
-void()	shockwave3	=[	2,	shockwave4	] {self.skin = 2; self.nextthink = time + 0.05;}
-void()	shockwave4	=[	3,	shockwave5	] {self.skin = 3; self.nextthink = time + 0.05;}
-void()	shockwave5	=[	4,	SUB_Remove	] {self.alpha = 0.6; self.nextthink = time + 0.05;}
-
-void()	shockwave6	=[	5,	shockwave7	] {self.skin = 0; self.nextthink = time + 0.05;}
-void()	shockwave7	=[	6,	shockwave8	] {self.skin = 0; self.nextthink = time + 0.05;}
-void()	shockwave8	=[	7,	shockwave9	] {self.skin = 1; self.nextthink = time + 0.05;}
-void()	shockwave9	=[	8,	shockwave10	] {self.skin = 2; self.nextthink = time + 0.05;}
-void()	shockwave10	=[	9,	shockwave11	] {self.skin = 3; self.nextthink = time + 0.05;}
-void()	shockwave11	=[	10,	SUB_Remove	] {self.alpha = 0.6; self.nextthink = time + 0.05;}
-
-
 //=============================================================================
 
 //flagrant abuse of particle()
-
 
 void(vector a, vector b, float color) fx_trail =
 {
@@ -672,19 +662,12 @@ void() target_explosion_go =
 	if (self.spawnflags & 1)
 	{
 		sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
-
-		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-		WriteByte (MSG_BROADCAST, TE_TAREXPLOSION);
-		WriteCoord (MSG_BROADCAST, self.origin_x);
-		WriteCoord (MSG_BROADCAST, self.origin_y);
-		WriteCoord (MSG_BROADCAST, self.origin_z);
-		
-		BecomeBlast ();
+		BecomeBlast(1);
 	}
+	else if (self.spawnflags & 2)
+		BecomeBlast(2);
 	else
-	{
-		BecomeExplosion();
-	}
+		BecomeBlast(0);
 }
 
 void() target_explosion_use =
@@ -728,8 +711,8 @@ void() target_explosion_use =
 	}
 }
 
-/*QUAKED target_explosion (0 .5 .8) (-8 -8 -8) (8 8 8) TARBABY
-Causes explosions, same appearance as a rocket/grenade blast. Set 'TARBABY' for a purple spawn explosion instead.
+/*QUAKED target_explosion (0 .5 .8) (-8 -8 -8) (8 8 8) TARBABY PUFF
+Causes explosions, same appearance as a rocket/grenade blast. Set 'TARBABY' for a purple spawn-style explosion or 'PUFF' for the weak anti-shambler-style burst instead.
 
 Keys
 "count" number of times to explode after triggering, default 1
@@ -745,7 +728,8 @@ Keys
 "Causes one or more explosions when triggered, same appearance as a rocket/grenade blast." 
 [
 	spawnflags(flags) = [
-		1 : "Tarbaby explosion" : 0
+		1 : "Tarbaby blast " : 0
+		1 : "Puff blast" : 0
 	]
 	count(integer) : "Repeat count" : 1
 	delay(string) : "Delay before first blast" : "0"

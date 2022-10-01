@@ -39,7 +39,7 @@ void() OgreGrenadeExplode =
 	T_RadiusDamage (self, self.trueowner, 40, world);
 	sound (self, CHAN_VOICE, "weapons/r_exp3.wav", 1, ATTN_NORM);
 	
-	BecomeExplosion();
+	T_ExplosiveTouch();
 }
 
 void() OgreGrenadeTouch =

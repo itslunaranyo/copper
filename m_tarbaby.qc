@@ -252,17 +252,8 @@ self.takedamage = DAMAGE_NO;
 void()	tbaby_die2	=[	$exp,		tbaby_run1	] 
 {
 	T_RadiusDamage (self, self, 120, world);
-	
 	sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
-	self.origin = self.origin - 8*normalize(self.velocity);
-
-	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
-	WriteByte (MSG_BROADCAST, TE_TAREXPLOSION);
-	WriteCoord (MSG_BROADCAST, self.origin_x);
-	WriteCoord (MSG_BROADCAST, self.origin_y);
-	WriteCoord (MSG_BROADCAST, self.origin_z);
-	
-	BecomeBlast ();
+	BecomeTarExplosion ();
 }
 
 //=============================================================================

@@ -126,7 +126,7 @@ void() ShalMissileExplode =
 	T_RadiusDamage (self, self.trueowner, 40, world);
 	sound (self, CHAN_WEAPON, "weapons/r_exp3.wav", 1, ATTN_NORM);
 
-	BecomeExplosion();
+	T_ExplosiveTouch();
 }
 
 void() ShalMissileTouch =
@@ -233,34 +233,6 @@ void() ShalHome =
 	self.oldvelocity = self.velocity;
 }
 
-
-/*
-void() ShalHome =
-{
-	local vector	dir, vtemp;
-	
-	if (self.attack_finished < time)
-	{
-		ShalMissileExplode();
-		return;
-	}		
-	
-	vtemp = self.enemy.origin + '0 0 10';
-	
-	if (self.enemy.health < 1)
-	{
-		remove(self);
-		return;
-	}
-	dir = normalize(vtemp - self.origin);
-	if (skill >= 3)
-		self.velocity = dir * 350;
-	else
-		self.velocity = dir * 250;
-	self.nextthink = time + 0.2;
-	self.think = ShalHome;	
-}
-*/
 
 void() ShalMissile =
 {

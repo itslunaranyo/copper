@@ -32,6 +32,14 @@ void(vector org, float rad) T_GibDownedZombies =
 
 // =======================================================
 
+void() T_ExplosiveTouch =
+{
+	if (other.classname == "monster_shambler")
+		BecomeWeakExplosion();
+	else
+		BecomeExplosion();
+}
+
 void() T_MissileExplode =
 {
 	local float	damg;
@@ -64,7 +72,7 @@ void() T_MissileTouch =
 	T_MissileExplode();
 
 	self.origin = self.origin - 8*normalize(self.velocity);
-	BecomeExplosion ();
+	T_ExplosiveTouch();
 }
 
 /*
@@ -117,7 +125,7 @@ void() GrenadeTouch =
 	{
 		self.velocity = '0 0 0';
 		T_MissileExplode();
-		BecomeExplosion();
+		T_ExplosiveTouch();
 		return;
 	}
 	sound (self, CHAN_WEAPON, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
