@@ -561,11 +561,6 @@ void() trigger_once_box =
 	message(string) : "Message"
 ]
 */
-void() target_secret_use =
-{
-	
-	secret_use();
-}
 
 void() secret_use =
 {
@@ -657,13 +652,13 @@ void() target_secret =
 	if (!SUB_ShouldSpawn()) return;
 	if (deathmatch) { remove(self); return; }
 	trigger_secret_setup();
-	self.use = target_secret_use;
+	self.use = secret_use;
 	
 	self.think = target_secret_check;
 	self.nextthink = time + 0.2;
 }
 
-/*QUAKED trigger_secret (.5 .0 .5) ? ? SUPERSECRET TRIGGER_FIRST
+/*QUAKED trigger_secret (.5 .0 .5) ? NOTOUCH SUPERSECRET TRIGGER_FIRST
 Secret counter trigger.  Player gets a secret credit when touched.  Set "SUPERSECRET" to hide its existence in the total until found.
 Keys:
 "message" message to display when triggered
@@ -680,12 +675,22 @@ Flags:
 "trigger_first" won't be touchable until triggered once by something else
 */
 /*FGD
-@SolidClass base(Trigger, Secret) = trigger_secret : "Secret counter trigger. Player gets a secret credit when touched." []
+@SolidClass base(Trigger, Secret) = trigger_secret : "Secret counter trigger. Player gets a secret credit when touched." 
+[
+	spawnflags(flags) = [
+		1 : "Notouch (legacy)" : 0
+	]
+]
 */
 void() trigger_secret =
 {
 	if (!SUB_ShouldSpawn()) return;
 	if (deathmatch) { remove(self); return; }
+	if (self.spawnflags & SPAWNFLAG_NOTOUCH)
+	{
+		target_secret();
+		return;
+	}
 	init_trigger_multiple();
 	InitTrigger();
 	trigger_secret_setup();
