@@ -68,7 +68,21 @@ void() explobox_explode_go =
 	
 	self.use = SUB_Null;
 	self.health = 0;	// ensure triggered exploboxes don't hurt themselves and loop again
-	kaboom(BoundsCenter(self), self.dmg, self, 0);
+	
+	entity boom = spawn();
+	setorigin(boom, BoundsCenter(self));
+	if (self.dmg > 0) T_RadiusMultiDamage (boom, self, self.dmg, boom, FALSE);
+	boom.nextthink = time;
+	if (self.spawnflags & 1)
+	{
+		sound (self, CHAN_VOICE, "blob/death1.wav", 1, ATTN_NORM);
+		boom.think = BecomeTarExplosion;
+	}
+	else if (self.spawnflags & 2)	
+		boom.think = BecomeWeakExplosion;
+	else
+		boom.think = BecomeExplosion;
+	
 	bmodel_lightstyle(self, "m");
 	
 	if (!self.wait)
@@ -123,6 +137,8 @@ void() barrel_explode =
 void() explobox_setup =
 {
 	precache_sound_safe ("weapons/r_exp3.wav");
+	if (self.spawnflags & 1)
+		precache_sound_safe("blob/death1.wav");
 	self.th_die = explobox_explode;
 	self.use = explobox_explode_go;
 	if (!self.health)
@@ -218,7 +234,7 @@ void() misc_explobox2 =
 	explobox_setup();
 }
 
-/*QUAKED func_explobox (.8 .2 0) ?
+/*QUAKED func_explobox (.8 .2 0) ? TARBABY PUFF
 Build your own exploding box!
 
 Keyvalues:
