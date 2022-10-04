@@ -180,7 +180,7 @@ void()	hknight_die8	=[	$death8,	hknight_die9	] {ai_forward(10);}
 void()	hknight_die9	=[	$death9,	hknight_die10	] {ai_forward(11);}
 void()	hknight_die10	=[	$death10,	hknight_die11	] {}
 void()	hknight_die11	=[	$death11,	hknight_die12	] {}
-void()	hknight_die12	=[	$death12,	hknight_die12	] {}
+void()	hknight_die12	=[	$death12,	SUB_Null	] {}
 
 void()	hknight_dieb1	=[	$deathb1,	hknight_dieb2	] {}
 void()	hknight_dieb2	=[	$deathb2,	hknight_dieb3	] {}
@@ -191,7 +191,7 @@ void()	hknight_dieb5	=[	$deathb5,	hknight_dieb6	] {}
 void()	hknight_dieb6	=[	$deathb6,	hknight_dieb7	] {}
 void()	hknight_dieb7	=[	$deathb7,	hknight_dieb8	] {}
 void()	hknight_dieb8	=[	$deathb8,	hknight_dieb9	] {}
-void()	hknight_dieb9	=[	$deathb9,	hknight_dieb9	] {}
+void()	hknight_dieb9	=[	$deathb9,	SUB_Null	] {}
 
 void() hknight_die =
 {

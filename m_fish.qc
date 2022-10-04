@@ -196,7 +196,7 @@ void() f_death17 =[	$death17, f_death18 ] {}
 void() f_death18 =[	$death18, f_death19 ] {}
 void() f_death19 =[	$death19, f_death20 ] {}
 void() f_death20 =[	$death20, f_death21 ] {}
-void() f_death21 =[	$death21, f_death21 ] {}
+void() f_death21 =[	$death21, SUB_Null ] {}
 
 void() f_pain1 =[	$pain1, f_pain2 ] {ai_nop();}
 void() f_pain2 =[	$pain2, f_pain3 ] {ai_pain(6);}

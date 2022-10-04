@@ -426,7 +426,7 @@ void()	ogre_die10	=[	$death10,	ogre_die11	] {}
 void()	ogre_die11	=[	$death11,	ogre_die12	] {}
 void()	ogre_die12	=[	$death12,	ogre_die13	] {}
 void()	ogre_die13	=[	$death13,	ogre_die14	] {}
-void()	ogre_die14	=[	$death14,	ogre_die14	] {}
+void()	ogre_die14	=[	$death14,	SUB_Null	] {}
 
 void()	ogre_bdie1	=[	$bdeath1,	ogre_bdie2	] {}
 void()	ogre_bdie2	=[	$bdeath2,	ogre_bdie3	] {ai_forward(5);}
@@ -440,7 +440,7 @@ void()	ogre_bdie6	=[	$bdeath6,	ogre_bdie7	] {ai_forward(7);}
 void()	ogre_bdie7	=[	$bdeath7,	ogre_bdie8	] {ai_forward(25);}
 void()	ogre_bdie8	=[	$bdeath8,	ogre_bdie9	] {}
 void()	ogre_bdie9	=[	$bdeath9,	ogre_bdie10	] {}
-void()	ogre_bdie10	=[	$bdeath10,	ogre_bdie10	] {}
+void()	ogre_bdie10	=[	$bdeath10,	SUB_Null	] {}
 
 void() ogre_die =
 {
