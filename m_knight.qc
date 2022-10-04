@@ -179,42 +179,42 @@ void(entity attacker, float damage)	knight_pain =
 
 //===========================================================================
 
-void()	knight_bow1	=[	$kneel1,		knight_bow2	] {ai_turn();}
-void()	knight_bow2	=[	$kneel2,		knight_bow3	] {ai_turn();}
-void()	knight_bow3	=[	$kneel3,		knight_bow4	] {ai_turn();}
-void()	knight_bow4	=[	$kneel4,		knight_bow5	] {ai_turn();}
+void()	knight_bow1	=[	$kneel1,	knight_bow2	] {ai_turn();}
+void()	knight_bow2	=[	$kneel2,	knight_bow3	] {ai_turn();}
+void()	knight_bow3	=[	$kneel3,	knight_bow4	] {ai_turn();}
+void()	knight_bow4	=[	$kneel4,	knight_bow5	] {ai_turn();}
 
-void()	knight_bow5	=[	$kneel5,		knight_bow5	] {ai_turn();}
+void()	knight_bow5	=[	$kneel5,	knight_bow5	] {ai_turn();}
 
-void()	knight_bow6	=[	$kneel4,		knight_bow7	] {ai_turn();}
-void()	knight_bow7	=[	$kneel3,		knight_bow8	] {ai_turn();}
-void()	knight_bow8	=[	$kneel2,		knight_bow9	] {ai_turn();}
-void()	knight_bow9	=[	$kneel1,		knight_bow10	] {ai_turn();}
-void()	knight_bow10	=[	$walk1,		knight_walk1	] {ai_turn();}
+void()	knight_bow6	=[	$kneel4,	knight_bow7	] {ai_turn();}
+void()	knight_bow7	=[	$kneel3,	knight_bow8	] {ai_turn();}
+void()	knight_bow8	=[	$kneel2,	knight_bow9	] {ai_turn();}
+void()	knight_bow9	=[	$kneel1,	knight_bow10] {ai_turn();}
+void()	knight_bow10=[	$walk1,		knight_walk1] {ai_turn();}
 
-void()	knight_die1	=[	$death1,	knight_die2	] {ai_nop();}
-void()	knight_die2	=[	$death2,	knight_die3	] {ai_nop();}
-void()	knight_die3	=[	$death3,	knight_die4	] {ai_nop();}
-void()	knight_die4	=[	$death4,	knight_die5	] {ai_nop();self.solid = SOLID_NOT;}
-void()	knight_die5	=[	$death5,	knight_die6	] {ai_nop();}
-void()	knight_die6	=[	$death6,	knight_die7	] {ai_nop();}
-void()	knight_die7	=[	$death7,	knight_die8	] {ai_nop();}
-void()	knight_die8	=[	$death8,	knight_die9	] {ai_nop();}
-void()	knight_die9	=[	$death9,	knight_die10] {ai_nop();}
-void()	knight_die10=[	$death10,	SUB_Null] {ai_nop(); if (self.lip == 555) self.think = SUB_Remove;}
+void()	knight_die1	=[	$death1,	knight_die2	] {}
+void()	knight_die2	=[	$death2,	knight_die3	] {}
+void()	knight_die3	=[	$death3,	knight_die4	] {}
+void()	knight_die4	=[	$death4,	knight_die5	] {self.solid = SOLID_NOT;}
+void()	knight_die5	=[	$death5,	knight_die6	] {}
+void()	knight_die6	=[	$death6,	knight_die7	] {}
+void()	knight_die7	=[	$death7,	knight_die8	] {}
+void()	knight_die8	=[	$death8,	knight_die9	] {}
+void()	knight_die9	=[	$death9,	knight_die10] {}
+void()	knight_die10=[	$death10,	SUB_Null	] {}
 
 
-void()	knight_dieb1	=[	$deathb1,	knight_dieb2	] {ai_nop();}
-void()	knight_dieb2	=[	$deathb2,	knight_dieb3	] {ai_nop();}
-void()	knight_dieb3	=[	$deathb3,	knight_dieb4	] {ai_nop();}
-void()	knight_dieb4	=[	$deathb4,	knight_dieb5	] {ai_nop();self.solid = SOLID_NOT;}
-void()	knight_dieb5	=[	$deathb5,	knight_dieb6	] {ai_nop();}
-void()	knight_dieb6	=[	$deathb6,	knight_dieb7	] {ai_nop();}
-void()	knight_dieb7	=[	$deathb7,	knight_dieb8	] {ai_nop();}
-void()	knight_dieb8	=[	$deathb8,	knight_dieb9	] {ai_nop();}
-void()	knight_dieb9	=[	$deathb9,	knight_dieb10] {ai_nop();}
-void()	knight_dieb10 = [	$deathb10,	knight_dieb11] {ai_nop();}
-void()	knight_dieb11 = [	$deathb11,	SUB_Null] {ai_nop(); if (self.lip == 555) self.think = SUB_Remove;}
+void()	knight_dieb1	=[	$deathb1,	knight_dieb2	] {}
+void()	knight_dieb2	=[	$deathb2,	knight_dieb3	] {}
+void()	knight_dieb3	=[	$deathb3,	knight_dieb4	] {}
+void()	knight_dieb4	=[	$deathb4,	knight_dieb5	] {self.solid = SOLID_NOT;}
+void()	knight_dieb5	=[	$deathb5,	knight_dieb6	] {}
+void()	knight_dieb6	=[	$deathb6,	knight_dieb7	] {}
+void()	knight_dieb7	=[	$deathb7,	knight_dieb8	] {}
+void()	knight_dieb8	=[	$deathb8,	knight_dieb9	] {}
+void()	knight_dieb9	=[	$deathb9,	knight_dieb10	] {}
+void()	knight_dieb10 = [	$deathb10,	knight_dieb11	] {}
+void()	knight_dieb11 = [	$deathb11,	SUB_Null		] {}
 
 
 void() knight_die =
