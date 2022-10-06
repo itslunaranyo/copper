@@ -144,6 +144,9 @@ void() InitTriggerBounds =
 	if (self.angles != '0 0 0')
 		SetMovedir ();
 	
+	if (self.distance > 1)
+		self.distance = cos(self.distance / 2);
+
 	if (self.spawnflags & SPAWNFLAG_TRIGGER_FIRST)
 	{
 		self.solid = SOLID_NOT;
