@@ -669,15 +669,15 @@ void() light_candle_group =
 	
 	entity c, clast;
 	string oh = self.targetname;
-	c = self;	
+	clast = c = self;	
 	do {
-		clast = c;
 		c = find(c, targetname, oh);
-		if (clast.classname == "light_candle")
+		if (c.classname == "light_candle")
 		{
 			clast.buddy = c;
-			clast.targetname = string_null;
-			clast.nextthink = 0;
+			c.targetname = string_null;
+			c.nextthink = 0;
+			clast = c;
 		}
 	} while (c != world);
 	
