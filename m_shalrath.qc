@@ -193,13 +193,17 @@ void() ShalHome =
 	
 	// 'poor' homing (half turn rate):
 	if ( self.owner.health <= 0		// if our mama dies
+		|| self.owner.customflags & CFL_PLUNGE	// or falls in a hole
+		
 		//|| !visible(self.enemy)		// if we lost LOS
 		// took ^^ this one out, because it made voreballs even more effective at going
 		// around corners, which meant that high skill players had a nice new dodge move
 		// but average players who tried to fight the vore the old cautious way were punished
+		
 		// || has_invis(self.enemy)			// if target is invis
 		// 1.1: took ^^ this one out too, because projectiles auto-miss the player when
 		// invisible now so they might as well always move the same
+		
 		|| pointcontents(self.origin) < CONTENT_SOLID ) // if voreball is underwater
 	{
 		// voreballs headed straight at the player when he's hidden should maintain course, to

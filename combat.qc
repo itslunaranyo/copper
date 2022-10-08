@@ -66,7 +66,12 @@ void(entity targ, entity attacker) Killed =
 	}
 
 	if (self.classname != "player" && self.customflags & CFL_PLUNGE)
-		remove(self);
+	{
+		setmodel(self, string_null);
+		self.health = 0;
+		self.think = SUB_Remove;
+		self.nextthink = time + 1;
+	}
 	else
 		self.th_die ();
 	
