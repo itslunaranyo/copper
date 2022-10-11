@@ -949,7 +949,7 @@ void() func_bobbing =
 	self.state = 1 - (self.spawnflags & 1);
 	if (self.state)
 	{
-		self.nextthink = 0.2;	// wait for items and monsters to rest on it
+		self.nextthink = 0.3;	// wait for items and monsters to rest on it
 		if (self.noise1 != string_null)		// make move sound right away
 			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	}
