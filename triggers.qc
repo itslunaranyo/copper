@@ -1269,7 +1269,7 @@ Keys:
 		32 : "Only if target below" : 0
 		64 : "Additive push" : 0
 	]
-	wait(string) : "Interval (-1 for once only)" : 0
+	wait(string) : "Interval (-1 for once only)" : "0"
 	speed(integer) : "Jump Speed" : 200
 	height(integer) : "Jump Height" : 200
 	include(string) : "Allow this classname of monster, or monsters with this targetname, no matter what"
