@@ -681,7 +681,7 @@ many prints in a row).
 SILENT: Don't play the beep wav when triggered.
 */
 /*FGD
-@PointClass color(128 128 128) size(16 16 16) base(Appearflags, Targetname, Target) color(128 128 128) = target_multiprint : 
+@PointClass color(128 128 128) size(16 16 16) base(Appearflags, Targetname, Target) = target_multiprint : 
 "Target : Multiprint
 This entity will print a different string every time it's triggered.  Prints 'message', 'noise', 'noise1', 'noise2', 'noise3', then 'noise4.'  Once all strings are used up, it will fire its targets instead (so several of these can be chained if you really need that 
 many prints in a row)."
