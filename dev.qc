@@ -94,12 +94,12 @@ void() dev_warp =
 
 void() dev_serverflags =
 {
-	bprint3("SERVER FLAGS:\n========\n",ftos(serverflags),"\n");
+	bprint3("SERVER FLAGS:\n========\n  ",ftos(serverflags),"  \n");
 	if (serverflags & SVFL_EPISODE1)	bprint("  episode 1 completed\n");
 	if (serverflags & SVFL_EPISODE2)	bprint("  episode 2 completed\n");
 	if (serverflags & SVFL_EPISODE3)	bprint("  episode 3 completed\n");
 	if (serverflags & SVFL_EPISODE4)	bprint("  episode 4 completed\n");
-	if (serverflags & SVFL_ALLEPISODES)	bprint("  all of quake completed\n");
+	if (serverflags & SVFL_ALLEPISODES == SVFL_ALLEPISODES)	bprint("  all of quake completed\n");
 }
 
 
