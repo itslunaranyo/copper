@@ -416,8 +416,8 @@ Keys:
 void() item_sigil =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (!self.spawnflags)
-		objerror("no spawnflags");
+	if (!(self.spawnflags & 15) && !self.svflags)
+		objerror("no flag set for item_sigil");
 
 	if (!self.noise)
 		self.noise = "misc/runekey.wav";
