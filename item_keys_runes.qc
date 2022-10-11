@@ -373,19 +373,7 @@ Keys:
 "targetname" entity name
 */
 /*FGD
-@PointClass size(-16 -16 -24, 16 16 32) color(128 0 128) base(Item) model({ "path": ":progs/end1.mdl" }) = 
-	item_sigil : "End of episode rune.  Can be customized through keyvalue manipulation to serve as any generic cross-map inventory item."
-[
-	noise(string) : "Override pickup noise"
-	model(string) : "Override model"
-	spawnflags(Flags) =
-	[
-		1 : "Episode 1" : 1
-		2 : "Episode 2" : 0
-		4 : "Episode 3" : 0
-		8 : "Episode 4" : 0
-		16 : "Suspended" : 0
-	]
+@baseclass = svFlags [
 	svflags(Flags) =
 	[
 		1		: "Episode 1" : 0
@@ -410,6 +398,21 @@ Keys:
 		524288	: "Bit 20" : 0
 		1048576	: "Bit 21" : 0
 		2097152	: "Bit 22" : 0
+	]
+]
+
+@PointClass size(-16 -16 -24, 16 16 32) color(128 0 128) base(Item, svFlags) model({ "path": ":progs/end1.mdl" }) = 
+	item_sigil : "End of episode rune.  Can be customized through keyvalue manipulation to serve as any generic cross-map inventory item."
+[
+	noise(string) : "Override pickup noise"
+	model(string) : "Override model"
+	spawnflags(Flags) =
+	[
+		1 : "Episode 1" : 1
+		2 : "Episode 2" : 0
+		4 : "Episode 3" : 0
+		8 : "Episode 4" : 0
+		16 : "Suspended" : 0
 	]
 ]
 */

@@ -289,15 +289,21 @@ void() gate_use =
 	SUB_UseTargets();
 }
 
-/*QUAKED func_episodegate (0 .5 .8) ? E1 E2 E3 E4
-This bmodel will appear if the episode has already been completed, so players can't reenter it.
+/*QUAKED func_episodegate (0 .5 .8) ? E1 E2 E3 E4 REVERSE NEED_ALL
+This bmodel will appear if the episode has already been completed (if player has the matching rune), so players can't reenter it.
 If it does spawn, it fires its targets immediately.
+
+Spawnflags
+REVERSE		Will spawn & fire targets only if the episode has NOT been completed (if player does not have the matching rune)
+NEED_ALL	Must match all sigils/serverflags (default is to match any)
 */
 /*FGD
-@SolidClass base(Appearflags, Target, Func) = func_episodegate : 
+@SolidClass base(Appearflags, Target, Func, svFlags) = func_episodegate : 
 "Episode Gate. 
 If players have completed the episode, it fires its targets.
-If players have NOT completed the episode, it self-removes."
+If players have NOT completed the episode, it self-removes.
+Match svflags to the svflags of an item_sigil to respond to that rune instead.
+If multiple svflags or episode spawnflags are set, gate will spawn if the player has ANY of those runes. To require them all, check 'Require All Specified'."
 [
 	spawnflags(Flags) =
 	[
@@ -305,17 +311,32 @@ If players have NOT completed the episode, it self-removes."
 		2 : "Episode 2" : 0
 		4 : "Episode 3" : 0
 		8 : "Episode 4" : 0
+		16 : "Reverse Outcome" : 0
+		32 : "Require All Specified" : 0
 	]
 ]
 */
 void() func_episodegate =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (!(serverflags & self.spawnflags))
+	
+	float runes = (self.spawnflags & 15) | self.svflags;
+	float inhibit = FALSE;
+	if (self.spawnflags & 32)
+		inhibit = !((serverflags & runes) == runes);
+	else
+		inhibit = ((serverflags & runes) == 0);
+	if (self.spawnflags & 16)
+		inhibit = TRUE - inhibit;
+	
+	if (inhibit)
 	{
+		dprint3("inhibiting episodegate ", ftos(runes), "\n");
 		bmodel_lightstyle(self,"m");
+//		remove(self);
 		return;			// can still enter episode
 	}
+	
 	bmodel_lightstyle(self,"a");
 	self.style = 0;
 	self.switchshadstyle = 0;
