@@ -826,18 +826,17 @@ void() func_bobbing_use =
 {
 	self.state = !self.state;
 	
-	
 	if (self.state)
 	{
-		if (self.noise != string_null)	// cut off move sound with stop sound
-			sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
-		self.nextthink = 0;
+		if (self.noise1 != string_null)	// move
+			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+		self.think();
 		return;
 	}
 	
-	if (self.noise1 != string_null)	// move
-		sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-	self.think();
+	if (self.noise != string_null)	// cut off move sound with stop sound
+		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	self.nextthink = 0;
 }
 
 vector(float phase) func_bobbing_pos =
@@ -947,8 +946,8 @@ void() func_bobbing =
 	
 	train_sounds();
 	
-	self.state = self.spawnflags & 1;
-	if (!(self.state))
+	self.state = 1 - (self.spawnflags & 1);
+	if (self.state)
 	{
 		self.nextthink = 0.2;	// wait for items and monsters to rest on it
 		if (self.noise1 != string_null)		// make move sound right away
