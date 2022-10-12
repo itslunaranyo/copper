@@ -810,32 +810,70 @@ void() func_train_point =
 
 // =======================================
 
+/*
+	FUNC_BOBBING
+
+a lot has been done here to never ever rely on values that are repeatedly summed
+over time, as floating point error will cause gradual drift.
+
+usually, movers use self.ltime so that time doesn't advance for them while they're
+blocked, preventing SUB_CalcMove from being shifted off the end of its motion and
+screwing up doors. we don't do that here, because accumulated time error in .ltime  
+will cause bobbings to slowly slide out of phase with each other and not keep good 
+time. if the mapper sets an oscillation period of 5.0 seconds, the mover damn sure
+better oscillate once every exactly 5 seconds, not '5-ish'.
+
+engine structure requires that mover thinks be scheduled using .ltime because that's
+what it compares a MOVETYPE_PUSH's nextthink against, but we can use global time for
+actual positioning/velocity. it requires some particular gymnastics in the .blocked()
+function, but the result is precise and seamless.
+
+.wait: wavelength in seconds
+.delay: current phase offset (0-1)
+.search_time: origin point in time of the cosine wave. whenever we save it, we shift
+	it backwards by the current .delay * .wait
+.length: think rate, usually 0.1 but can be lower on hyperactive bobbers
+*/
+
+const float SFLAG_BOB_CRUSHER = 2;
+
 void() func_bobbing_blocked = 
 {
 	T_Damage (other, self, self, self.dmg);
 	
-	if ((self.spawnflags & 2))	// don't reverse if we're a CRUSHER
+	if (self.spawnflags & SFLAG_BOB_CRUSHER)	// don't reverse
 		return;
-		
+	
 	// reversing direction entails reversing the phase
-	self.delay = (self.delay * -1) + 1;
+	self.delay = (self.delay * -1) + 1 + (self.length / self.wait);
+	// put it one think in the future too
+	
+	// set new starting conditions to reanchor the reverse movement at
+	// the moment of contact
+	self.search_time = time - self.delay * self.wait - self.length;
+	// subtracting .length puts the reversed wave one more think in the past.
+	// if we don't we'll get a frame of 0 movement
+	
+	// start new movement now or we'll be a CRUSHER anyway
 	func_bobbing_think();
 }
 
 void() func_bobbing_use = 
 {
+	self.think = func_bobbing_think;
+	
 	self.state = !self.state;
 	
-	if (self.state)
+	if (self.state)	// start immediately
 	{
-		if (self.noise1 != string_null)	// move
-			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+		self.search_time = time - self.delay * self.wait;
+		sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);	// move
 		self.think();
 		return;
 	}
 	
-	if (self.noise != string_null)	// cut off move sound with stop sound
-		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+	// stop immediately
+	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);	// cut off move sound with stop sound
 	self.nextthink = 0;
 }
 
@@ -849,28 +887,37 @@ vector(float phase) func_bobbing_pos =
 	return pos;
 }
 
-void() func_bobbing_think = 
+void() func_bobbing_think =
 {
+	if (!self.state)
+	{
+		self.velocity = VEC_ORIGIN;
+		return;
+	}
+
 	vector dst;
 	float phase;
 	
-	// delay = current phase offset (0-1)
-	// length = current think rate
-	// wait = total wave interval
-	phase = self.delay + self.length / self.wait;	// advance the phase
-	if ( (self.delay < 0.5 && phase > 0.5) || (self.delay < 1 && phase > 1) )
+	// always derive current phase from a fixed starting time rather than
+	// summing an offset every think, or we'll accumulate error and drift
+	phase = ((time - self.search_time) / self.wait) % 1;
+	if (phase < self.delay)
+		phase += 1;	// don't wrap yet
+	
+	if ( (self.delay < 0.5 && phase >= 0.5) || (self.delay < 1 && phase >= 1) )
 	{
 		// when we pass either apex, repeat the noises
-		if (self.noise1 != string_null)	// move
-			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-		if (self.noise != string_null)	// stop
-			sound (self, CHAN_BODY, self.noise, 1, ATTN_NORM);
+		sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);	// move
+		sound (self, CHAN_BODY, self.noise, 1, ATTN_NORM);	// stop
 	}
+	
 	self.delay = phase;
-	while (self.delay > 1)	// wrap phase to 0-1
+	if (self.delay > 1)	// now we can wrap
 		self.delay -= 1;
-		
-	dst = func_bobbing_pos(self.delay);
+	
+	// whither are we going
+	dst = func_bobbing_pos(phase);
+	
 	self.velocity = (dst - self.origin) / self.length;
 	self.nextthink = self.ltime + self.length;
 }
@@ -911,7 +958,7 @@ CRUSHER		don't reverse when blocked
 ]
 @SolidClass base(Bob) = func_bobbing : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
-Trigger to freeze/reactivate.
+Trigger to freeze in place or reactivate. 
 
 Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  []
 */
@@ -940,18 +987,15 @@ void() func_bobbing =
 	}
 	self.use = func_bobbing_use;
 	self.blocked = func_bobbing_blocked;
-	self.think = func_bobbing_think;
 	
 	self.length = min(0.1, self.wait / 6);
 	
 	train_sounds();
 	
-	self.state = 1 - (self.spawnflags & 1);
-	if (self.state)
+	if (!(self.spawnflags & START_OFF))
 	{
+		self.think = func_bobbing_use;
 		self.nextthink = 0.3;	// wait for items and monsters to rest on it
-		if (self.noise1 != string_null)		// make move sound right away
-			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	}
 	
 	precache_model_safe(self.model);
@@ -960,7 +1004,7 @@ void() func_bobbing =
 	setorigin (self, func_bobbing_pos(self.delay));
 }
 
-/*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER 
+/*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER
 Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
 Trigger to freeze/reactivate.
 
@@ -981,7 +1025,7 @@ CRUSHER		don't reverse when blocked
 /*FGD
 @PointClass size(16 16 16) base(Bob) = func_bobbing_point : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
-Trigger to freeze/reactivate.
+Trigger to freeze in place or reactivate.
 
 Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  [
 	model(string) : "Model to use"
