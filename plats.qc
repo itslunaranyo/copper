@@ -836,6 +836,10 @@ function, but the result is precise and seamless.
 */
 
 const float SFLAG_BOB_CRUSHER = 2;
+const float SFLAG_BOB_STOPLOW = 4;
+const float SFLAG_BOB_STOPMID = 8;
+const float SFLAG_BOB_STOPHI = 16;
+const float SFLAG_BOB_STOP = 4+8+16;
 
 void() func_bobbing_blocked = 
 {
@@ -862,13 +866,22 @@ void() func_bobbing_use =
 {
 	self.think = func_bobbing_think;
 	
-	self.state = !self.state;
+	if (self.state == 2)	// a future stop was requested but we never reached it
+		self.state = 1;		// go back to being plain old 'on'
+	else
+		self.state = !self.state;
 	
 	if (self.state)	// start immediately
 	{
 		self.search_time = time - self.delay * self.wait;
 		sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);	// move
 		self.think();
+		return;
+	}
+	
+	if (self.spawnflags & SFLAG_BOB_STOP)	// stop at an apex, not immediately
+	{
+		self.state = 2;
 		return;
 	}
 	
@@ -897,6 +910,7 @@ void() func_bobbing_think =
 
 	vector dst;
 	float phase;
+	float atLow, atHigh, stop;
 	
 	// always derive current phase from a fixed starting time rather than
 	// summing an offset every think, or we'll accumulate error and drift
@@ -904,11 +918,46 @@ void() func_bobbing_think =
 	if (phase < self.delay)
 		phase += 1;	// don't wrap yet
 	
-	if ( (self.delay < 0.5 && phase >= 0.5) || (self.delay < 1 && phase >= 1) )
+	atLow = (self.delay < 0.5 && phase >= 0.5);
+	atHigh = (self.delay < 1 && phase >= 1);
+	
+	if (self.state == 2) // stop at our earliest convenience
+	{
+		if (atLow && (self.spawnflags & SFLAG_BOB_STOPLOW))
+		{
+			phase = 0.5;
+			stop = TRUE;
+		}
+		else if (atHigh && (self.spawnflags & SFLAG_BOB_STOPHI))
+		{
+			phase = 0;
+			stop = TRUE;
+		}
+		else if (self.spawnflags & SFLAG_BOB_STOPMID)
+		{
+			if (self.delay < 0.25 && phase >= 0.25)
+			{
+				phase = 0.25;
+				stop = TRUE;
+			}
+			else if (self.delay < 0.75 && phase >= 0.75)
+			{
+				phase = 0.75;
+				stop = TRUE;
+			}		
+		}
+	}	
+	else if ( atLow || atHigh )
 	{
 		// when we pass either apex, repeat the noises
 		sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);	// move
 		sound (self, CHAN_BODY, self.noise, 1, ATTN_NORM);	// stop
+	}
+	
+	if (stop)
+	{
+		self.state = 0;
+		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);	// cut off move sound with stop sound
 	}
 	
 	self.delay = phase;
@@ -922,7 +971,7 @@ void() func_bobbing_think =
 	self.nextthink = self.ltime + self.length;
 }
 
-/*QUAKED func_bobbing (0 .5 .8) ? START_OFF CRUSHER
+/*QUAKED func_bobbing (0 .5 .8) ? START_OFF CRUSHER STOP_LOW STOP_MID STOP_HIGH
 Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
 Trigger to freeze/reactivate.
 
@@ -939,6 +988,7 @@ Trigger to freeze/reactivate.
 Spawnflags
 START_OFF	start off
 CRUSHER		don't reverse when blocked
+STOP_*		when triggered off, keep oscillating until reaching the low/high/midpoint and stop there. checking more than one adds eligible stopping places, and the bobber will stop at the first one reached.
 */
 /*FGD
 @baseclass base(Appearflags, Targetname, TrainSounds, Angle, Func) = Bob
@@ -946,6 +996,9 @@ CRUSHER		don't reverse when blocked
 	spawnflags(flags) = [
 		1 : "Start off" : 0
 		2 : "Crusher (no reverse)" : 0
+		4 : "Don't stop until low pos" : 0
+		8 : "Don't stop until mid pos" : 0
+		16 : "Don't stop until high pos" : 0
 	]
 	wait(string) : "Period (Wavelength)" : "4"
 	distance(integer) : "Length (Amplitude)" : 64
@@ -958,7 +1011,7 @@ CRUSHER		don't reverse when blocked
 ]
 @SolidClass base(Bob) = func_bobbing : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
-Trigger to freeze in place or reactivate. 
+Trigger to freeze in place or reactivate. If any "don't stop until" spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
 
 Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  []
 */
@@ -1004,7 +1057,7 @@ void() func_bobbing =
 	setorigin (self, func_bobbing_pos(self.delay));
 }
 
-/*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER
+/*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER STOP_LOW STOP_MID STOP_HIGH
 Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
 Trigger to freeze/reactivate.
 
@@ -1021,11 +1074,12 @@ Trigger to freeze/reactivate.
 Spawnflags
 START_OFF	start off
 CRUSHER		don't reverse when blocked
+STOP_*		when triggered off, keep oscillating until reaching the low/high/midpoint and stop there. checking more than one adds eligible stopping places, and the bobber will stop at the first one reached.
 */
 /*FGD
 @PointClass size(16 16 16) base(Bob) = func_bobbing_point : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
-Trigger to freeze in place or reactivate.
+Trigger to freeze in place or reactivate. If any "don't stop until" spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
 
 Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  [
 	model(string) : "Model to use"
