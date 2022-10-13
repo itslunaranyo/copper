@@ -42,18 +42,6 @@ void() bmodel_appear =
 	//force_retouch = 2;
 }
 
-void() bmodel_vanish =
-{
-	self.state = STATE_TOP;
-	self.modelindex = 0;
-	bmodel_lightstyle(self,"m");
-	//self.alpha = -1;
-	
-	if (self.solid != SOLID_NOT)
-		wall_spawn_tdrop();
-	self.solid = SOLID_NOT;
-}
-
 /*
 quake doesn't catch when a bmodel turns nonsolid while it is the groundentity for 
 other entities, so those entities stay floating in the air if they're at rest or
@@ -85,21 +73,63 @@ other things that didn't work, for future reference:
 	have extra code handle its own position in the list when it is removed on 
 	behalf of func_walls
 */
-void() wall_spawn_tdrop =
+void() bmodel_vanish =
 {
-	entity t = spawn();
-	t.owner = self;
-	t.solid = SOLID_BSP;
-	t.movetype = MOVETYPE_PUSH;
-	setorigin (t, self.origin);	
-	setmodel (t, self.model);
-	t.alpha = -1;
+	if (self.solid == SOLID_NOT)
+	{
+		bmodel_vanish_do();
+		return;
+	}
+
+	self.buddy = spawn();
+	self.buddy.owner = self;
+	self.buddy.solid = SOLID_BSP;
+	self.buddy.movetype = MOVETYPE_PUSH;
+	setorigin (self.buddy, self.origin);	
+	setmodel (self.buddy, self.model);
+	//self.buddy.modelindex = 0;
+	self.buddy.alpha = -1;	// this hack notably doesn't work in software
 	
 	// this could be less aggressive but somehow doesn't work if the wall is made of skip
-	t.velocity = '0 0 2';
+	self.buddy.velocity = '0 0 2';
 	
-	t.think = SUB_Remove;
-	t.nextthink = self.ltime + 0.1;
+	/*
+	the various thinks and scheduling are necessary too:
+
+	because the duplicate has to be MOVETYPE_PUSH (because it has to be SOLID_BSP),
+	its nextthink has to be relative to .ltime, which doesn't advance if the wall
+	is blocked, so the original wall has to be prepared to kill the duplicate as a
+	backup plan.
+	yes this is all terrible
+	*/
+	self.buddy.think = wall_tdrop_think;
+	self.buddy.nextthink = self.ltime + 0.1;
+
+	self.solid = SOLID_NOT;
+	self.movetype = MOVETYPE_NONE;
+	self.nextthink = time + 0.2;
+	self.think = bmodel_vanish_think;
+}
+
+void() wall_tdrop_think =
+{
+	self.owner.buddy = world;
+	SUB_CallAsSelf(bmodel_vanish_do, self.owner);
+	remove(self);
+}
+
+void() bmodel_vanish_think =
+{
+	if (self.buddy)
+		remove(self.buddy);
+	bmodel_vanish_do();
+}
+
+void() bmodel_vanish_do =
+{
+	self.state = STATE_TOP;
+	self.modelindex = 0;
+	bmodel_lightstyle(self,"m");
 }
 
 // ==========================================
