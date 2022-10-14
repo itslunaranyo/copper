@@ -70,7 +70,9 @@ void() ItemPiff =
 {
 	vector org;
 	org = BoundsCenter(self);
-	org_z = self.absmin_z + 8;
+	org_z = self.absmin_z + 12;
+	if (self.items & (IT_POWERUPS | IT_WEAPONS | IT_KEY1 | IT_KEY2))
+		org_z += 20;
 	particle(org, '8 8 0', 8, 16);
 	particle(org, '8 -8 0', 8, 16);
 	particle(org, '-8 8 0', 8, 16);
