@@ -8,10 +8,7 @@ adapted from similar things czg did in honey_fog.qc god bless him
 new skyfog stuff:
 the skyfog keys will all be 0 in all existing maps, and therefore the desired
 behavior when a skyfog key is 0 has to be "do not change the skyfog". -1 is
-the new "actually mark it zero" for mappers, and just to make it harder and
-more confusing for ourselves the code does the reverse: -1 means no change, 
-all other values (including zero) will set skyfog. any entity with fog keys
-has to swap the two upon spawning.
+the new "actually mark it zero" for mappers.
 
 ====================
 */
@@ -40,14 +37,8 @@ void() fog_fixKeys =
 	if (self.fog_color2_x > 1 || self.fog_color2_y > 1 || self.fog_color2_z > 1)
 		self.fog_color2 /= 255;
 
-	if (self.fog_sky == -1)
-		self.fog_sky = 0;
-	else if (self.fog_sky == 0)
-		self.fog_sky = -1;
-	if (self.fog_sky2 == -1)
-		self.fog_sky2 = 0;
-	else if (self.fog_sky2 == 0)
-		self.fog_sky2 = -1;
+	self.fog_density = zeroconvert(self.fog_density);
+	self.fog_density2 = zeroconvert(self.fog_density2);
 }
 
 float(entity e, float dens, vector col, float sky) fog_sigdif =
@@ -125,9 +116,8 @@ void( entity client, float density, vector color, float sky ) fog_set =
 			return FALSE;
 	}
 
-	//stuffcmd(client, "r_showtris 0\n"); return;
-	//dprint3("setting fog at ", ftos(time*1000), "\n");
-	
+	//dprint5("fog ",ftos(density*1000),vtos(color),ftos(sky*100),"\n");
+
 	stuffcmd(client, "\nfog ");
 	stuffcmd_float(client, density);
 	stuffcmd(client, " ");
@@ -138,14 +128,18 @@ void( entity client, float density, vector color, float sky ) fog_set =
 	stuffcmd_float(client, color_z * (icantsee + 1));
 	stuffcmd(client, "\n");
 
-	if (sky != -1 && client.fog_sky != sky)
+	if (sky)
 	{
-		stuffcmd(client, "r_skyfog ");
-		stuffcmd_float(client, sky);
-		stuffcmd(client, "\n");
-	}	
-
+		float skyz = zeroconvert(sky);
+		if (client.fog_sky != skyz)
+		{
+			stuffcmd(client, "r_skyfog ");
+			stuffcmd_float(client, skyz);
+			stuffcmd(client, "\n");
+		}
+	}
 	fog_save(client, density, color, sky);
+
 }
 
 /*
@@ -162,7 +156,7 @@ void() fog_blendTouch =
 		if (time < self.attack_finished)
 			return;
 		
-	float f, ldensity, lsky, leaving, force, doSky;
+	float f, ldensity, lsky, leaving, force;
 	vector dorg, mid, ovel;
 	vector lcolor;
 	
@@ -179,8 +173,6 @@ void() fog_blendTouch =
 				(other.absmin_y + ovel_y > self.absmax_y) ||
 				(other.absmin_z + ovel_z > self.absmax_z) );
 				
-	doSky = (self.fog_sky != -1) && (self.fog_sky2 != -1);
-	
 	if (leaving)
 	{
 		// last chance to set fog correctly, so snap it to the final values
@@ -189,13 +181,13 @@ void() fog_blendTouch =
 		{
 			ldensity = self.fog_density2;
 			lcolor = self.fog_color2;
-			if (doSky) lsky = self.fog_sky2;
+			if (self.fog_sky2) lsky = zeroconvert(self.fog_sky2);
 		}
 		else
 		{
 			ldensity = self.fog_density;
 			lcolor = self.fog_color;
-			if (doSky) lsky = self.fog_sky;
+			if (self.fog_sky) lsky = zeroconvert(self.fog_sky);
 		}
 		force = TRUE;
 	}
@@ -210,16 +202,20 @@ void() fog_blendTouch =
 		
 		ldensity = lerp(self.fog_density, self.fog_density2, f);
 		lcolor = lerpVector(self.fog_color, self.fog_color2, f);
-		if (doSky) lsky = lerp(self.fog_sky, self.fog_sky2, f);
+		if (self.fog_sky && self.fog_sky2)
+		{
+			lsky = lerp(zeroconvert(self.fog_sky), zeroconvert(self.fog_sky2), f);
+		}
 	}
+	
+	// fog_set does final interpretation of 0 = ignore, -1 = 0
+	if (self.fog_sky && self.fog_sky2 && !lsky)
+		lsky = -1;
 	
 	if (force || fog_sigdif(other,ldensity,lcolor,lsky))
 	{
 		self.invisible_time = time;
-		if (doSky) 
-			fog_set(other, ldensity, lcolor, lsky);
-		else
-			fog_set(other, ldensity, lcolor, -1);
+		fog_set(other, ldensity, lcolor, lsky);
 	}
 	//fog_save(other, ldensity, lcolor);
 	
@@ -270,40 +266,7 @@ void() trigger_fogblend =
 }
 
 
-
 // ================================
-
-void(float density, vector color, float sky) target_fogblend_save =
-{
-	if (self.spawnflags & 4)
-	{
-		entity pl;
-		pl = nextent(world);
-		while (pl.flags & FL_CLIENT)
-		{
-			fog_save(pl, density, color, sky);
-			pl = nextent(pl);
-		}
-	}
-	else
-		fog_save(self.enemy, density, color, sky);
-}
-
-void(float density, vector color, float sky) target_fogblend_set =
-{
-	if (self.spawnflags & 4)
-	{
-		entity pl;
-		pl = nextent(world);
-		while (pl.flags & FL_CLIENT)
-		{
-			fog_set(pl, density, color, sky);
-			pl = nextent(pl);
-		}
-	}
-	else
-		fog_set(self.enemy, density, color, sky);
-}
 
 /*
 ================
@@ -312,30 +275,24 @@ target_fogblend_use
 */
 void() target_fogblend_use =
 {
+	if (activator.classname != "player") return;
+	
 	float d, s;
 	vector c;
+	
 	self.enemy = activator;
-	if (self.enemy.classname != "player") return;
+	
 	if (!(self.spawnflags & 1))
 		self.state = 1 - self.state;
 	
-	self.nextthink = time + self.delay;
 	if (self.state)
-	{
 		self.pain_finished = time + self.delay + self.speed;
-		d = self.fog_density2;
-		c = self.fog_color2;
-		s = self.fog_sky2;
-	}
 	else
-	{
 		self.pain_finished = time + self.delay + self.speed2;
-		d = self.fog_density;
-		c = self.fog_color;
-		s = self.fog_sky;
-	}
-	target_fogblend_save(d, c, s);
-	self.use = SUB_Null;	// don't allow retriggering before the blend is done or it looks super duper wacky
+		
+	fog_blendTimeThink();
+	// don't allow retriggering before the blend is done or it looks super duper wacky
+	self.use = SUB_Null;
 }
 
 /*
@@ -345,8 +302,9 @@ fog_blendTimeThink
 */
 void() fog_blendTimeThink =
 {
-	float f, d, s, doSky;
-	vector c;
+	float f, ldensity, lsky;
+	vector dorg, mid, ovel;
+	vector lcolor;
 	
 	if (time >= self.pain_finished)
 	{
@@ -355,7 +313,7 @@ void() fog_blendTimeThink =
 	}
 	else
 	{
-		self.nextthink = time + FOG_INTERVAL;
+		self.nextthink = time + self.delay;
 		if (self.state && self.speed)
 			f = 1 - (self.pain_finished - time) / self.speed;
 		else if (self.speed2)
@@ -363,28 +321,50 @@ void() fog_blendTimeThink =
 		else
 			f = 1;
 	}
-	
-	if (self.fog_sky != -1 && self.fog_sky2 != -1)
-		doSky = TRUE;
-	
-	if (self.state)
+
+	if (self.state == 0)
+		f = 1-f;
+
+	if (f == 1)
 	{
-		d = lerpHermite(self.fog_density, self.fog_density2, f);
-		c = lerpVectorHermite(self.fog_color, self.fog_color2, f);
-		if (doSky)
-			s = lerpHermite(self.fog_sky, self.fog_sky2, f);
+		ldensity = self.fog_density2;
+		lcolor = self.fog_color2;
+		if (self.fog_sky2) lsky = zeroconvert(self.fog_sky2);
+	}
+	else if (f == 0)
+	{
+		ldensity = self.fog_density;
+		lcolor = self.fog_color;
+		if (self.fog_sky) lsky = zeroconvert(self.fog_sky);
 	}
 	else
 	{
-		d = lerpHermite(self.fog_density2, self.fog_density, f);
-		c = lerpVectorHermite(self.fog_color2, self.fog_color, f);
-		if (doSky)
-			s = lerpHermite(self.fog_sky2, self.fog_sky, f);
+		// in transition, blend proportionally between the two fogs
+		ldensity = lerpHermite(self.fog_density, self.fog_density2, f);
+		lcolor = lerpVectorHermite(self.fog_color, self.fog_color2, f);
+		if (self.fog_sky && self.fog_sky2)
+		{
+			lsky = lerpHermite(zeroconvert(self.fog_sky), zeroconvert(self.fog_sky2), f);
+		}
 	}
-	if (doSky)
-		target_fogblend_set(d, c, s);
-	else
-		target_fogblend_set(d, c, -1);
+	
+	// fog_set does final interpretation of 0 = ignore, -1 = 0
+	if (self.fog_sky && self.fog_sky2 && !lsky)
+		lsky = -1;
+	
+	if (self.spawnflags & 4)
+	{
+		entity pl;
+		pl = nextent(world);
+		while (pl.flags & FL_CLIENT)
+		{
+			if (fog_sigdif(pl, ldensity, lcolor, lsky))
+				fog_set(pl, ldensity, lcolor, lsky);
+			pl = nextent(pl);
+		}
+	}
+	else if (fog_sigdif(self.enemy, ldensity, lcolor, lsky))
+		fog_set(self.enemy, ldensity, lcolor, lsky);
 }
 
 /*QUAKED target_fogblend (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE GLOBAL
