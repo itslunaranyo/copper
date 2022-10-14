@@ -595,10 +595,10 @@ void() PutClientInServer =
 	self.attack_finished = time + 0.1;	// don't shoot on the first frame if we clicked to spawn
 	
 	// yet another thing that doesn't work on the first frame
-	if (spot.fog_density)
-		fog_save(self,spot.fog_density,spot.fog_color,spot.fog_sky);
-	else if (world.fog_density)
-		fog_save(self,world.fog_density,world.fog_color,spot.fog_sky);
+	if (spot.fog_density || spot.fog_color || spot.fog_sky)
+		fog_save(self, spot.fog_density, spot.fog_color, spot.fog_sky);
+	else if (world.fog_density || world.fog_color || world.fog_sky)
+		fog_save(self, world.fog_density, world.fog_color, world.fog_sky);
 	cleanUpClientShit = 2;
 
 // oh, this is a hack!

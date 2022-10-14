@@ -131,12 +131,9 @@ void( entity client, float density, vector color, float sky ) fog_set =
 	if (sky)
 	{
 		float skyz = zeroconvert(sky);
-		if (client.fog_sky != skyz)
-		{
-			stuffcmd(client, "r_skyfog ");
-			stuffcmd_float(client, skyz);
-			stuffcmd(client, "\n");
-		}
+		stuffcmd(client, "r_skyfog ");
+		stuffcmd_float(client, skyz);
+		stuffcmd(client, "\n");
 	}
 	fog_save(client, density, color, sky);
 
@@ -277,9 +274,6 @@ void() target_fogblend_use =
 {
 	if (activator.classname != "player") return;
 	
-	float d, s;
-	vector c;
-	
 	self.enemy = activator;
 	
 	if (!(self.spawnflags & 1))
@@ -303,7 +297,6 @@ fog_blendTimeThink
 void() fog_blendTimeThink =
 {
 	float f, ldensity, lsky;
-	vector dorg, mid, ovel;
 	vector lcolor;
 	
 	if (time >= self.pain_finished)
