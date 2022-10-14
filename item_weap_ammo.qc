@@ -63,7 +63,7 @@ void() weapon_touch =
 
 	if (!CheckValidTouch()) return;
 
-	if (deathmatch == 2 || coop > 1)
+	if (deathmatch == 2 || deathmatch == 3 || coop > 1)
 		leave = 1;
 	else
 		leave = 0;
@@ -369,6 +369,8 @@ void() StartAmmo =
 	self.touch = ammo_touch;
 	if (deathmatch == 1)
 		self.wait = 30;
+	if (deathmatch == 3)
+		self.wait = 15;
 	StartItem ();
 	//ItemRotateAndSize('32 32 56');
 }

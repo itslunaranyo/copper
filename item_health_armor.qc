@@ -72,8 +72,18 @@ void() item_health_go
 	}
 	setsize (self, '0 0 0', '32 32 56');
 	
-	if (deathmatch == 1)
-		self.wait = 20;
+	if (deathmatch == 1 || deathmatch == 3)
+	{
+		if (self.spawnflags & ITEM_HEALTH_MEGA)
+			// 20 seconds after health <= 100, minimum 25 seconds
+			// Copper doesn't handle megahealth the same way, so we can't do that.
+			// This is a longer time, picked somewhat arbitrarily.
+			// This will be slower than vanilla id1 if you're taking a lot of damage,
+			// but faster if you're being relatively safe.
+			self.wait = 40;
+		else
+			self.wait = 20;
+	}
 		
 	StartItem ();
 }
@@ -287,7 +297,7 @@ void(float skn, float amt) StartArmor =
 	precache_model_safe ("progs/armor.mdl");
 	setmodel (self, "progs/armor.mdl");
 	
-	if (deathmatch == 1)
+	if (deathmatch == 1 || deathmatch == 3)
 		self.wait = 20;
 
 	setsize (self, '-16 -16 0', '16 16 56');
