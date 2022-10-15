@@ -361,7 +361,7 @@ void() target_heal =
 //============================================================================
 
 
-void() target_kill_use =
+void() target_kill_go =
 {
 	local entity t;
 
@@ -400,6 +400,19 @@ void() target_kill_use =
 	}
 
 	SUB_KillTargets(self.killtarget);
+}
+
+void() target_kill_use =
+{
+	if (!self.delay)
+	{
+		target_kill_go();
+		return;
+	}
+	entity killer = spawn();
+	SUB_CopyTargets(killer);
+	killer.think = target_kill_go;
+	killer.nextthink = time + self.delay;
 }
 
 /*QUAKED target_kill (0.75 0.5 0) (-8 -8 -8) (8 8 8)
