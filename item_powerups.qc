@@ -44,7 +44,7 @@ void(entity h, float t) powerup_invisibility =
 	//h.notrace = 1;
 	h.invisible_time = 1;
 	h.invisible_finished = time + t;
-	h.invisible_sound = time + ((random() * 3) + 1);
+	h.invisible_sound = time + 1.5;
 }
 
 /*

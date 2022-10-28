@@ -1264,14 +1264,7 @@ void() CheckPowerups =
 // invisibility
 	if (self.invisible_finished)
 	{
-// sound and screen flash when items starts to run out
-		if (self.invisible_sound < time)
-		{
-			sound (self, CHAN_POWERUP, "items/inv3.wav", 0.5, ATTN_IDLE);
-			self.invisible_sound = time + ((random() * 3) + 1);
-		}
-
-
+		// sound and screen flash when items starts to run out
 		if (self.invisible_finished < time + 3)
 		{
 			if (self.invisible_time == 1)
@@ -1288,6 +1281,13 @@ void() CheckPowerups =
 				stuffcmd (self, "bf\n");
 			}
 		}
+		// ambient whispering
+		else if (self.invisible_sound < time)
+		{
+			sound (self, CHAN_POWERUP, "items/inv3.wav", 0.5, ATTN_IDLE);
+			self.invisible_sound = time + ((random() * 3) + 1);
+		}
+
 
 		if (self.invisible_finished < time)
 		{	// just stopped
