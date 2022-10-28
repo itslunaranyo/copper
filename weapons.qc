@@ -62,9 +62,10 @@ SuperDamageSound
 void() SuperDamageSound =
 {
 	if (!has_quad(self)) return;
+	if (self.super_damage_finished < time + 3) return;
 	if (self.super_sound < time)
 	{
-		self.super_sound = time + 1;
+		self.super_sound = time + 0.9;
 		sound (self, CHAN_POWERUP, "items/damage3.wav", 1, ATTN_NORM);
 	}
 }
