@@ -229,18 +229,25 @@ void Hud_DrawSBar(vector pos, float balpha)
 
 	if (stat_items & IT_INVULNERABILITY)
 	{
-		drawpic(pos, "sb_armor666", '24 24', '1 1 1', 1, 0);
+		/*
+		if (time < paintime - 0.075)
+			drawpic(pos + '1 0', "sb_armor666_p1", '24 24', '1 1 1', 1, 0);
+		else if (time < paintime)
+			drawpic(pos + '1 0', "sb_armor666_p2", '24 24', '1 1 1', 1, 0);
+		else
+		*/
+			drawpic(pos + '1 0', "sb_armor666", '24 24', '1 1 1', 1, 0);
 		Hud_DrawLargeValue(pos+'24 0', 666, 999);
 	}
 	else
 	{
 		Hud_DrawLargeValue(pos+'24 0', getstatf(STAT_ARMOR), 25);
 		if (stat_items & IT_ARMOR3)
-			drawpic(pos, "sb_armor3", '24 24', '1 1 1', 1, 0);
+			drawpic(pos + '1 0', "sb_armor3b", '24 24', '1 1 1', 1, 0);
 		else if (stat_items & IT_ARMOR2)
-			drawpic(pos, "sb_armor2", '24 24', '1 1 1', 1, 0);
+			drawpic(pos + '1 0', "sb_armor2b", '24 24', '1 1 1', 1, 0);
 		else if (stat_items & IT_ARMOR1)
-			drawpic(pos, "sb_armor1", '24 24', '1 1 1', 1, 0);
+			drawpic(pos + '1 0', "sb_armor1b", '24 24', '1 1 1', 1, 0);
 	}
 
 	Hud_DrawLargeValue(pos+'136 0', stat_health, 25);
@@ -501,7 +508,12 @@ void() Hud_Init
 	precache_pic("face_invulquad", TRUE);
 	precache_pic("face_invisquad", TRUE);
 	precache_pic("face_allpups", TRUE);
+	precache_pic("sb_armor1b", TRUE);
+	precache_pic("sb_armor2b", TRUE);
+	precache_pic("sb_armor3b", TRUE);
 	precache_pic("sb_armor666", TRUE);
+	//precache_pic("sb_armor666_p1", TRUE);
+	//precache_pic("sb_armor666_p2", TRUE);
 	
 	paintime = -1;
 	lookseed = floor(random() * 100);
