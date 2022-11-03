@@ -375,16 +375,24 @@ void Hud_DrawIBar(vector pos, float balpha)
 	if (stat_items2 & 256)
 		drawpic(pos+'312 8', "sb_sigil4", '8 16', '1 1 1', 1, 0);
 		
-	//if (!cvar("coop") && !cvar("deathmatch"))
-	//	return;
+	if (!cvar("coop") && !cvar("deathmatch"))
+		return;
 
-	float p;
-	
-	for (p = 0; p < 4; p++)
+	float p, numclients, scorew;
+	string score;
+	numclients = getstatf(STAT_CLIENTS);
+	for (p = 0; p < numclients; p++)
 	{
 		drawpic(pos + '192 0'+ '32 0' * p, strcat("shirt", getplayerkeyvalue(p, "topcolor")), '8 8', '1 1 1', 1, 0);
 		drawpic(pos + '192 0'+ '32 0' * p, strcat("pants", getplayerkeyvalue(p, "bottomcolor")), '8 8', '1 1 1', 1, 0);
-		drawstring(pos + '192 0'+ '32 0' * p + '12 0', getplayerkeyvalue(p, "ping"), '8 8', '1 1 1', 1, 0);
+		score = getplayerkeyvalue(p, "frags");
+		scorew = stringwidth(score, TRUE);
+		if (scorew <= 16)
+			drawstring(pos + '192 0'+ '32 0' * p + '12 0', score, '8 8', '1 1 1', 1, 0);
+		else if (scorew <= 24)
+			drawstring(pos + '192 0'+ '32 0' * p + '8 0', score, '8 8', '1 1 1', 1, 0);
+		else
+			drawstring(pos + '192 0'+ '32 0' * p, score, '8 8', '1 1 1', 1, 0);
 	}
 };
 
