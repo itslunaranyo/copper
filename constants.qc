@@ -272,6 +272,7 @@ const float STAT_PUNCHANGLE_Z	= 28;
 const float STAT_USER			= 32; // Custom user stats start here (lower values are reserved for engine use)
 const float STAT_MAXHEALTH		= 32;
 const float STAT_KEYCOUNTS		= 33;
+const float STAT_CLIENTS		= 34;
 
 
 // temporary entities
