@@ -623,11 +623,15 @@ Keys:
 void() monster_zombie =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (nomonster()) return;
-	if (deathmatch)
+	float crux = zombie_crucifix();
+	if (!crux)
 	{
-		remove(self);
-		return;
+		if (nomonster()) return;
+		if (deathmatch)
+		{
+			remove(self);
+			return;
+		}
 	}
 	
 	precache_model ("progs/zombie.mdl");
@@ -648,7 +652,7 @@ void() monster_zombie =
 	setsize (self, '-16 -16 -24', '16 16 40');
 	self.type = "zombie";
 	
-	if ( !zombie_crucifix() )
+	if ( !crux )
 	{
 		// TODO: if triggered and lying, spawn 16u under the ground and rise through the floor on spawn
 		if ( monster_spawnsetup( monster_zombie_spawner ) ) return;
