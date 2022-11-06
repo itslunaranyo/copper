@@ -397,7 +397,7 @@ The player's view will have faded completely by the time they touch the bottom, 
 
 Keyvalues
 "delay" how long the player should 'fall' before the splat, default 3
-"height" how high above the func_void the plunge trigger should spawn. do not make this high enough that players will touch it without falling in or they'll hear random screaming noises as they walk around and that'll be strange.
+"height" how high above the func_void the plunge trigger should spawn. do not make this high enough that players will touch it without falling in or they'll hear random screaming noises as they walk around and that'll be strange. default 128
 "lip" distance to raise the visual model, default 32
 "fadecolor" color to fade the screen to while falling, default black
 
@@ -417,7 +417,7 @@ Fires all targets when a client touches the plunge trigger (ie the yell, not the
 If the func_void's first target is an info_teleport_destination, it will hurt the player and teleport him to the destination. If the damage is enough to kill the player, it continues with the fade and splat as normal without teleporting."
 [
 	delay(string) : "how long the player should 'fall' before the splat" : "3"
-	height(integer) : "how high above the func_void the plunge trigger should spawn. do not make this high enough that players will touch it without falling in or they'll hear random screaming noises as they walk around and that'll be strange."
+	height(integer) : "how high above the func_void the plunge trigger should spawn. do not make this high enough that players will touch it without falling in or they'll hear random screaming noises as they walk around and that'll be strange." : 128
 	lip(integer) : "distance to raise the visual model" : 32
 	dmg(integer) : "pain to apply before salvation teleport" : 60
 	fadecolor(string) : "color to fade the screen to while falling" : "0 0 0"
