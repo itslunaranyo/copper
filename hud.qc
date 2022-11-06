@@ -640,9 +640,9 @@ void() HUD_UpdateStats =
 	
 	// update health and check for sudden reductions
 	f = getstatf(STAT_HEALTH);
-	if (stat_health - f > 0 && f < getstatf(STAT_MAXHEALTH) || stat_health - f > 3)
+	if (stat_health - f > 1)
 	{
-		paintime = time + 0.15;	// flinch
+		paintime = time + 0.2;	// flinch
 	}
 	stat_health = f;
 }
