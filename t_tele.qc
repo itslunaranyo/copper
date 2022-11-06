@@ -202,8 +202,8 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 	float flash = 3;	// 1 = @org, 2 = @dest, 3 = both
 	entity t;
 
-	// telefrag protection in /*no-friendly-fire*/ coop
-	if (coop)// && teamplay)
+	// telefrag protection in coop
+	if (coop && traveler.classname == "player")
 	{
 		if (teleport_check_for_client(dst))
 		{
