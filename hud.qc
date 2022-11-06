@@ -18,7 +18,9 @@ const string weaponlabel[7] = {	"shotgun","sshotgun","nailgun","snailgun","rlaun
 
 float stat_items, stat_items2, stat_health, keytype;
 float paintime, lookseed;
-float itemtimes[23];
+float itemtimes[30];
+float baralpha;
+float hudstyle;
 
 const float HUD_FACELEFT = 0;
 const float HUD_FACEFWD = 1;
@@ -72,12 +74,12 @@ void(vector pos, float bx, float by, float bwidth, float bheight, float pixelspe
 	}
 };
 
-void(vector pos, float balpha) Hud_DrawLevelInfoBar =
+void(vector pos) Hud_DrawLevelInfoBar =
 {
 	string s;
 	float mins, secs, w, kw, gap;
 
-	drawpic(pos, "scorebar", '320 24', '1 1 1', balpha, 0);
+	drawpic(pos, "scorebar", '320 24', '1 1 1', baralpha, 0);
 
 	s = strcat(world.message, " (", mapname, ")");
 	Hud_ScrollTextBox(pos, 8, 4, 304, 8, 16, s);
@@ -110,14 +112,13 @@ void(vector pos, float value, float threshhold) Hud_DrawLargeValue =
 	string s;
 	if (value < 0)
 		value = 0;	//hrm
-	if (value>999)
+	if (value > 999)
 		value = 999;
 
 	s = ftos(floor(value));
 	len = strlen(s);
 
 	pos_x += 24 * (3-len);
-	
 
 	if (value <= threshhold)
 	{	//use alternate (red) numbers
@@ -143,7 +144,7 @@ void(vector pos, float value, float threshhold) Hud_DrawLargeValue =
 	}
 };
 
-void(float type, vector pos, float drawback) Hud_DrawAmmoCount =
+void(float type, vector pos) Hud_DrawAmmoCount =
 {
 	string s;
 	float value;
@@ -221,87 +222,60 @@ void Hud_DrawHead(vector pos)
 	drawpic(pos, headpic, '24 24', '1 1 1', 1, 0);
 }
 
-void Hud_DrawSBar(vector pos, float balpha)
+void Hud_DrawArmorIcon(vector pos)
 {
-	drawpic(pos, "sbar", '320 24', '1 1 1', balpha, 0);
-
-	Hud_DrawHead(pos + '112 0');
-
 	if (stat_items & IT_INVULNERABILITY)
 	{
+		// obviously paintime doesn't work when you're invulnerable because your health never changes ...
 		/*
 		if (time < paintime - 0.075)
-			drawpic(pos + '1 0', "sb_armor666_p1", '24 24', '1 1 1', 1, 0);
+			drawpic(pos, "sb_armor666_p1", '24 24', '1 1 1', 1, 0);
 		else if (time < paintime)
-			drawpic(pos + '1 0', "sb_armor666_p2", '24 24', '1 1 1', 1, 0);
+			drawpic(pos, "sb_armor666_p2", '24 24', '1 1 1', 1, 0);
 		else
 		*/
-			drawpic(pos + '1 0', "sb_armor666", '24 24', '1 1 1', 1, 0);
-		Hud_DrawLargeValue(pos+'24 0', 666, 999);
+			drawpic(pos, "sb_armor666", '24 24', '1 1 1', 1, 0);
 	}
-	else
-	{
-		Hud_DrawLargeValue(pos+'24 0', getstatf(STAT_ARMOR), 25);
-		if (stat_items & IT_ARMOR3)
-			drawpic(pos + '1 0', "sb_armor3b", '24 24', '1 1 1', 1, 0);
-		else if (stat_items & IT_ARMOR2)
-			drawpic(pos + '1 0', "sb_armor2b", '24 24', '1 1 1', 1, 0);
-		else if (stat_items & IT_ARMOR1)
-			drawpic(pos + '1 0', "sb_armor1b", '24 24', '1 1 1', 1, 0);
-	}
+	else if (stat_items & IT_ARMOR3)
+		drawpic(pos, "sb_armor3b", '24 24', '1 1 1', 1, 0);
+	else if (stat_items & IT_ARMOR2)
+		drawpic(pos, "sb_armor2b", '24 24', '1 1 1', 1, 0);
+	else if (stat_items & IT_ARMOR1)
+		drawpic(pos, "sb_armor1b", '24 24', '1 1 1', 1, 0);
 
+}
+void Hud_DrawCurrentAmmoIcon(vector pos)
+{
+	if (stat_items & IT_SHELLS)
+		drawpic(pos, "sb_shells", '24 24', '1 1 1', 1, 0);
+	else if (stat_items & IT_NAILS)
+		drawpic(pos, "sb_nails", '24 24', '1 1 1', 1, 0);
+	else if (stat_items & IT_ROCKETS)
+		drawpic(pos, "sb_rocket", '24 24', '1 1 1', 1, 0);
+	else if (stat_items & IT_CELLS)
+		drawpic(pos, "sb_cells", '24 24', '1 1 1', 1, 0);
+}
+
+void Hud_DrawSBar(vector pos)
+{
+	drawpic(pos, "sbar", '320 24', '1 1 1', baralpha, 0);
+
+	Hud_DrawHead(pos + '112 0');
 	Hud_DrawLargeValue(pos+'136 0', stat_health, 25);
 
-	if (stat_items & IT_SHELLS)
-		drawpic(pos+'224 0', "sb_shells", '24 24', '1 1 1', 1, 0);
-	else if (stat_items & IT_NAILS)
-		drawpic(pos+'224 0', "sb_nails", '24 24', '1 1 1', 1, 0);
-	else if (stat_items & IT_ROCKETS)
-		drawpic(pos+'224 0', "sb_rocket", '24 24', '1 1 1', 1, 0);
-	else if (stat_items & IT_CELLS)
-		drawpic(pos+'224 0', "sb_cells", '24 24', '1 1 1', 1, 0);
+	Hud_DrawArmorIcon(pos + '1 0');
+	if (stat_items & IT_INVULNERABILITY)
+		Hud_DrawLargeValue(pos + '24 0', 666, 999);
+	else
+		Hud_DrawLargeValue(pos + '24 0', getstatf(STAT_ARMOR), 25);
+
+	Hud_DrawCurrentAmmoIcon(pos + '224 0');
 	Hud_DrawLargeValue(pos+'248 0', getstatf(STAT_AMMO), 10);
 };
 
 // ================================================================
 
 // INVENTORY BAR
-
-void Hud_DrawKeys(vector pos, float it)
-{
-	if (!(stat_items & it))
-		return;
-
-	string s;
-	float n;
-	
-	if (it == IT_KEY1)
-	{
-		n = getstatbits(STAT_KEYCOUNTS, 0, 4)-1;
-		if (n < 0) n = 0;	// happens in demos where .worldtype isn't increased
-		if (keytype == 2)
-			s = strcat("gfx/sb_bkey1_", ftos(n + 1));
-		else if (keytype == 1)
-			s = strcat("gfx/sb_rkey1_", ftos(n + 1));
-		else
-			s = strcat("gfx/sb_key1_", ftos(n + 1));
-			
-		drawpic(pos+'192 8', s, '16 16', '1 1 1', 1, 0);
-	}
-	if (it == IT_KEY2)
-	{
-		n = getstatbits(STAT_KEYCOUNTS, 4, 4)-1;
-		if (n < 0) n = 0;	// happens in demos where .worldtype isn't increased
-		if (keytype == 2)
-			s = strcat("gfx/sb_bkey2_", ftos(n + 1));
-		else if (keytype == 1)
-			s = strcat("gfx/sb_rkey2_", ftos(n + 1));
-		else
-			s = strcat("gfx/sb_key2_", ftos(n + 1));
-			
-		drawpic(pos+'208 8', s, '16 16', '1 1 1', 1, 0);
-	}
-}
 
 float HUD_FlashTime(float it)
 {
@@ -311,6 +285,56 @@ float HUD_FlashTime(float it)
 		return flash[floor(t*10)];
 	else
 		return 0;
+}
+
+void Hud_DrawSuit(vector pos)
+{
+	drawpic(pos, strcat(powerupflash[HUD_FlashTime(21)], "suit"), '16 16', '1 1 1', 1, 0);
+}
+void Hud_DrawInvis(vector pos)
+{
+	drawpic(pos, strcat(powerupflash[HUD_FlashTime(19)], "invis"), '16 16', '1 1 1', 1, 0);
+}
+void Hud_DrawInvuln(vector pos)
+{
+	drawpic(pos, strcat(powerupflash[HUD_FlashTime(20)], "invul"), '16 16', '1 1 1', 1, 0);
+}
+void Hud_DrawQuad(vector pos)
+{
+	drawpic(pos, strcat(powerupflash[HUD_FlashTime(22)], "quad"), '16 16', '1 1 1', 1, 0);
+}
+
+float Hud_DrawKeys(vector pos, float it)
+{
+	if (!(stat_items & it))
+		return 0;
+
+	string s;
+	float n;
+	
+	if (it == IT_KEY1)
+	{
+		s = "key1_";
+		n = 0;
+	}
+	if (it == IT_KEY2)
+	{
+		s = "key2_";
+		n = 4;
+	}
+	
+	n = getstatbits(STAT_KEYCOUNTS, n, 4) - 1;
+	if (n < 0) n = 0;	// happens in demos where .worldtype isn't increased
+	
+	if (keytype == 2)
+		s = strcat("gfx/sb_b", s);
+	else if (keytype == 1)
+		s = strcat("gfx/sb_r", s);
+	else
+		s = strcat("gfx/sb_", s);
+	s = strcat(s, ftos(n + 1));
+	drawpic(pos, s, '16 16', '1 1 1', 1, 0);
+	return n + 1;
 }
 
 void(float wnum, vector pos, float sel) Hud_DrawWeapon
@@ -326,92 +350,268 @@ void(float wnum, vector pos, float sel) Hud_DrawWeapon
 	
 	string pic = strcat(weaponflash[fram], weaponlabel[wnum]);
 	
-	drawpic(pos+'24 0'*wnum, pic, sz, '1 1 1', 1, 0);
+	drawpic(pos, pic, sz, '1 1 1', 1, 0);
 };
 
-void Hud_DrawIBar(vector pos, float balpha)
+void Hud_DrawSigils(vector pos)
 {
-	string s;
+	float pulse;
+	if (stat_items2 & 32)
+	{
+		if (time < itemtimes[23] + 1.5) pulse = 1.2 - 2 * ((time - itemtimes[23]) % 0.5);
+		else pulse = 1;
+		drawpic(pos, "sb_sigil1", '8 16', '1 1 1', pulse, 0);
+	}
+	if (stat_items2 & 64)
+	{
+		if (time < itemtimes[24] + 1.5) pulse = 1.2 - 2 * ((time - itemtimes[24]) % 0.5);
+		else pulse = 1;
+		drawpic(pos + '9 0', "sb_sigil2", '8 16', '1 1 1', pulse, 0);
+	}
+	if (stat_items2 & 128)
+	{
+		if (time < itemtimes[25] + 1.5) pulse = 1.2 - 2 * ((time - itemtimes[25]) % 0.5);
+		else pulse = 1;
+		drawpic(pos + '16 0', "sb_sigil3", '8 16', '1 1 1', pulse, 0);
+	}
+	if (stat_items2 & 256)
+	{
+		if (time < itemtimes[26] + 1.5) pulse = 1.2 - 2 * ((time - itemtimes[26]) % 0.5);
+		else pulse = 1;
+		drawpic(pos + '24 0', "sb_sigil4", '8 16', '1 1 1', pulse, 0);
+	}
+}
+
+void Hud_DrawMultiplayerClient(vector pos, string c1, string c2, string score)
+{
+	drawpic(pos, strcat("shirt", c1), '8 8', '1 1 1', 1, 0);
+	drawpic(pos, strcat("pants", c2), '8 8', '1 1 1', 1, 0);
+	
+	float scorew = stringwidth(score, TRUE);
+	if (scorew <= 16)
+		drawstring(pos + '12 0', score, '8 8', '1 1 1', 1, 0);
+	else if (scorew <= 24)
+		drawstring(pos + '8 0', score, '8 8', '1 1 1', 1, 0);
+	else
+		drawstring(pos, score, '8 8', '1 1 1', 1, 0);
+}
+
+void Hud_DrawMultiplayer(vector pos)
+{
+	float p, numclients;
+	numclients = getstatf(STAT_CLIENTS);
+	for (p = 0; p < numclients; p++)
+	{
+		Hud_DrawMultiplayerClient(pos + '32 0' * p, getplayerkeyvalue(p, "topcolor"), getplayerkeyvalue(p, "bottomcolor"), getplayerkeyvalue(p, "frags"));
+	}
+}
+
+void Hud_DrawIBarWeapons(vector pos)
+{
 	float currweap = getstatf(STAT_ACTIVEWEAPON);
 	float i;
-	
-	drawpic(pos, "ibar", '320 24', '1 1 1', balpha, 0);
-	
+	pos_y += 8;
 	for (i = 0; i < 7; i++)
 	{
 		if (stat_items & weaponflags[i])
-			Hud_DrawWeapon(i, pos+'0 8', (currweap == weaponflags[i]));
+			Hud_DrawWeapon(i, pos + '24 0' * i, (currweap == weaponflags[i]));
 	}
-	
-	Hud_DrawAmmoCount(0, pos + '10 0', FALSE);
-	Hud_DrawAmmoCount(1, pos + '58 0', FALSE);
-	Hud_DrawAmmoCount(2, pos + '106 0', FALSE);
-	Hud_DrawAmmoCount(3, pos + '154 0', FALSE);
+}
 
-	keytype = getstatbits(STAT_KEYCOUNTS, 8, 8);
-	Hud_DrawKeys(pos, IT_KEY1);
-	Hud_DrawKeys(pos, IT_KEY2);
-
-	if (stat_items & IT_INVISIBILITY) 
-	{
-		s = strcat(powerupflash[HUD_FlashTime(19)], "invis");
-		drawpic(pos+'224 8', s, '16 16', '1 1 1', 1, 0);
-	}
-	if (stat_items & IT_INVULNERABILITY)
-	{
-		s = strcat(powerupflash[HUD_FlashTime(20)], "invul");
-		drawpic(pos+'240 8', s, '16 16', '1 1 1', 1, 0);
-	}
+void Hud_DrawIBarPowerups(vector pos)
+{
 	if (stat_items & IT_SUIT)
-	{
-		s = strcat(powerupflash[HUD_FlashTime(21)], "suit");
-		drawpic(pos+'256 8', s, '16 16', '1 1 1', 1, 0);
-	}
+		Hud_DrawSuit(pos + '32 0');
+	if (stat_items & IT_INVISIBILITY) 
+		Hud_DrawInvis(pos);
+	if (stat_items & IT_INVULNERABILITY)
+		Hud_DrawInvuln(pos + '16 0');
 	if (stat_items & IT_QUAD)
+		Hud_DrawQuad(pos + '48 0');
+}
+
+void Hud_DrawIBar(vector pos)
+{
+	if (baralpha < 1.0)
 	{
-		s = strcat(powerupflash[HUD_FlashTime(22)], "quad");
-		drawpic(pos+'272 8', s, '16 16', '1 1 1', 1, 0);
+		// put these behind the solid bar bc they have an outline
+		drawpic(pos + '32 0',  "sb_ammos", '12 12', '1 1 1', 1, 0);
+		drawpic(pos + '80 0',  "sb_ammon", '12 12', '1 1 1', 1, 0);
+		drawpic(pos + '128 0', "sb_ammor", '12 12', '1 1 1', 1, 0);
+		drawpic(pos + '176 0', "sb_ammoc", '12 12', '1 1 1', 1, 0);
 	}
+	drawpic(pos, "ibar", '320 24', '1 1 1', baralpha, 0);
 	
-	if (stat_items2 & 32)
-		drawpic(pos+'288 8', "sb_sigil1", '8 16', '1 1 1', 1, 0);
-	if (stat_items2 & 64)
-		drawpic(pos+'296 8', "sb_sigil2", '8 16', '1 1 1', 1, 0);
-	if (stat_items2 & 128)
-		drawpic(pos+'304 8', "sb_sigil3", '8 16', '1 1 1', 1, 0);
-	if (stat_items2 & 256)
-		drawpic(pos+'312 8', "sb_sigil4", '8 16', '1 1 1', 1, 0);
+	Hud_DrawAmmoCount(0, pos + '10 0');
+	Hud_DrawAmmoCount(1, pos + '58 0');
+	Hud_DrawAmmoCount(2, pos + '106 0');
+	Hud_DrawAmmoCount(3, pos + '154 0');
+
+	Hud_DrawIBarWeapons(pos);
+	Hud_DrawKeys(pos + '192 8', IT_KEY1);
+	Hud_DrawKeys(pos + '208 8', IT_KEY2);
+
+	Hud_DrawIBarPowerups(pos + '224 8');
+	Hud_DrawSigils(pos + '288 8');
 		
 	if (!cvar("coop") && !cvar("deathmatch"))
 		return;
 
-	float p, numclients, scorew;
-	string score;
+	Hud_DrawMultiplayer(pos + '192 0');
+};
+
+// ================================================================
+
+void Hud_DrawAmmo1(vector pos)
+{
+	if (baralpha < 1.0)
+	{
+		// put these behind the solid bar bc they have an outline
+		drawpic(pos + '32 0', "sb_ammos", '12 12', '1 1 1', 1, 0);
+		drawpic(pos + '80 0', "sb_ammon", '12 12', '1 1 1', 1, 0);
+	}
+	drawsubpic(pos, '96 10', "ibar", '0 0', '0.3 0.416666666666666', '1 1 1', baralpha);
+	Hud_DrawAmmoCount(0, pos + '10 0');
+	Hud_DrawAmmoCount(1, pos + '58 0');
+}
+
+void Hud_DrawAmmo2(vector pos)
+{
+	if (baralpha < 1.0)
+	{
+		// put these behind the solid bar bc they have an outline
+		drawpic(pos + '32 0', "sb_ammor", '12 12', '1 1 1', 1, 0);
+		drawpic(pos + '80 0', "sb_ammoc", '12 12', '1 1 1', 1, 0);
+	}
+	drawsubpic(pos, '96 10', "ibar", '0.3 0', '0.3 0.416666666666666', '1 1 1', baralpha);
+	Hud_DrawAmmoCount(2, pos + '10 0');
+	Hud_DrawAmmoCount(3, pos + '58 0');
+}
+
+void Hud_DrawModernLeft(vector pos, float expanded)
+{
+	pos += '0 -24';
+	Hud_DrawHead(pos);
+	Hud_DrawLargeValue(pos + '28 0', stat_health, 25);
+	
+	if (stat_items & IT_INVULNERABILITY || getstatf(STAT_ARMOR) > 0)
+	{
+		pos += '0 -24';
+		Hud_DrawArmorIcon(pos);
+		if (stat_items & IT_INVULNERABILITY)
+			Hud_DrawLargeValue(pos + '28 0', 666, 999);
+		else if (getstatf(STAT_ARMOR) > 0)
+			Hud_DrawLargeValue(pos + '28 0', getstatf(STAT_ARMOR), 25);
+	}
+	
+	if (!expanded)
+		return;
+	
+	pos += '4 -16';
+	if (stat_items & IT_SUIT)
+	{
+		Hud_DrawSuit(pos);
+		pos += '0 -16';
+	}
+	if (stat_items & IT_INVISIBILITY) 
+	{
+		Hud_DrawInvis(pos);
+		pos += '0 -16';
+	}
+	if (stat_items & IT_INVULNERABILITY)
+	{
+		Hud_DrawInvuln(pos);
+		pos += '0 -16';
+	}
+	if (stat_items & IT_QUAD)
+	{
+		Hud_DrawQuad(pos);
+	}
+	
+}
+
+void Hud_DrawModernRight(vector pos, float expanded)
+{
+	//if (getstatf(STAT_ACTIVEWEAPON) != IT_AXE)
+	//{
+		Hud_DrawCurrentAmmoIcon(pos + '-24 -24');
+		Hud_DrawLargeValue(pos + '-104 -24', getstatf(STAT_AMMO), 10);
+	//}
+	
+	if (!expanded) return;
+	pos += '0 -26';
+	if (hudstyle == 2)
+	{	
+		Hud_DrawAmmo1(pos + '-96 -20');
+		Hud_DrawAmmo2(pos + '-96 -10');
+		pos += '0 -24';
+	}
+	
+	if (Hud_DrawKeys(pos + '-20 -16', IT_KEY1))
+		pos += '0 -16';
+	Hud_DrawKeys(pos + '-20 -16', IT_KEY2);
+}
+
+void Hud_DrawModernWeapons(vector pos)
+{
+	pos += '0 -64';
+	float currweap = getstatf(STAT_ACTIVEWEAPON);
+	float i;
+	for (i = 6; i >= 0; i--)
+	{
+		if (stat_items & weaponflags[i])
+		{
+			if (currweap == weaponflags[i])
+				Hud_DrawWeapon(i, pos + '-24 0', TRUE);
+			else
+				Hud_DrawWeapon(i, pos + '-16 0', FALSE);
+		}
+		pos += '0 16';
+	}
+}
+
+void Hud_DrawModernMultiplayer(vector pos)
+{
+	float p, numclients;
 	numclients = getstatf(STAT_CLIENTS);
+	pos += '0 -64';
 	for (p = 0; p < numclients; p++)
 	{
-		drawpic(pos + '192 0'+ '32 0' * p, strcat("shirt", getplayerkeyvalue(p, "topcolor")), '8 8', '1 1 1', 1, 0);
-		drawpic(pos + '192 0'+ '32 0' * p, strcat("pants", getplayerkeyvalue(p, "bottomcolor")), '8 8', '1 1 1', 1, 0);
-		score = getplayerkeyvalue(p, "frags");
-		scorew = stringwidth(score, TRUE);
-		if (scorew <= 16)
-			drawstring(pos + '192 0'+ '32 0' * p + '12 0', score, '8 8', '1 1 1', 1, 0);
-		else if (scorew <= 24)
-			drawstring(pos + '192 0'+ '32 0' * p + '8 0', score, '8 8', '1 1 1', 1, 0);
-		else
-			drawstring(pos + '192 0'+ '32 0' * p, score, '8 8', '1 1 1', 1, 0);
+		Hud_DrawMultiplayerClient(pos + '0 12' * p, getplayerkeyvalue(p, "topcolor"), getplayerkeyvalue(p, "bottomcolor"), getplayerkeyvalue(p, "frags"));
 	}
-};
+}
+
+
+void Hud_DrawModernCenter(vector pos, float expanded)
+{
+	if ((world.model == "maps/start.bsp" && (stat_items2 & 480)) ||
+		(itemtimes[23] && time < itemtimes[23] + 3) ||
+		(itemtimes[24] && time < itemtimes[24] + 3) ||
+		(itemtimes[25] && time < itemtimes[25] + 3) ||
+		(itemtimes[26] && time < itemtimes[26] + 3) )
+	{
+		drawsubpic(pos + '-16 -32', '32 16', "ibar", '0.9 0.3333333333', '0.1 0.6666666667', '1 1 1', 1);
+		Hud_DrawSigils(pos + '-16 -32');
+	}
+	
+	if (hudstyle == 1 && expanded)
+	{	
+		Hud_DrawAmmo1(pos + '-96 -10');
+		Hud_DrawAmmo2(pos + '0 -10');
+	}
+}
 
 // ================================================================
 
 void() HUD_UpdateStats =
 {
-	float olditems, i, f;
+	float olditems, olditems2, i, f;
 	
 	olditems = stat_items;	
+	olditems2 = stat_items2;	
 	stat_items = getstatbits(STAT_ITEMS, 0, 23);
 	stat_items2 = getstatbits(STAT_ITEMS, 23, 9);
+	keytype = getstatbits(STAT_KEYCOUNTS, 8, 8);
 	
 	f = 1;
 	for (i=0;i<23;i++)
@@ -422,6 +622,18 @@ void() HUD_UpdateStats =
 				itemtimes[i] = time;
 			else if (olditems & f)
 				itemtimes[i] = 0;
+		}
+		f *= 2;
+	}
+	f = 32;
+	for (i = 0; i < 4; i++)
+	{
+		if ((stat_items2 & f) != (olditems2 & f))
+		{
+			if (stat_items2 & f)
+				itemtimes[i + 23] = time;
+			else if (olditems2 & f)
+				itemtimes[i + 23] = 0;
 		}
 		f *= 2;
 	}
@@ -437,24 +649,53 @@ void() HUD_UpdateStats =
 
 void(vector screensize, float scoreboard) CSQC_DrawHud =
 {
-	vector pos;
 	float viewsize = cvar("viewsize");
-	float baralpha = cvar("scr_sbaralpha");
+	if (viewsize > 110)
+		return;
 
-	pos_x = (screensize_x-320)/2;
-	pos_y = screensize_y;
+	vector pos;
+	baralpha = cvar("scr_sbaralpha");
+	hudstyle = max(cvar("saved1"), cvar("hudstyle"));	// catch ironwail hud cvar
+	float margin;
 
 	HUD_UpdateStats();
 
-	if (viewsize <= 110)
+	pos = screensize;
+	pos_x = screensize_x / 2;
+	
+	if (scoreboard || stat_health <= 0)
 	{
-		if (scoreboard || stat_health <= 0)
-			Hud_DrawLevelInfoBar(pos - '0 24', baralpha);
-		else
-			Hud_DrawSBar(pos - '0 24', baralpha);
-	}	
-	if (viewsize <= 100)
-		Hud_DrawIBar(pos - '0 48', baralpha);
+		Hud_DrawLevelInfoBar(pos - '160 24');
+		return;
+	}
+	
+	if (hudstyle)
+	{
+		margin = 4 * (floor(screensize_y / 120) - 1);
+		
+		pos_x = margin;
+		pos_y = screensize_y - margin;
+		Hud_DrawModernLeft(pos, (viewsize <= 100));
+
+		pos_x = screensize_x / 2;
+		Hud_DrawModernCenter(pos, (viewsize <= 100));
+		
+		pos_x = screensize_x - margin;
+		Hud_DrawModernRight(pos, (viewsize <= 100));
+		
+		pos_x = margin;
+		pos_y = floor(screensize_y * 0.4);
+		if (coop || deathmatch) Hud_DrawModernMultiplayer(pos);
+		
+		pos_x = screensize_x;
+		Hud_DrawModernWeapons(pos);
+	}
+	else
+	{
+		Hud_DrawSBar(pos - '160 24');
+		if (viewsize <= 100)
+			Hud_DrawIBar(pos - '160 48');
+	}
 };
 
 // ================================================================
@@ -514,6 +755,11 @@ void() Hud_Init
 	precache_pic("sb_armor666", TRUE);
 	//precache_pic("sb_armor666_p1", TRUE);
 	//precache_pic("sb_armor666_p2", TRUE);
+
+	precache_pic("sb_ammos", TRUE);
+	precache_pic("sb_ammoc", TRUE);
+	precache_pic("sb_ammon", TRUE);
+	precache_pic("sb_ammor", TRUE);
 	
 	paintime = -1;
 	lookseed = floor(random() * 100);
