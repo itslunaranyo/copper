@@ -1011,7 +1011,7 @@ STOP_*		when triggered off, keep oscillating until reaching the low/high/midpoin
 ]
 @SolidClass base(Bob) = func_bobbing : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
-Trigger to freeze in place or reactivate. If any "don't stop until" spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
+Trigger to freeze in place or reactivate. If any 'don't stop until' spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
 
 Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  []
 */
@@ -1079,7 +1079,7 @@ STOP_*		when triggered off, keep oscillating until reaching the low/high/midpoin
 /*FGD
 @PointClass size(16 16 16) base(Bob) = func_bobbing_point : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
-Trigger to freeze in place or reactivate. If any "don't stop until" spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
+Trigger to freeze in place or reactivate. If any 'don't stop until' spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
 
 Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  [
 	model(string) : "Model to use"
