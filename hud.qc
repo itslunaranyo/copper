@@ -382,27 +382,52 @@ void Hud_DrawSigils(vector pos)
 	}
 }
 
-void Hud_DrawMultiplayerClient(vector pos, string c1, string c2, string score)
+void Hud_DrawMultiplayer(vector pos, vector offset, float w)
 {
-	drawpic(pos, strcat("shirt", c1), '8 8', '1 1 1', 1, 0);
-	drawpic(pos, strcat("pants", c2), '8 8', '1 1 1', 1, 0);
+	float p, numclients, clientmask;
+	string lbl;
+	float lblw, isdead, pb;
+	vector ofs;
 	
-	float scorew = stringwidth(score, TRUE);
-	if (scorew <= 16)
-		drawstring(pos + '12 0', score, '8 8', '1 1 1', 1, 0);
-	else if (scorew <= 24)
-		drawstring(pos + '8 0', score, '8 8', '1 1 1', 1, 0);
-	else
-		drawstring(pos, score, '8 8', '1 1 1', 1, 0);
-}
-
-void Hud_DrawMultiplayer(vector pos)
-{
-	float p, numclients;
 	numclients = getstatf(STAT_CLIENTS);
+	clientmask = getstatf(STAT_CLIENTSALIVEMASK);
+	if (numclients > 4) numclients = 4;
+	pb = 1;
 	for (p = 0; p < numclients; p++)
 	{
-		Hud_DrawMultiplayerClient(pos + '32 0' * p, getplayerkeyvalue(p, "topcolor"), getplayerkeyvalue(p, "bottomcolor"), getplayerkeyvalue(p, "frags"));
+		drawsubpic(pos, '8 8', "sb_teams", [0, stof(getplayerkeyvalue(p, "topcolor"))/16], [0.5,1/16], '1 1 1', 1);
+		drawsubpic(pos, '8 8', "sb_teams", [0.5, stof(getplayerkeyvalue(p, "bottomcolor"))/16], [0.5,1/16], '1 1 1', 1);
+		
+		if (coop)
+		{
+			lbl = getplayerkeyvalue(p, "name");
+			isdead = !(pb & clientmask);
+		}
+		else // dm
+			lbl = getplayerkeyvalue(p, "frags");
+		
+		lbl = substring(lbl, 0, w);
+		lblw = stringwidth(lbl, TRUE);
+		if (w < 4)	// try to cram three letters onto the classic hud
+		{
+			if (lblw < w * 8)
+				ofs = '12 0';
+			else
+				ofs = '8 0';
+		}
+		else
+		{
+			ofs = '12 0';
+		}
+		drawstring(pos + ofs, lbl, '8 8', '1 1 1', 1, 0);
+		
+		if (isdead)	// cross out the names of the dead
+		{
+			drawfill(pos + ofs + '0 3', [lblw, 1], '0.8 0 0', 1);
+			drawfill(pos + ofs + '0 4', [lblw, 1], '0.6 0 0', 1);
+		}
+
+		pos += offset;
 	}
 }
 
@@ -457,7 +482,7 @@ void Hud_DrawIBar(vector pos)
 	if (!cvar("coop") && !cvar("deathmatch"))
 		return;
 
-	Hud_DrawMultiplayer(pos + '192 0');
+	Hud_DrawMultiplayer(pos + '192 0', '32 0', 3);
 };
 
 // ================================================================
@@ -570,18 +595,6 @@ void Hud_DrawModernWeapons(vector pos)
 	}
 }
 
-void Hud_DrawModernMultiplayer(vector pos)
-{
-	float p, numclients;
-	numclients = getstatf(STAT_CLIENTS);
-	pos += '0 -64';
-	for (p = 0; p < numclients; p++)
-	{
-		Hud_DrawMultiplayerClient(pos + '0 12' * p, getplayerkeyvalue(p, "topcolor"), getplayerkeyvalue(p, "bottomcolor"), getplayerkeyvalue(p, "frags"));
-	}
-}
-
-
 void Hud_DrawModernCenter(vector pos, float expanded)
 {
 	if ((world.model == "maps/start.bsp" && (stat_items2 & 480)) ||
@@ -656,44 +669,46 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 	vector pos;
 	baralpha = cvar("scr_sbaralpha");
 	hudstyle = max(cvar("saved1"), cvar("hudstyle"));	// catch ironwail hud cvar
-	float margin;
+	float margin, exp;
 
 	HUD_UpdateStats();
+	exp = (viewsize <= 100);
 
-	pos = screensize;
-	pos_x = screensize_x / 2;
-	
-	if (scoreboard || stat_health <= 0)
-	{
-		Hud_DrawLevelInfoBar(pos - '160 24');
-		return;
-	}
-	
 	if (hudstyle)
 	{
 		margin = 4 * (floor(screensize_y / 120) - 1);
 		
-		pos_x = margin;
-		pos_y = screensize_y - margin;
-		Hud_DrawModernLeft(pos, (viewsize <= 100));
-
-		pos_x = screensize_x / 2;
-		Hud_DrawModernCenter(pos, (viewsize <= 100));
-		
-		pos_x = screensize_x - margin;
-		Hud_DrawModernRight(pos, (viewsize <= 100));
-		
-		pos_x = margin;
-		pos_y = floor(screensize_y * 0.4);
-		if (coop || deathmatch) Hud_DrawModernMultiplayer(pos);
-		
-		pos_x = screensize_x;
-		Hud_DrawModernWeapons(pos);
+		if (scoreboard || stat_health <= 0)
+		{
+			Hud_DrawLevelInfoBar([screensize_x / 2, screensize_y] - '160 24');
+			if (screensize_x >= 500)
+			{
+				Hud_DrawModernLeft([margin, screensize_y - margin], exp);
+				Hud_DrawModernRight([screensize_x - margin, screensize_y - margin], exp);
+			}
+		}
+		else
+		{
+			Hud_DrawModernLeft([margin, screensize_y - margin], exp);
+			Hud_DrawModernCenter([screensize_x / 2, screensize_y - margin], exp);
+			Hud_DrawModernRight([screensize_x - margin, screensize_y - margin], exp);
+		}
+		if (exp)
+		{
+			if (coop || deathmatch)
+				Hud_DrawMultiplayer([margin, floor(screensize_y * 0.3)], '0 12', 8);
+			Hud_DrawModernWeapons([screensize_x, floor(screensize_y * 0.4)]);
+		}		
 	}
 	else
 	{
-		Hud_DrawSBar(pos - '160 24');
-		if (viewsize <= 100)
+		pos = screensize;
+		pos_x = screensize_x / 2;
+		if (scoreboard || stat_health <= 0)
+			Hud_DrawLevelInfoBar(pos - '160 24');
+		else
+			Hud_DrawSBar(pos - '160 24');
+		if (exp)
 			Hud_DrawIBar(pos - '160 48');
 	}
 };
@@ -724,12 +739,8 @@ void() Hud_Init
 		precache_pic(strcat(powerupflash[i], "suit"), TRUE);
 		precache_pic(strcat(powerupflash[i], "quad"), TRUE);
 	}
-	for (i = 0; i < 14; i++)
-	{
-		precache_pic(strcat("shirt", ftos(i)), TRUE);
-		precache_pic(strcat("pants", ftos(i)), TRUE);
-	}
-	
+	precache_pic("sb_teams", TRUE);
+
 	precache_pic("sbar", TRUE);
 	precache_pic("face1_l", TRUE);
 	precache_pic("face1_r", TRUE);

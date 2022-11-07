@@ -231,8 +231,8 @@ void() worldspawn =
 	{
 		//if (checkextension("EXT_CSQC"))
 			globalstat(STAT_CLIENTS, 2, "clients");	// multiple keys on hud
+			globalstat(STAT_CLIENTSALIVEMASK, 2, "clientsAliveMask");	// cheap client death status monitor
 			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
-			clientstat(STAT_MAXHEALTH, 2, max_health);	// for nightmare
 		if (checkextension("QUAKE_EX"))
 			isKex = TRUE;
 	}
@@ -364,6 +364,20 @@ void() StartFrame =
 		
 	framecount++;
 	//cvar_set("registered",ftos(framecount));
+	
+	if (coop)
+	{
+		entity e = nextent(world);
+		float p = 1;
+		clientsAliveMask = 0;
+		while (e.flags & FL_CLIENT)
+		{
+			if (e.health > 0 && e.deadflag != DEAD_DEAD)
+			clientsAliveMask |= p;
+			p *= 2;
+			e = nextent(e);
+		}
+	}
 	
 	/*
 	'activator' should be a parameter of *_use(), but it's a global. so it goes.
