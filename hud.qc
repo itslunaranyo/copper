@@ -310,30 +310,25 @@ float Hud_DrawKeys(vector pos, float it)
 		return 0;
 
 	string s;
-	float n;
-	
-	if (it == IT_KEY1)
-	{
-		s = "key1_";
-		n = 0;
-	}
+	if (keytype == 2)
+		s = "gfx/sb_bkey";
+	else if (keytype == 1)
+		s = "gfx/sb_rkey";
+	else
+		s = "gfx/sb_mkey";
+
+	float n = 0;
 	if (it == IT_KEY2)
-	{
-		s = "key2_";
 		n = 4;
-	}
-	
 	n = getstatbits(STAT_KEYCOUNTS, n, 4) - 1;
 	if (n < 0) n = 0;	// happens in demos where .worldtype isn't increased
 	
-	if (keytype == 2)
-		s = strcat("gfx/sb_b", s);
-	else if (keytype == 1)
-		s = strcat("gfx/sb_r", s);
-	else
-		s = strcat("gfx/sb_", s);
-	s = strcat(s, ftos(n + 1));
-	drawpic(pos, s, '16 16', '1 1 1', 1, 0);
+	if (it == IT_KEY1)
+		s = strcat(s, "1");
+	if (it == IT_KEY2)
+		s = strcat(s, "2");
+
+	drawsubpic(pos, '16 16', s, [n/16, 0], [1/16,1], '1 1 1', 1);
 	return n + 1;
 }
 
@@ -723,15 +718,6 @@ void() Hud_Init
 		precache_pic(number[i], TRUE);
 		precache_pic(anumber[i], TRUE);
 	}
-	for (i = 0; i < 16; i++)
-	{
-		precache_pic(strcat("gfx/sb_key1_", ftos(i+1)), TRUE);
-		precache_pic(strcat("gfx/sb_key2_", ftos(i+1)), TRUE);
-		precache_pic(strcat("gfx/sb_rkey1_", ftos(i+1)), TRUE);
-		precache_pic(strcat("gfx/sb_rkey2_", ftos(i+1)), TRUE);
-		precache_pic(strcat("gfx/sb_bkey1_", ftos(i+1)), TRUE);
-		precache_pic(strcat("gfx/sb_bkey2_", ftos(i+1)), TRUE);
-	}
 	for (i = 0; i < 6; i++)
 	{
 		precache_pic(strcat(powerupflash[i], "invis"), TRUE);
@@ -739,7 +725,13 @@ void() Hud_Init
 		precache_pic(strcat(powerupflash[i], "suit"), TRUE);
 		precache_pic(strcat(powerupflash[i], "quad"), TRUE);
 	}
-	precache_pic("sb_teams", TRUE);
+	
+	precache_pic("gfx/sb_mkey1", TRUE);
+	precache_pic("gfx/sb_mkey2", TRUE);
+	precache_pic("gfx/sb_rkey1", TRUE);
+	precache_pic("gfx/sb_rkey2", TRUE);
+	precache_pic("gfx/sb_bkey1", TRUE);
+	precache_pic("gfx/sb_bkey2", TRUE);
 
 	precache_pic("sbar", TRUE);
 	precache_pic("face1_l", TRUE);
@@ -771,6 +763,8 @@ void() Hud_Init
 	precache_pic("sb_ammoc", TRUE);
 	precache_pic("sb_ammon", TRUE);
 	precache_pic("sb_ammor", TRUE);
+	
+	precache_pic("sb_teams", TRUE);
 	
 	paintime = -1;
 	lookseed = floor(random() * 100);
