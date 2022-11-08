@@ -195,13 +195,13 @@ float(entity me) monster_check_enemy_inheritance =
 
 entity(float onlymonsters) find_touching =
 {
-	entity head = findradius(BoundsCenter(self), self.size_z + 16);
+	entity head = findradius(BoundsCenter(self), self.size_z + 64);
 	while (head != world)
 	{
 		if (head.health <= 0 ||
 			(head.solid == SOLID_NOT || head.solid == SOLID_TRIGGER) ||
-			!BoundsTouching(self.absmin, self.absmax, head.absmin, head.absmax, 4) ||
-			(onlymonsters && (head.flags & FL_MONSTER == 0)) )
+			!BoundsTouching(self.absmin, self.absmax, head.absmin, head.absmax, 2) ||
+			(onlymonsters && !(head.flags & FL_MONSTER)) )
 		{
 			head = head.chain;
 		}
@@ -214,7 +214,7 @@ void() mon_spawner_tryspawn
 {
 	if (find_touching(TRUE))
 	{
-		self.nextthink = time + 0.5;
+		self.nextthink = time + 0.25;
 		return;
 	}
 	
@@ -405,8 +405,11 @@ void() monster_start =
 	}
 		
 	// moved from mon_spawner_use because it was too early to catch the monster's mins and maxs
-	if (self.type != "zombie" || !(self.spawnflags & SPAWN_LYING))	// lying zombies are nonsolid
+	if (!(self.spawnflags & SPAWN_NO_TFRAG)	// we can have confidence in the telefrag protection check*
+		&& (self.type != "zombie" || !(self.spawnflags & SPAWN_LYING)))	// lying zombies are nonsolid
 		spawn_tdeath(self.origin, self);
+		// *if we don't, monsters can graze the telefrag trigger and explode even if they 
+		// weren't truly blocking the spawn
 
 	// wait a few frames to make sure doors have spawned before doing droptofloor
 	self.nextthink = 1.15;
