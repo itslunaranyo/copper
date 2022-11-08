@@ -321,7 +321,7 @@ float Hud_DrawKeys(vector pos, float it)
 	float n = 0;
 	if (it == IT_KEY2)
 		n = 4;
-	n = getstatbits(STAT_KEYCOUNTS, n, 4) - 1;
+	n = getstatbits(STAT_KEYCOUNTS, n, 4);
 	if (n < 0) n = 0;	// happens in demos where .worldtype isn't increased
 	
 	if (it == IT_KEY1)
