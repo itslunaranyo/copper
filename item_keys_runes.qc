@@ -15,14 +15,14 @@ float(entity cl) key_count_silver =
 {
 	if (!(cl.items & IT_KEY1))
 		return 0;
-	return (cl.worldtype & 15);
+	return (cl.worldtype & 15) + 1;
 }
 
 float(entity cl) key_count_gold =
 {
 	if (!(cl.items & IT_KEY2))
 		return 0;
-	return (cl.worldtype & 240)/16;
+	return (cl.worldtype & 240)/16 + 1;
 }
 
 void(entity cl, float gold) key_sprint_name =
@@ -41,7 +41,6 @@ float(entity cl) key_give_silver =
 		sprint (cl, "\n");
 
 		cl.items |= IT_KEY1;
-		cl.worldtype += 1;
 		return TRUE;
 	}
 		
@@ -50,7 +49,7 @@ float(entity cl) key_give_silver =
 		
 	cl.worldtype += 1;
 	sprint (cl, "You have ");
-	sprint (cl, ftos(cl.worldtype & 15));
+	sprint (cl, ftos(key_count_silver(cl)));
 	key_sprint_name(cl, FALSE);
 	sprint (cl, "s\n");
 	
@@ -64,14 +63,14 @@ float(entity cl) key_take_silver =
 		return FALSE;	// we're dry
 	}
 	
-	cl.worldtype -= 1;
 	if (cl.worldtype & 15 == 0)
 	{
 		cl.items = not(cl.items, IT_KEY1);
 		return TRUE;
 	}
 	
-	float keys = (cl.worldtype & 15);
+	cl.worldtype -= 1;
+	float keys = key_count_silver(cl);
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
 	key_sprint_name(cl, FALSE);
@@ -86,19 +85,20 @@ float(entity cl) key_take_silver =
 
 float(entity cl, float num) key_take_silvers =
 {
-	if (key_count_silver(cl) < num)
-	{
+	float keys = key_count_silver(cl);
+	if (keys < num)
 		return FALSE;	// we're dry
-	}
 	
-	cl.worldtype -= num;
-	if (cl.worldtype & 15 == 0)
+	if (keys == num)
 	{
+		cl.worldtype -= num - 1;
 		cl.items = not(cl.items, IT_KEY1);
 		return TRUE;
 	}
 	
-	float keys = (cl.worldtype & 15);
+	cl.worldtype -= num;
+	
+	keys = key_count_silver(cl);
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
 	key_sprint_name(cl, FALSE);
@@ -119,7 +119,6 @@ float(entity cl) key_give_gold =
 		sprint (cl, "\n");
 
 		cl.items |= IT_KEY2;
-		cl.worldtype += 16;
 		return TRUE;
 	}
 		
@@ -128,7 +127,7 @@ float(entity cl) key_give_gold =
 	
 	cl.worldtype += 16;
 	sprint (cl, "You have ");
-	sprint (cl, ftos((cl.worldtype & 240)/16));
+	sprint (cl, ftos(key_count_gold(cl)));
 	key_sprint_name(cl, TRUE);
 	sprint (cl, "s\n");
 	
@@ -142,14 +141,14 @@ float(entity cl) key_take_gold =
 		return FALSE;	// we're dry
 	}
 	
-	cl.worldtype -= 16;
 	if (cl.worldtype & 240 == 0)
 	{
 		cl.items = not(cl.items, IT_KEY2);
 		return TRUE;
 	}
 	
-	float keys = (cl.worldtype & 240)/16;
+	cl.worldtype -= 16;
+	float keys = key_count_gold(cl);
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
 	key_sprint_name(cl, TRUE);
@@ -163,19 +162,20 @@ float(entity cl) key_take_gold =
 
 float(entity cl, float num) key_take_golds =
 {
-	if (key_count_gold(cl) < num)
-	{
+	float keys = key_count_gold(cl);
+	if (keys < num)
 		return FALSE;	// we're dry
-	}
-	
-	cl.worldtype -= 16 * num;
-	if (cl.worldtype & 240 == 0)
+
+	if (keys == num)
 	{
+		cl.worldtype -= 16 * (num - 1);
 		cl.items = not(cl.items, IT_KEY2);
 		return TRUE;
 	}
 	
-	float keys = (cl.worldtype & 240)/16;
+	cl.worldtype -= 16 * num;
+	
+	keys = key_count_gold(cl);
 	sprint (cl, "You have ");
 	sprint (cl, ftos(keys));
 	key_sprint_name(cl, TRUE);
