@@ -234,10 +234,16 @@ void() worldspawn =
 
 	if (cvar("pr_checkextension"))
 	{
-		//if (checkextension("EXT_CSQC"))
+		if (checkextension("EXT_CSQC"))
+		{
 			globalstat(STAT_CLIENTS, 2, "clients");	// multiple keys on hud
 			globalstat(STAT_CLIENTSALIVEMASK, 2, "clientsAliveMask");	// cheap client death status monitor
-			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
+		}
+		else
+		{
+			clientstat(STAT_CLIENTSALIVEMASK, 2, length);	// cheap and shitty client death status monitor
+		}
+		clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
 		if (checkextension("QUAKE_EX"))
 			isKex = TRUE;
 	}
@@ -395,6 +401,15 @@ void() StartFrame =
 			clientsAliveMask |= p;
 			p *= 2;
 			e = nextent(e);
+		}
+		if (!globalStatSupported)
+		{
+			e = nextent(world);
+			while (e.flags & FL_CLIENT)
+			{
+				e.length = clientsAliveMask;
+				e = nextent(e);
+			}
 		}
 	}
 	

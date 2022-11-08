@@ -21,6 +21,7 @@ float paintime, lookseed;
 float itemtimes[30];
 float baralpha;
 float hudstyle;
+float globalStatSupported;
 
 const float HUD_FACELEFT = 0;
 const float HUD_FACEFWD = 1;
@@ -380,22 +381,33 @@ void Hud_DrawSigils(vector pos)
 void Hud_DrawMultiplayer(vector pos, vector offset, float w)
 {
 	float p, numclients, clientmask;
-	string lbl;
+	string cname, lbl;
 	float lblw, isdead, pb;
 	vector ofs;
 	
-	numclients = getstatf(STAT_CLIENTS);
 	clientmask = getstatf(STAT_CLIENTSALIVEMASK);
-	if (numclients > 4) numclients = 4;
+	if (globalStatSupported)
+	{
+		numclients = getstatf(STAT_CLIENTS);
+		if (numclients > 8) numclients = 8;
+	}
+	else
+		numclients = 8;
 	pb = 1;
 	for (p = 0; p < numclients; p++)
 	{
+		cname = getplayerkeyvalue(p, "name");
+		// dumb hack: just assume the first player with an empty name is the end of the 
+		// client list. it isn't necessarily, but globalstat() support is unreliable
+		if (!globalStatSupported && cname == string_null)
+			break;
+			
 		drawsubpic(pos, '8 8', "sb_teams", [0, stof(getplayerkeyvalue(p, "topcolor"))/16], [0.5,1/16], '1 1 1', 1);
 		drawsubpic(pos, '8 8', "sb_teams", [0.5, stof(getplayerkeyvalue(p, "bottomcolor"))/16], [0.5,1/16], '1 1 1', 1);
-		
+
 		if (coop)
 		{
-			lbl = getplayerkeyvalue(p, "name");
+			lbl = cname;
 			isdead = !(pb & clientmask);
 		}
 		else // dm
@@ -421,7 +433,7 @@ void Hud_DrawMultiplayer(vector pos, vector offset, float w)
 			drawfill(pos + ofs + '0 3', [lblw, 1], '0.8 0 0', 1);
 			drawfill(pos + ofs + '0 4', [lblw, 1], '0.6 0 0', 1);
 		}
-
+		
 		pos += offset;
 	}
 }
@@ -768,6 +780,10 @@ void() Hud_Init
 	
 	paintime = -1;
 	lookseed = floor(random() * 100);
+
+	if (cvar("pr_checkextension"))
+		if (checkextension("EXT_CSQC"))
+			globalStatSupported = TRUE;
 };
 
 void(float apilevel, string enginename, float engineversion) CSQC_Init = {Hud_Init();}
