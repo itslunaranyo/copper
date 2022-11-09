@@ -49,8 +49,8 @@ void() EndFrame = {};
 //CSQC entry points
 void(vector virtsize, float showscores) CSQC_DrawHud;
 void(float apilevel, string enginename, float engineversion) CSQC_Init;
+void(vector virtsize, float showscores) CSQC_DrawScores;
 /*
-void(vector virtsize, float showscores) CSQC_DrawScores = {};
 float(float save, float take, vector dir) CSQC_Parse_Damage = {return 0;};
 void(float vwidth, float vheight, float notmenu) CSQC_UpdateView;
 void() CSQC_Shutdown = {};
