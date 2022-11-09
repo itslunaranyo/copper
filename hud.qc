@@ -27,6 +27,12 @@ const float HUD_FACELEFT = 0;
 const float HUD_FACEFWD = 1;
 const float HUD_FACERIGHT = 2;
 
+float(float a, float m) clampf =
+{
+	if (a < 0) return 0;
+	if (a > m) return m;
+	return a;
+}
 string(float f, float chars, string lead) FormatFloat
 {
 	string s = ftos(f);
@@ -106,20 +112,16 @@ void(vector pos) Hud_DrawLevelInfoBar =
 
 // STATUS BAR
 
-void(vector pos, float value, float threshhold) Hud_DrawLargeValue =
+void(vector pos, float value, float threshhold, float left = FALSE) Hud_DrawLargeValue =
 {
 	float c;
 	float len;
 	string s;
-	if (value < 0)
-		value = 0;	//hrm
-	if (value > 999)
-		value = 999;
 
 	s = ftos(floor(value));
 	len = strlen(s);
-
-	pos_x += 24 * (3-len);
+	if (!left)
+		pos_x -= 24 * len;
 
 	if (value <= threshhold)
 	{	//use alternate (red) numbers
@@ -129,7 +131,7 @@ void(vector pos, float value, float threshhold) Hud_DrawLargeValue =
 			len--;
 			c = str2chr(s, len);
 
-			drawpic(pos+len * '24 0', anumber[c-'0'], '24 24', '1 1 1', 1, 0);
+			drawpic(pos + len * '24 0', anumber[c-'0'], '24 24', '1 1 1', 1, 0);
 		}
 	}
 	else
@@ -140,7 +142,7 @@ void(vector pos, float value, float threshhold) Hud_DrawLargeValue =
 			len--;
 			c = str2chr(s, len);
 
-			drawpic(pos+len * '24 0', number[c-'0'], '24 24', '1 1 1', 1, 0);
+			drawpic(pos + len * '24 0', number[c-'0'], '24 24', '1 1 1', 1, 0);
 		}
 	}
 };
@@ -151,11 +153,7 @@ void(float type, vector pos) Hud_DrawAmmoCount =
 	float value;
 	float len;
 	float c;
-	value = getstati(STAT_SHELLS + type);
-	if (value < 0)
-		value = 0;	//hrm
-	if (value>999)
-		value = 999;
+	value = clampf(getstati(STAT_SHELLS + type),999);
 
 	s = ftos(floor(value));
 	len = strlen(s);
@@ -259,19 +257,24 @@ void Hud_DrawCurrentAmmoIcon(vector pos)
 
 void Hud_DrawSBar(vector pos)
 {
+	float value;
 	drawpic(pos, "sbar", '320 24', '1 1 1', baralpha, 0);
 
-	Hud_DrawHead(pos + '112 0');
-	Hud_DrawLargeValue(pos+'136 0', stat_health, 25);
+	value = clampf(stat_health, 999);
 
+	Hud_DrawHead(pos + '112 0');
+	Hud_DrawLargeValue(pos+'208 0', value, 25);
+
+	value = clampf(getstatf(STAT_ARMOR), 999);
 	Hud_DrawArmorIcon(pos + '1 0');
 	if (stat_items & IT_INVULNERABILITY)
-		Hud_DrawLargeValue(pos + '24 0', 666, 999);
+		Hud_DrawLargeValue(pos + '96 0', 666, 999);
 	else
-		Hud_DrawLargeValue(pos + '24 0', getstatf(STAT_ARMOR), 25);
+		Hud_DrawLargeValue(pos + '96 0', value, 25);
 
+	value = clampf(getstatf(STAT_AMMO), 999);
 	Hud_DrawCurrentAmmoIcon(pos + '224 0');
-	Hud_DrawLargeValue(pos+'248 0', getstatf(STAT_AMMO), 10);
+	Hud_DrawLargeValue(pos+'320 0', value, 10);
 };
 
 // ================================================================
@@ -522,18 +525,21 @@ void Hud_DrawAmmo2(vector pos)
 
 void Hud_DrawModernLeft(vector pos, float expanded)
 {
+	float value;
 	pos += '0 -24';
+	value = clampf(stat_health, 999);
 	Hud_DrawHead(pos);
-	Hud_DrawLargeValue(pos + '28 0', stat_health, 25);
+	Hud_DrawLargeValue(pos + '100 0', value, 25);
 	
 	if (stat_items & IT_INVULNERABILITY || getstatf(STAT_ARMOR) > 0)
 	{
+		value = clampf(getstatf(STAT_ARMOR), 999);
 		pos += '0 -24';
 		Hud_DrawArmorIcon(pos);
 		if (stat_items & IT_INVULNERABILITY)
-			Hud_DrawLargeValue(pos + '28 0', 666, 999);
+			Hud_DrawLargeValue(pos + '100 0', 666, 999);
 		else if (getstatf(STAT_ARMOR) > 0)
-			Hud_DrawLargeValue(pos + '28 0', getstatf(STAT_ARMOR), 25);
+			Hud_DrawLargeValue(pos + '100 0', value, 25);
 	}
 	
 	if (!expanded)
@@ -567,7 +573,7 @@ void Hud_DrawModernRight(vector pos, float expanded)
 	//if (getstatf(STAT_ACTIVEWEAPON) != IT_AXE)
 	//{
 		Hud_DrawCurrentAmmoIcon(pos + '-24 -24');
-		Hud_DrawLargeValue(pos + '-104 -24', getstatf(STAT_AMMO), 10);
+		Hud_DrawLargeValue(pos + '-32 -24', clampf(getstatf(STAT_AMMO), 999), 10);
 	//}
 	
 	if (!expanded) return;
@@ -632,6 +638,7 @@ void() HUD_UpdateStats =
 	stat_items = getstatbits(STAT_ITEMS, 0, 23);
 	stat_items2 = getstatbits(STAT_ITEMS, 23, 9);
 	keytype = getstatbits(STAT_KEYCOUNTS, 8, 8);
+	skill = cvar("skill");
 	
 	f = 1;
 	for (i=0;i<23;i++)
@@ -672,6 +679,7 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 	float viewsize = cvar("viewsize");
 	if (viewsize > 110)
 		return;
+	if (intermission) return;
 
 	vector pos;
 	baralpha = cvar("scr_sbaralpha");
@@ -719,6 +727,81 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 			Hud_DrawIBar(pos - '160 48');
 	}
 };
+
+// ================================================================
+
+// INTERMISSION
+
+void(vector screensize, float showscores) CSQC_DrawScores =
+{
+	if (!intermission) return;
+	vector pos, div;
+	float value, mins, secs;
+	string s;
+	HUD_UpdateStats();
+	
+	pos = [screensize_x / 2 - 160, screensize_y / 2 - 120];
+	drawpic(pos + '64 0', "gfx/complete.lmp", '196 24', '1 1 1', 1);
+
+	s = strcat(world.message, " (", mapname, ")");
+	Hud_ScrollTextBox(pos + '2 28', 0, 0, 320, 8, 8, s);
+	if (skill == 0)
+		drawstring(pos + '144 40', "Easy", '8 8', '1 1 1', 1, 0);
+	if (skill == 1)
+		drawstring(pos + '136 40', "Normal", '8 8', '1 1 1', 1, 0);
+	if (skill == 2)
+		drawstring(pos + '144 40', "Hard", '8 8', '1 1 1', 1, 0);
+	if (skill == 3)
+		drawstring(pos + '126 40', "\bNightmare\b", '8 8', '1 1 1', 1, 0);
+
+	mins = floor(intermission_time / 60);
+	secs = floor(intermission_time - mins * 60);
+
+	pos += '16 0';
+	div = '200 0';
+	value = max(clampf(getstatf(STAT_MONSTERS), 9999), clampf(getstatf(STAT_SECRETS), 9999));
+	value = max(value, mins);
+	
+	if (value > 99)
+	{
+		pos -= '24 0';
+		div += '24 0';
+	}
+	if (value > 999)
+	{
+		pos -= '24 0';
+		div += '24 0';
+	}
+	
+	// kills
+	pos += '0 64';
+	drawsubpic(pos + '51 2', '96 24', "gfx/inter.lmp", [8/160, 88/144], [96/160, 24/144], '1 1 1', 1);
+	
+	value = clampf(getstatf(STAT_MONSTERS), 9999);
+	Hud_DrawLargeValue(pos+div, value, -1);
+	drawpic(pos+div, "num_slash", '16 24', '1 1 1', 1);
+	value = clampf(getstatf(STAT_TOTALMONSTERS), 9999);
+	Hud_DrawLargeValue(pos+div + '16 0', value, -1, TRUE);
+	
+	// secrets
+	pos += '0 32';
+	drawsubpic(pos + '8 2', '136 24', "gfx/inter.lmp", [8/160, 48/144], [136/160, 24/144], '1 1 1', 1);
+	
+	value = clampf(getstatf(STAT_SECRETS), 9999);
+	Hud_DrawLargeValue(pos+div, value, -1);
+	drawpic(pos+div, "num_slash", '16 24', '1 1 1', 1);
+	value = clampf(getstatf(STAT_TOTALSECRETS), 9999);
+	Hud_DrawLargeValue(pos+div + '16 0', value, -1, TRUE);
+	
+	// time
+	pos += '0 32';
+	drawsubpic(pos + '67 2', '80 24', "gfx/inter.lmp", [8/160, 8/144], [80/160, 24/144], '1 1 1', 1);
+	
+	mins = clampf(mins, 999);
+	Hud_DrawLargeValue(pos+div, mins, -1);
+	drawpic(pos+div, "num_colon", '16 24', '1 1 1', 1);
+	Hud_DrawLargeValue(pos+div + '16 0', secs, -1, TRUE);
+}
 
 // ================================================================
 
@@ -777,6 +860,8 @@ void() Hud_Init
 	precache_pic("sb_ammor", TRUE);
 	
 	precache_pic("sb_teams", TRUE);
+	
+	precache_pic("gfx/complete.lmp", FALSE);
 	
 	paintime = -1;
 	lookseed = floor(random() * 100);
