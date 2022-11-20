@@ -229,18 +229,24 @@ void() worldspawn =
 
 	if (cvar("pr_checkextension"))
 	{
-		if (checkextension("EXT_CSQC"))
+		if (checkextension("QUAKE_EX"))
 		{
-			globalstat(STAT_CLIENTS, 2, "clients");	// multiple keys on hud
-			globalstat(STAT_CLIENTSALIVEMASK, 2, "clientsAliveMask");	// cheap client death status monitor
+			// do absolutely nothing in the rerelease
+			isKex = TRUE;
 		}
 		else
 		{
-			clientstat(STAT_CLIENTSALIVEMASK, 2, length);	// cheap and shitty client death status monitor
+			if (checkextension("EXT_CSQC"))
+			{
+				globalstat(STAT_CLIENTS, 2, "clients");	// multiple keys on hud
+				globalstat(STAT_CLIENTSALIVEMASK, 2, "clientsAliveMask");	// cheap client death status monitor
+			}
+			else
+			{
+				clientstat(STAT_CLIENTSALIVEMASK, 2, length);	// cheap and shitty client death status monitor
+			}
+			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
 		}
-		clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
-		if (checkextension("QUAKE_EX"))
-			isKex = TRUE;
 	}
 
 // the area based ambient sounds MUST be the first precache_sounds
