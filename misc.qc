@@ -191,7 +191,6 @@ void() misc_model =
 	if (!self.speed)
 		self.speed = 0.1;
 		
-	self.state = 1;
 	// toggle animation
 	if (self.targetname != string_null)
 	{
@@ -202,6 +201,8 @@ void() misc_model =
 			self.modelindex = 0;
 			self.state = 0;
 		}
+		else
+			self.state = 1;
 	}
 	if (self.pos1)
 	{
