@@ -2,7 +2,7 @@
 // constants
 //================================================
 
-const string version_s = "Copper Quake 1.20b - 12 August 2022";
+const string version_s = "Copper Quake 1.20 - 20 November 2022";
 const float version_f = 1.20;
 
 const float	FALSE					= 0;
