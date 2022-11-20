@@ -41,6 +41,7 @@ float	SPAWNFLAG_ALL_CLIENTS = 16;
 @baseclass base(Trigger, TriggerSounds, Angle) = TriggerMulti
 [
 	health(integer) : "solid, must be killed to activate"
+	count(integer) : "limit uses before self destructing" : 0
 	angle(integer) : "Direction player must be facing to trigger (0-360 yaw, or -1 for up/-2 for down)"
 	angles(string) : "Direction player must be facing to trigger, specifically (pitch yaw roll)"
 	distance(integer) : "Width of facing cone (in degrees) if angle or angles is set" : 180
@@ -218,6 +219,13 @@ float() multi_trigger =
 		return FALSE;
 	}
 
+	playercount_convert(count);
+	if (self.count > 0)
+	{
+		self.count -= 1;
+		if (self.count == 0)
+			remove(self);
+	}
 	SUB_UseTargets();
 	
 	// sub_usetargets plays the sound if there's a message, doesn't if not
@@ -257,6 +265,13 @@ float() multi_trigger_coop =
 		if (time < self.attack_finished)
 			return FALSE;
 	
+	playercount_convert(count);
+	if (self.count > 0)
+	{
+		self.count -= 1;
+		if (self.count == 0)
+			remove(self);
+	}
 	activator = self.enemy;
 	SUB_UseTargets();
 	
