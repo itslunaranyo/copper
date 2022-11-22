@@ -110,6 +110,8 @@ void() trigger_relay =
 
 float(entity inc) target_state_compare =
 {
+	dprint5("tstate '", self.targetname, "' comparing to '", self.include,"': ");
+	dprint4(ftos(self.state), " vs ", ftos(inc.state), "\n");
 	float out = FALSE;
 	if (self.style & 1)
 		out |= (inc.state == self.state);
