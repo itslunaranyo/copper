@@ -258,7 +258,7 @@ float	sight_entity_time;
 entity	lastspawn, bodyqueue_head;
 
 // moved from client.qc
-float	intermission_running, intermission_exittime;
+float	intermission, intermission_exittime;
 float	modelindex_eyes, modelindex_player;
 
 float	icantsee;

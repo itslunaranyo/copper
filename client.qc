@@ -861,7 +861,7 @@ void() IntermissionThink =
 		self.impulse = 0;
 	}
 	
-	if (!intermission_running) return;
+	if (!intermission) return;
 	
 	// auto-cycle intermission camera after six seconds
 	else if (time > self.lifetime_finished)
@@ -1476,7 +1476,7 @@ void() PlayerPreThink =
 		}
 	}
 
-	if (intermission_running || self.deadflag == DEAD_SPECTATING )
+	if (intermission || self.deadflag == DEAD_SPECTATING )
 	{
 		IntermissionThink ();	// otherwise a button could be missed between
 		return;					// the think tics
@@ -1542,7 +1542,7 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
-	if ( intermission_running ) return;
+	if ( intermission ) return;
 	
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
@@ -1641,7 +1641,7 @@ void() ClientConnect =
 //	clientsAlive += 1;	// happens on putclientinserver
 	
 // a client connecting during an intermission can cause problems
-	if (intermission_running)
+	if (intermission)
 		ExitIntermission ();
 }
 
