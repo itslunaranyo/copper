@@ -515,8 +515,8 @@ void(entity targ, float mag) screenshake_go =
 	vector kick;
 	
 	// punchangle doesn't work when we're in an intermission camera, so do
-	// this with actual angle offsets when intermission_running > 0
-	if (intermission_running)
+	// this with actual angle offsets when intermission > 0
+	if (intermission)
 	{
 		kick = Vector(crandom(),crandom(),crandom());
 		kick *= clamp(mag,1,4);	// don't let vp wander too far, it might clip
@@ -567,7 +567,7 @@ void() screenshake_think =
 		while (t.classname == "player")
 		{
 			t.v_angle_z = 0;	// unroll
-			if (intermission_running || t.health <= 0)
+			if (intermission || t.health <= 0)
 				t.view_ofs_z = 0;
 			else
 				t.view_ofs_z = 22;
