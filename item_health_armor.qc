@@ -181,11 +181,11 @@ void(entity e) armor_set_type =
 		return;
 	}
 	
-	if (e.armortype == ARMORTYPE_GREEN)
+	if (e.armortype < ARMORTYPE_YELLOW)
 		e.items |= IT_ARMOR1;
-	else if (e.armortype == ARMORTYPE_YELLOW)
+	else if (e.armortype < ARMORTYPE_RED)
 		e.items |= IT_ARMOR2;
-	else if (e.armortype == ARMORTYPE_RED)
+	else
 		e.items |= IT_ARMOR3;
 	
 	e.armorvalue = min(e.armorvalue, 500);
