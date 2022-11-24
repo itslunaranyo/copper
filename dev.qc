@@ -126,6 +126,8 @@ void() dev_invoke =
 			button_force(trace_ent);
 		else if (trace_ent.classname == "func_plat")
 			plat_force(trace_ent);
+		else if (trace_ent.classname == "monster_boss")
+			SUB_CallAsSelf(boss_death1, trace_ent);	
 		else if (trace_ent.use)
 			SUB_CallAsSelf(trace_ent.use, trace_ent);		
 	}
