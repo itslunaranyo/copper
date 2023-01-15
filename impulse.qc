@@ -156,6 +156,14 @@ void() Cheat_Suit =
 	powerup_envirosuit(self, 30);
 }
 
+// --------------------------------
+// ServerflagsCommand
+// --------------------------------
+void() ServerflagsCommand =
+{
+	serverflags = serverflags * 2 + 1;
+	dev_serverflags();
+};
 
 
 // --------------------------------
@@ -183,7 +191,9 @@ void() ImpulseCommands =
 	case 12:
 		CycleWeaponReverseCommand();
 		break;
-		
+	case 11:
+		ServerflagsCommand();
+		break;
 /*
 	// ai_nav
 	case 80:
