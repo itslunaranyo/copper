@@ -392,18 +392,18 @@ void() tdeath_touch =
 		T_Damage (other, self, self, 50000);
 }
 
-void(vector org, entity death_owner) spawn_tdeath =
+entity(vector org, entity death_owner) spawn_tdeath =
 {
-	local entity	death;
+	entity death;
 
 	// dumb hack so the world isn't flooded with a tdeath for every monster at map start
-	if (time < 2) return;	
+	if (time < 2) return world;	
 	
 	death = spawn();
 	death.classname = "teledeath";
 	death.movetype = MOVETYPE_NONE;
 	death.solid = SOLID_TRIGGER;
-	setsize (death, death_owner.mins - '1 1 1', death_owner.maxs + '1 1 1');
+	setsize (death, death_owner.mins - '0.1 0.1 0.1', death_owner.maxs + '0.1 0.1 0.1');
 	setorigin (death, org);
 	death.angles = '0 0 0';
 	death.touch = tdeath_touch;
@@ -412,6 +412,8 @@ void(vector org, entity death_owner) spawn_tdeath =
 	death.owner = death_owner;
 	
 	force_retouch = 2;		// make sure even still objects get hit
+	
+	return death;
 }
 
 // --------------------------------

@@ -405,11 +405,19 @@ void() monster_start =
 	}
 		
 	// moved from mon_spawner_use because it was too early to catch the monster's mins and maxs
-	if (!(self.spawnflags & SPAWN_NO_TFRAG)	// we can have confidence in the telefrag protection check*
-		&& (self.type != "zombie" || !(self.spawnflags & SPAWN_LYING)))	// lying zombies are nonsolid
-		spawn_tdeath(self.origin, self);
-		// *if we don't, monsters can graze the telefrag trigger and explode even if they 
-		// weren't truly blocking the spawn
+	if ((self.type != "zombie" || !(self.spawnflags & SPAWN_LYING)))	// lying zombies are nonsolid
+	{
+		entity tdeath = spawn_tdeath(self.origin, self);
+		if (tdeath && self.spawnflags & SPAWN_NO_TFRAG)
+		{
+			// we still need to spawn a tdeath so players counter-telefrag these monsters if 
+			// they're in the way
+			tdeath.nextthink = time + 0.05;
+			// we make the tdeath remove itself before the minimum time for the spawned 
+			// monster's nextthink, or else monsters can graze the telefrag trigger and 
+			// explode even if they weren't truly blocking the spawn
+		}
+	}
 
 	// wait a few frames to make sure doors have spawned before doing droptofloor
 	self.nextthink = 1.15;
