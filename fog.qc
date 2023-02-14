@@ -283,8 +283,14 @@ void() target_fogblend_use =
 		self.pain_finished = time + self.delay + self.speed;
 	else
 		self.pain_finished = time + self.delay + self.speed2;
-		
-	fog_blendTimeThink();
+	
+	if (self.delay > 0)
+	{
+		self.think = fog_blendTimeThink;
+		self.nextthink = time + self.delay;
+	}
+	else
+		fog_blendTimeThink();
 	// don't allow retriggering before the blend is done or it looks super duper wacky
 	self.use = SUB_Null;
 }
@@ -306,7 +312,7 @@ void() fog_blendTimeThink =
 	}
 	else
 	{
-		self.nextthink = time + self.delay;
+		self.nextthink = time + FOG_INTERVAL;//self.delay;//wtf
 		if (self.state && self.speed)
 			f = 1 - (self.pain_finished - time) / self.speed;
 		else if (self.speed2)
