@@ -436,9 +436,12 @@ void() teleport_touch =
 		return;
 	}
 
-	t = find (world, targetname, self.target);
+	t = findunlockedtarget(world);//find (world, targetname, self.target);
 	if (!t)
+	{
 		objerror ("teleporter couldn't find target");
+		return;
+	}
 
 	playercount_convert(count);
 	if (!self.count) 
