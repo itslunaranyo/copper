@@ -160,15 +160,16 @@ void() dev_trigger =
 {
 	if(deathmatch || coop)
 		return;
-	local entity t, act;
+	entity t;
 	
-//	bprint("dev\n");
-	act = activator;
+	dprint3("dev trigger impulse firing '", self.netname, "'\n");
+	activator = self;
 	t = world;
 	do	{
 		t = SUB_UseNextTarget( t, self.netname );
-		activator = act;
+		activator = self;
 		if (!t) break;
+		dprint3("  fired a ", t.classname, "\n");
 	} while ( 1 );
 }
 
