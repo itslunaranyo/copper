@@ -186,7 +186,7 @@ void() target_meat_fireworks_use =
 	entity meats;
 	
 	playercount_convert(count);
-	if (self.count == 1 && self.delay == 0)
+	if (self.count == 1 && self.delay == 0 && self.rand == 0)
 	{
 		target_meat_fireworks_go();
 		return;

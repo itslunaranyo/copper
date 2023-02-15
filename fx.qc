@@ -679,7 +679,7 @@ void() target_explosion_use =
 	self.enemy = activator;
 	
 	playercount_convert(count);
-	if (self.count == 1 && self.delay == 0)
+	if (self.count == 1 && self.delay == 0 && self.rand == 0)
 	{
 		bewm = spawn();
 		if (self.size != VEC_ORIGIN)
@@ -761,7 +761,7 @@ void() target_telefog_use =
 	vector offset;
 	
 	playercount_convert(count);
-	if (self.count == 1 && self.delay == 0)
+	if (self.count == 1 && self.delay == 0 && self.rand == 0)
 	{
 		tfog = spawn();
 		if (self.size != VEC_ORIGIN)
