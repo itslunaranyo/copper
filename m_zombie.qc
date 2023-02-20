@@ -78,7 +78,9 @@ void() zombie_cruc4	=	[	$cruc_4,	zombie_cruc5	] {self.nextthink = time + 0.1 + r
 void() zombie_cruc5	=	[	$cruc_5,	zombie_cruc6	] {self.nextthink = time + 0.1 + random()*0.1;}
 void() zombie_cruc6	=	[	$cruc_6,	zombie_cruc1	] {self.nextthink = time + 0.1 + random()*0.1;}
 
-void() zombie_walk1		=[	$walk1,		zombie_walk2	] {ai_walk(0);}
+void() zombie_walk1		=[	$walk1,		zombie_walk2	] {ai_walk(0);
+	self.customflags = not(self.customflags, CFL_INPAIN | CFL_KNOCKEDDOWN);	// defensive hack
+}
 void() zombie_walk2		=[	$walk2,		zombie_walk3	] {ai_walk(2);}
 void() zombie_walk3		=[	$walk3,		zombie_walk4	] {ai_walk(3);}
 void() zombie_walk4		=[	$walk4,		zombie_walk5	] {ai_walk(2);}
@@ -368,8 +370,8 @@ float(void() lay, void() getup) zombie_forget =
 
 
 void() zombie_paine1	=[	$paine1,	zombie_paine2	] {
-	sound (self, CHAN_VOICE, "zombie/z_pain.wav", 1, ATTN_NORM);
-	self.health = 60;
+		self.customflags = self.customflags | CFL_KNOCKEDDOWN;
+		sound (self, CHAN_VOICE, "zombie/z_pain.wav", 1, ATTN_NORM);
 }
 void() zombie_paine2	=[	$paine2,	zombie_paine3	] {ai_pain(8);}
 void() zombie_paine3	=[	$paine3,	zombie_paine4	] {ai_pain(5);}
@@ -392,11 +394,13 @@ void() zombie_paine13	=[	$paine13,	zombie_paine14	]{
 	self.health = 60;
 	if (zombie_forget(zombie_layidle, zombie_paine13))	// don't get up for infights
 		return;
-	zombie_try_stand();	// see if ok to stand up
+	zombie_try_stand(zombie_paine12);	// see if ok to stand up
+	self.think1 = zombie_run1;
 }
 void() zombie_paine14	=[	$paine14,	zombie_paine15	] {}
 void() zombie_paine15	=[	$paine15,	zombie_paine16	] {
 	self.th_stand = zombie_stand1;
+	self.th_walk = zombie_walk1;
 	self.th_run = zombie_run1;
 }
 void() zombie_paine16	=[	$paine16,	zombie_paine17	] {}
@@ -416,9 +420,9 @@ void() zombie_paine27	=[	$paine27,	zombie_paine28	] {ai_painforward(1);
 }
 void() zombie_paine28	=[	$paine28,	zombie_paine29	] {ai_pain(1);}
 void() zombie_paine29	=[	$paine29,	zombie_paine30	] {}
-void() zombie_paine30	=[	$paine30,	zombie_run1		] {ai_attack_finished (1);}
+void() zombie_paine30	=[	$paine30,	zombie_run1		] {ai_attack_finished (1); self.think = self.think1;}
 
-void() zombie_try_stand =
+void(void() giveup) zombie_try_stand =
 {
 	if (time > self.show_hostile)
 		sound (self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_NORM);
@@ -426,7 +430,7 @@ void() zombie_try_stand =
 	setsize (self, '-16 -16 -24', '16 16 40');
 	if (!walkmove (0, 0))
 	{
-		self.think = zombie_paine12;
+		self.think = giveup;
 		self.solid = SOLID_NOT;
 	}
 }
@@ -439,8 +443,20 @@ void() zombie_layidle	=[	$paine12,	zombie_layidle	] {
 
 void() zombie_getup	=[	$paine12,	zombie_paine13	]{
 	self.health = 60;
-	zombie_try_stand();
+	self.customflags = self.customflags | (CFL_INPAIN | CFL_KNOCKEDDOWN);
+	zombie_try_stand(zombie_paine12);
+	self.dmgtime = time + 1.5;
 }
+
+void() zombie_getupw	=[	$paine13,	zombie_paine14	]{
+	self.health = 60;
+	zombie_try_stand(zombie_getupw);	// see if ok to stand up
+	self.customflags = self.customflags | (CFL_INPAIN | CFL_KNOCKEDDOWN);
+	self.think1 = zombie_walk1;
+	self.dmgtime = time + 1.5;
+}
+
+
 
 // this expects a zombie's th_pain to trigger the long knockdown if currently in
 // pain_finished
@@ -492,8 +508,8 @@ void(entity attacker, float take) zombie_pain =
 	// go down immediately if hit is big enough or frequent enough
 	if (take >= 25 || self.pain_finished > time)
 	{
-		self.customflags = self.customflags | CFL_KNOCKEDDOWN;
-		zombie_paine1 ();
+		self.health = 60;
+		zombie_paine1();
 		return;
 	}
 	
@@ -506,7 +522,6 @@ void(entity attacker, float take) zombie_pain =
 	
 	// go into one of the fast pain animations	
 	self.customflags = self.customflags | CFL_INPAIN;
-
 	r = random();
 	if (r < 0.25)
 		zombie_paina1 ();
@@ -571,15 +586,16 @@ void() monster_zombie_spawn =
 		if (self.spawnflags & SPAWN_LYING)	// lying in wait flag for zombehs
 		{
 			self.th_stand = zombie_layidle;
+			self.th_walk = zombie_getupw;
 			self.th_run = zombie_getup;
 			self.frame = $paine12;	// don't display frame 1 in the split second before first think
 		}
 		else
 		{
 			self.th_stand = zombie_stand1;
+			self.th_walk = zombie_walk1;
 			self.th_run = zombie_run1;
 		}
-		self.th_walk = zombie_walk1;
 		self.th_pain = zombie_pain;
 		self.th_die = zombie_die;
 		self.th_missile = zombie_missile;
