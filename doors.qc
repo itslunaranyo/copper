@@ -702,7 +702,7 @@ Key doors are always wait -1.
 "lip"		lip remaining at end of move (8 default)
 "distance"	specify movement distance directly, overrides lip (-1 to explicitly not move)
 "dmg"		damage to inflict when blocked (2 default)
-"noise1-4"	override open/stop/locked/unlocked sounds, respectively
+"noise1-4"	override stop/open/locked/unlocked sounds, respectively
 "sounds"
 0) silent
 1) stone
@@ -730,8 +730,8 @@ Doors will not link if either has the 'don't link' spawnflag, if they have diffe
 		5: "Winchy secret door"
 		6: "Base secret door"
 	]
-	noise1(string) : "Override move sound"
-	noise2(string) : "Override stop sound"
+	noise1(string) : "Override stop sound"
+	noise2(string) : "Override move sound"
 	noise3(string) : "Override key-required sound"
 	noise4(string) : "Override key-unlocked sound"
 	wait(string) : "Wait before close" : "3" 
