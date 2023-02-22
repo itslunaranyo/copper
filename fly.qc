@@ -26,7 +26,7 @@ vector() fly_origin =
 // sometimes this is desirable but sometimes not (big flytrains)
 void() fly_go =
 {
-	dprint("in fly_go\n");
+	//dprint("in fly_go\n");
 	local vector vel, destvel;
 	local float frac, lspeed;
 	
@@ -66,7 +66,7 @@ void() fly_go =
 
 void() fly_idle =
 {
-	dprint("in fly_idle," );
+	//dprint("in fly_idle," );
 	local vector vel, destvel;
 	local float frac, lspeed;
 	
@@ -85,9 +85,9 @@ void() fly_idle =
 	
 	local string what;
 	what = ftos(frac);
-	dprint("frac: ");
-	dprint( what );
-	dprint("\n");
+	//dprint("frac: ");
+	//dprint( what );
+	//dprint("\n");
 	
 	vel = self.velocity;
 	vel = normalize(vel);
@@ -122,11 +122,12 @@ void() fly_findnextgoal =
 
 void( float nowait, float idlespeed ) fly_newgoal = 
 {
-	dprint("in fly_newgoal\n");
+	//dprint("in fly_newgoal\n");
 	entity t;
 	if (self.goalentity.wait && !nowait)
 	{
-		dprint("waiting at pathcorner\n");
+		if (self.think1 != fly_idle)
+			dprint("flytrain: waiting at pathcorner\n");
 		self.speed2 = vlen(self.velocity); // self.speed;
 		if ( self.classname == "func_flytrain" )
 			self.speed = 8;
@@ -146,7 +147,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		self.dest = self.goalentity.origin + randy;
 		
 		if (self.goalentity.wait > 0) {
-			dprint("waiting here for a few seconds\n");
+			dprint("flytrain: waiting for a few seconds\n");
 
 			// create a temp object to fire at a later time
 			t = spawn();
@@ -162,7 +163,7 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		// get new destination
 		if (!self.goalentity.target)
 		{
-			dprint("no goalentity target\n");
+			dprint("flytrain: no goalentity target\n");
 			if (self.classname != "func_flytrain")
 			{
 				self.th_die();
@@ -181,11 +182,12 @@ void( float nowait, float idlespeed ) fly_newgoal =
 		}
 
 		if (!self.goalentity) {
-			dprint("no goalentity\n");
+			dprint("flytrain: no goalentity\n");
 			self.th_die();
 			return;
 		}
 
+		dprint("flytrain: new goal\n");
 		self.think1 = fly_go;
 		
 		// get new speed from where we are now
