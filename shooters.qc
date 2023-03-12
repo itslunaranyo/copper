@@ -223,7 +223,7 @@ void() trap_lightning_fire =
 	float i = 0;
 	
 	if (!self.enemy)	// might already be activator
-		self.enemy = findunlockedtarget(world);
+		self.enemy = findunlockedtarget(self, world);
 	if (!self.enemy)
 	{
 		if (self.target != string_null || self.target2 != string_null || 

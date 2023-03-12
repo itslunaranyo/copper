@@ -113,11 +113,7 @@ void() fly_delayuse =
 
 void() fly_findnextgoal =
 {
-	entity oself;
-	oself = self;
-	self = self.goalentity;
-	oself.goalentity = findunlockedtarget(world);
-	self = oself;
+	self.goalentity = findunlockedtarget(self.goalentity, world);
 }
 
 void( float nowait, float idlespeed ) fly_newgoal = 

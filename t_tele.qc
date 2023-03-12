@@ -436,7 +436,7 @@ void() teleport_touch =
 		return;
 	}
 
-	t = findunlockedtarget(world);//find (world, targetname, self.target);
+	t = findunlockedtarget(self, world);//find (world, targetname, self.target);
 	if (!t)
 	{
 		objerror ("teleporter couldn't find target");

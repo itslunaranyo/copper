@@ -636,11 +636,7 @@ void() train_wait =
 void() train_next =
 {
 	entity corner, oself;
-
-	oself = self;
-	self = self.enemy;
-	corner = findunlockedtarget(world);
-	self = oself;
+	corner = findunlockedtarget(self.enemy, world);
 	
 	if (!corner)
 	{
@@ -672,7 +668,7 @@ void() func_train_find =
 {
 	entity corner;
 
-	corner = findunlockedtarget(world);
+	corner = findunlockedtarget(self, world);
 	self.enemy = corner;
 	//self.target = corner.target;
 	setorigin (self, corner.origin - self.mins);

@@ -357,23 +357,23 @@ entity(entity start, .string fld, string match) findunlocked =
 	return head;
 }
 
-entity(entity start) findunlockedtarget =
+entity(entity e, entity start) findunlockedtarget =
 {
 	entity head = world;
-	if (self.target != string_null)
-		head = findunlocked(start, targetname, self.target);
+	if (e.target != string_null)
+		head = findunlocked(start, targetname, e.target);
 	if (head) return head;
 	
-	if (self.target2 != string_null)
-		head = findunlocked(start, targetname, self.target2);
+	if (e.target2 != string_null)
+		head = findunlocked(start, targetname, e.target2);
 	if (head) return head;
 	
-	if (self.target3 != string_null)
-		head = findunlocked(start, targetname, self.target3);
+	if (e.target3 != string_null)
+		head = findunlocked(start, targetname, e.target3);
 	if (head) return head;
 	
-	if (self.target4 != string_null)
-		return findunlocked(start, targetname, self.target4);
+	if (e.target4 != string_null)
+		return findunlocked(start, targetname, e.target4);
 	return world;
 }
 
