@@ -803,7 +803,7 @@ void() path_corner_touch =
 	other.ideal_yaw = vectoyaw(other.goalentity.origin - other.origin);
 }
 
-/*QUAKED path_corner (0.5 0.3 0) (-8 -8 -8) (8 8 8)
+/*QUAKED path_corner (0.5 0.3 0) (-8 -8 -8) (8 8 8) - - - - BEZIER
 Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
 Monsters who wait here will turn to face 'angle'.
 
@@ -813,15 +813,25 @@ Keys:
 "wait" The number of seconds to spend standing here
 "angle" direction to face while standing here
 "speed" tell a visiting func_train to change its speed. If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
+
+Spawnflags:
+BEZIER	Act as a bilinear control point between the previous and next pathcorner in the chain (train only, no monster patrols)
+	"count"	change number of steps of interpolation along the curve the train will make (default 10)
 */
 /*FGD
 @PointClass base(Appearflags, Targetname, Target, Angle) size(16 16 16) color(128 80 0) = 
 	path_corner : 
 "Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
-Monsters who wait here will turn to face 'angle'."
+Monsters who wait here will turn to face 'angle'.
+Checking the Bezier spawnflag will make this pathcorner act as a bilinear control point - meaning curved motion - between the previous and next pathcorner in the chain (train only, no monster patrols).
+	"count"	change number of steps of interpolation along the curve the train will make (default 10)"
 [
+	spawnflags(Flags) = [
+		16 : "Bezier point" : 0
+	]
 	wait(string) : "Wait time (seconds)" : "0"
 	speed(string) : "A visiting func_train to change its speed to this. If 'speed' is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner." : "0"
+	count(integer) : "steps of interpolation along this bezier curve segment" : 10
 ]
 */
 void() path_corner =
@@ -842,6 +852,9 @@ void() path_corner =
 		//else if (!self.target)
 		//	self.wait = -1;
 	}
+	
+	if ((self.spawnflags & 16) && self.count <= 0)
+		self.count = 10;
 	
 	self.solid = SOLID_TRIGGER;
 	self.touch = path_corner_touch;

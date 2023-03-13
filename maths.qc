@@ -161,6 +161,13 @@ vector(vector a, vector b, float mix) lerpVectorCosine =
 	return (b * cmx + a * ( 1 - cmx ) );
 }
 
+// bez is short for Bilinear EnterpolationZ
+vector(vector start, vector ctrl, vector end, float t) bez =
+{
+	vector b1 = t * ctrl + (1-t) * start;
+	vector b2 = t * end + (1-t) * ctrl;
+	return t * b2 + (1-t) * b1;
+}
 
 // rotates B around A
 vector(vector b, vector a, float r) rotateVectorAround =

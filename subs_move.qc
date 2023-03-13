@@ -134,6 +134,61 @@ void(entity ent, vector tdest, float tspeed, void() func) SUB_CalcMoveEnt =
 
 // ================================================================
 
+/*
+CURVACEOUS MOVE
+
+pathcorners can have a curve spawnflag that marks them as bezier control points
+bezier path corners affect the curve but will never be visited
+	this means they don't affect speed, don't fire targets, etc
+*/
+
+void() SUB_CalcMoveCurveSeg =
+{
+	// self.cnt is number of steps we've passed through
+	// (when self.cnt == nodeCtrl.count we should be at nodeEnd)
+	if (self.cnt == self.goalentity.count)
+	{
+		SUB_CalcMoveDone();
+		return;
+	}
+	self.cnt += 1;
+	
+	float t = self.cnt / self.goalentity.count;
+	vector dest = bez(self.oldenemy.origin, self.goalentity.origin, self.enemy.origin, t) - self.origin - self.mins;
+	float wishspeed = lerp(self.speed, self.speed2, t);
+	float dist = vlen(dest);
+	float traveltime = dist / wishspeed;
+	if (traveltime < 0.05)
+	{
+		self.velocity = VEC_ORIGIN;
+		self.nextthink = self.ltime + 0.05;
+		self.think = SUB_CalcMoveDone;
+		return;
+	}	
+	self.velocity = normalize(dest) * wishspeed;
+	self.think = SUB_CalcMoveCurveSeg;
+	self.nextthink = self.ltime + traveltime;
+}
+
+// init curved motion
+void(entity nodeEnd, entity nodeCtrl, float speedStart, float speedEnd, void() fnDone) SUB_CalcMoveCurve =
+{
+	// self.oldenemy is current pathcorner already
+	self.enemy = nodeEnd;
+	self.goalentity = nodeCtrl;
+	self.speed = speedStart;
+	self.speed2 = speedEnd;
+	self.cnt = 0;
+	self.think1 = fnDone;
+	self.finaldest = nodeEnd.origin - self.mins;
+	
+	SUB_CalcMoveCurveSeg();
+}
+
+
+
+// ================================================================
+
 
 /*
 =============

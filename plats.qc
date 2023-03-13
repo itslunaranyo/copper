@@ -566,7 +566,8 @@ void() func_flytrain_point =
 
 //============================================================================
 
-float TRAIN_INHERIT = 1;
+const float TRAIN_INHERIT = 1;
+const float TRAIN_TOGGLE = 2;
 
 void() train_blocked =
 {
@@ -578,7 +579,7 @@ void() train_blocked =
 
 void() train_use =
 {
-	if ((self.spawnflags & 2) && (self.origin + self.mins) != self.enemy.origin)
+	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.mins) != self.enemy.origin)
 	{
 		if (self.state == STATE_ON)
 		{
@@ -591,7 +592,11 @@ void() train_use =
 		{
 			self.state = STATE_ON;
 			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-			SUB_CalcMove (self.enemy.origin - self.mins, self.speed, train_wait);
+			if (self.goalentity)
+				// we were stopped along a bezier curve, resume with saved values
+				SUB_CalcMoveCurveSeg();
+			else
+				SUB_CalcMove (self.enemy.origin - self.mins, self.speed, train_wait);
 		}
 		return;
 	}
@@ -635,9 +640,9 @@ void() train_wait =
 
 void() train_next =
 {
-	entity corner, oself;
+	entity corner, ctrl;
+	float dspeed;
 	corner = findunlockedtarget(self.enemy, world);
-	
 	if (!corner)
 	{
 		dprint("train_next: no next target\n");
@@ -647,20 +652,49 @@ void() train_next =
 			remove(self);
 		return;
 	}
-	oself = self.enemy;
-	self.enemy = corner;
+	self.oldenemy = self.enemy;
+	self.goalentity = world;
+	if (corner.spawnflags & 16)
+	{
+		ctrl = corner;
+		corner = findunlockedtarget(ctrl, world);
+		if (!corner)
+		{
+			dprint("train_next: no next target after curve point\n");
+			if (self.th_die)
+				self.th_die();
+			else
+				remove(self);
+			return;
+		}
+	}
 	if (corner.wait)
 		self.wait = corner.wait;
 	else
 		self.wait = self.pausetime;
+	
+	self.enemy = corner;
 	self.state = STATE_ON;
-	if (oself.speed == -1)
+	
+	if (self.oldenemy.speed == -1)
 	{
 		setorigin(self, corner.origin - self.mins);
 		train_wait();
 		return;
 	}
+	
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
+	
+	if (ctrl)
+	{
+		if ((self.spawnflags & TRAIN_INHERIT) && corner.speed > 0)
+			dspeed = corner.speed;
+		else
+			dspeed = self.speed;
+		SUB_CalcMoveCurve(corner, ctrl, self.speed, dspeed, train_wait);
+		return;
+	}
+	
 	SUB_CalcMove (corner.origin - self.mins, self.speed, train_wait);
 }
 
