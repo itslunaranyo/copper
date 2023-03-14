@@ -592,11 +592,11 @@ void() train_use =
 		{
 			self.state = STATE_ON;
 			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
-			if (self.goalentity)
+			if (self.pos2)
 				// we were stopped along a bezier curve, resume with saved values
 				SUB_CalcMoveCurveSeg();
 			else
-				SUB_CalcMove (self.enemy.origin - self.mins, self.speed, train_wait);
+				SUB_CalcMove (self.enemy.origin - self.mins, self.speed, self.th_stand);
 		}
 		return;
 	}
@@ -653,7 +653,6 @@ void() train_next =
 		return;
 	}
 	self.oldenemy = self.enemy;
-	self.goalentity = world;
 	if (corner.spawnflags & 16)
 	{
 		ctrl = corner;
@@ -679,7 +678,7 @@ void() train_next =
 	if (self.oldenemy.speed == -1)
 	{
 		setorigin(self, corner.origin - self.mins);
-		train_wait();
+		self.th_stand();
 		return;
 	}
 	
@@ -691,11 +690,11 @@ void() train_next =
 			dspeed = corner.speed;
 		else
 			dspeed = self.speed;
-		SUB_CalcMoveCurve(corner, ctrl, self.speed, dspeed, train_wait);
+		SUB_CalcMoveCurve(corner.origin - self.mins, ctrl.origin - self.mins, ctrl.count, self.speed, dspeed, self.th_stand);
 		return;
 	}
 	
-	SUB_CalcMove (corner.origin - self.mins, self.speed, train_wait);
+	SUB_CalcMove (corner.origin - self.mins, self.speed, self.th_stand);
 }
 
 void() func_train_find =
@@ -788,6 +787,8 @@ void() func_train =
 	if (!SUB_ShouldSpawn()) return;
 	func_train_setup();
 	
+	self.th_stand = train_wait;
+	
 	precache_model_safe(self.model);
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
@@ -831,6 +832,8 @@ void() func_train_point =
 {	
 	if (!SUB_ShouldSpawn()) return;
 	func_train_setup();
+	
+	self.th_stand = train_wait;
 	
 	precache_model_safe(self.model);
 	setmodel (self, self.model);

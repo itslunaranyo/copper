@@ -146,18 +146,19 @@ void() SUB_CalcMoveCurveSeg =
 {
 	// self.cnt is number of steps we've passed through
 	// (when self.cnt == nodeCtrl.count we should be at nodeEnd)
-	if (self.cnt == self.goalentity.count)
+	if (self.cnt == self.count)
 	{
+		self.pos2 = VEC_ORIGIN;
 		SUB_CalcMoveDone();
 		return;
 	}
 	self.cnt += 1;
 	
-	float t = self.cnt / self.goalentity.count;
-	vector dest = bez(self.oldenemy.origin, self.goalentity.origin, self.enemy.origin, t) - self.origin - self.mins;
+	float t = self.cnt / self.count;
+	vector destdelta = bez(self.pos1, self.pos2, self.finaldest, t) - self.origin;
+	
 	float wishspeed = lerp(self.speed, self.speed2, t);
-	float dist = vlen(dest);
-	float traveltime = dist / wishspeed;
+	float traveltime = vlen(destdelta) / wishspeed;
 	if (traveltime < 0.05)
 	{
 		self.velocity = VEC_ORIGIN;
@@ -165,22 +166,23 @@ void() SUB_CalcMoveCurveSeg =
 		self.think = SUB_CalcMoveDone;
 		return;
 	}	
-	self.velocity = normalize(dest) * wishspeed;
+	self.velocity = destdelta * (1/traveltime);
 	self.think = SUB_CalcMoveCurveSeg;
 	self.nextthink = self.ltime + traveltime;
 }
 
 // init curved motion
-void(entity nodeEnd, entity nodeCtrl, float speedStart, float speedEnd, void() fnDone) SUB_CalcMoveCurve =
+void(vector end, vector ctrl, float segs, float speedStart, float speedEnd, void() fnDone) SUB_CalcMoveCurve =
 {
 	// self.oldenemy is current pathcorner already
-	self.enemy = nodeEnd;
-	self.goalentity = nodeCtrl;
+	self.pos1 = self.origin;
+	self.pos2 = ctrl;
+	self.finaldest = end;
 	self.speed = speedStart;
 	self.speed2 = speedEnd;
 	self.cnt = 0;
+	self.count = segs;
 	self.think1 = fnDone;
-	self.finaldest = nodeEnd.origin - self.mins;
 	
 	SUB_CalcMoveCurveSeg();
 }
