@@ -427,6 +427,12 @@ void(string s) precache_model3	= { return; }
 void(string s) precache_sound3	= { return; }
 */
 
+float(entity e) localtime =
+{
+	if (e.solid == SOLID_BSP || e.movetype == MOVETYPE_PUSH)
+		return e.ltime;
+	return time;
+}
 
 // shorthand for turning -1 to 0 for keyvalues for which 0 is a valid non-default selection
 float(float in) zeroconvert =

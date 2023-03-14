@@ -72,15 +72,10 @@ void(vector tdest, float tspeed, void() func) SUB_CalcMove =
 {
 	vector	vdestdelta;
 	float	len, traveltime;
-	float	chron;
+	float	chron = localtime(self);
 
 	if (!tspeed)
 		objerror( "No speed is defined!" );
-
-	if (self.solid == SOLID_BSP || self.movetype == MOVETYPE_PUSH)
-		chron = self.ltime;
-	else
-		chron = time;
 
 	self.think1 = func;
 	self.finaldest = tdest;
@@ -144,6 +139,7 @@ bezier path corners affect the curve but will never be visited
 
 void() SUB_CalcMoveCurveSeg =
 {
+	float chron = localtime(self);
 	// self.cnt is number of steps we've passed through
 	// (when self.cnt == nodeCtrl.count we should be at nodeEnd)
 	if (self.cnt == self.count)
@@ -162,13 +158,13 @@ void() SUB_CalcMoveCurveSeg =
 	if (traveltime < 0.05)
 	{
 		self.velocity = VEC_ORIGIN;
-		self.nextthink = self.ltime + 0.05;
+		self.nextthink = chron + 0.05;
 		self.think = SUB_CalcMoveDone;
 		return;
 	}	
 	self.velocity = destdelta * (1/traveltime);
 	self.think = SUB_CalcMoveCurveSeg;
-	self.nextthink = self.ltime + traveltime;
+	self.nextthink = chron + traveltime;
 }
 
 // init curved motion

@@ -391,6 +391,9 @@ void() func_plat =
 
 //============================================================================
 
+const float TRAIN_INHERIT = 1;
+const float TRAIN_TOGGLE = 2;
+
 void() train_sounds =
 {
 	if (self.sounds == 0)
@@ -420,52 +423,6 @@ void() train_sounds =
 
 }
 
-void() flytrain_think = 
-{
-	self.think1();
-	self.nextthink = self.ltime + 0.1;
-	
-//	dprint(ftos(vlen(self.velocity)));
-//	dprint("\n");
-}
-
-void() flytrain_use =
-{
-	dprint("in flytrain_use\n");
-	if (self.think1 == fly_idle)
-		fly_newgoal( 1, 0 );
-}
-
-void() flytrain_init2 =
-{
-	//dprint("in flytrain_init2\n");
-	fly_newgoal( 1, 0 );
-	
-	self.think = flytrain_think;
-	flytrain_think();
-
-	//dprint("end of flytrain_init2\n");
-}
-
-// flytrain_init
-// switch the light and sparklies on
-void() flytrain_init =
-{
-	//dprint("in flytrain_init\n");
-	self.goalentity = self;		// haaax
-	self.use = flytrain_use;
-	self.think = flytrain_init2;
-	self.nextthink = self.ltime + 0.1;
-	//dprint("end of flytrain_init\n");
-}
-
-void() flytrain_stop =
-{
-	setorigin(self, self.goalentity.origin);
-	self.velocity = '0 0 0';
-	self.nextthink = -1;
-}
-
 /*FGD
 @baseclass = TrainSounds [
 	sounds(choices) : "Sound" : 1 =
@@ -485,12 +442,71 @@ void() flytrain_stop =
 ]
 */
 
+
+void() flytrain_ghost_resume =
+{
+	if (self.state == STATE_OFF)	// already deactivated
+		return;	
+	if (self.pos2)
+		// we were stopped along a bezier curve, resume with saved values
+		SUB_CalcMoveCurveSeg();
+	else
+		SUB_CalcMove (self.enemy.origin - self.mins, self.speed, self.th_stand);
+}
+
+void() flytrain_ghost_blocked =
+{
+	if (self.state == STATE_OFF)	// already deactivated
+		return;	
+	self.velocity = VEC_ORIGIN;
+	self.think = flytrain_ghost_resume;
+	self.nextthink = localtime(self) + 0.05;
+}
+
+// if the flytrain is blocked, it has to halt its buddy's movement and schedule it to restart immediately
+void() flytrain_blocked =
+{
+	if (self.buddy.state == STATE_ON)
+		SUB_CallAsSelf(flytrain_ghost_blocked, self.buddy);
+
+	if (time < self.attack_finished)
+		return;
+	self.attack_finished = time + self.dmgtime;
+	T_Damage (other, self, self, self.dmg);
+}
+
+void() flytrain_think =
+{
+	vector delta, wishvel;
+
+	if (time > self.pain_finished)
+	{
+		self.pain_finished = time + 0.5;
+		self.pos1_x = crandom() * self.width;
+		self.pos1_y = crandom() * self.width;
+		self.pos1_z = crandom() * self.height;
+	}
+	
+	delta = (self.buddy.origin + self.pos1) - self.origin - self.mins;
+	wishvel = self.buddy.velocity;
+	
+	// if the ghost train hits a speed -1 teleport corner we have to teleport with it, not zoom to it
+	if (vlen(delta) > self.lip)
+		setorigin(self, self.buddy.origin - self.mins);
+	else
+		wishvel += delta;
+	
+	self.velocity = (self.velocity * 4 + wishvel) * 0.2;
+	self.nextthink = localtime(self) + 0.05;
+}
+
 /*QUAKED func_flytrain (0 .5 .8) ?
 A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
 If the train is the target of a button or trigger, it will not begin moving until activated.
 
-Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
-
+"width"		Horizontal drift range, default 8 (-1 for 0)
+"height"	Vertical drift range, default 8 (-1 for 0)
+"lip"		Length of 'leash', default 64 (increase if train jumps around at high speeds)
 "sounds"
 0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
 1) ratchet metal
@@ -498,40 +514,60 @@ Movement is smoothed out so it doesn't move in straight lines between waypoints.
 */
 /*FGD
 @SolidClass base(Train) = func_flytrain : 
-"A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key.
-
-Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it." []
+"A func_train that has smoothed drifty movement. Inherits movement speed from each path_corner's 'speed' key."
+[
+	width(string) : "Horizontal drift range" : "8"
+	height(string) : "Vertical drift range" : "8"
+	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
+]
 */
 void() func_flytrain =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (!self.target)
-		objerror ("func_train without a target");
-	
-	self.dmg = zeroconvertdefault(self.dmg,2);
-	if (!self.speed) {
-		self.speed2 = 128;
-		self.speed = 128;
-	}
-	train_sounds();
 
-	self.use = flytrain_init;
-	self.th_die = flytrain_stop;
-	self.th_stand = SUB_Null;
+	if (!self.target)
+		objerror("func_flytrain without a target");
+		
+	// spawn a nonsolid point ent to follow our path sensibly and 
+	//	handle all train-like logic, bc it's a func_train
+	// we shadow it at all times with floaty drifty movement to keep 
+	//	that logic separate from train behavior and allow us to sludge
+	//	the velocity over a few frames for rubber-bandy motion without
+	//	colliding with state changes
+	self.buddy = spawn();
+	self.buddy.spawnflags = self.spawnflags | TRAIN_INHERIT | TRAIN_TOGGLE; // flytrains always inherit speed
+	self.buddy.speed = self.speed;
+	self.dmg = zeroconvertdefault(self.dmg, 2);
+	if (!self.dmgtime)
+		self.dmgtime = 0.5;
+	self.buddy.pausetime = self.pausetime;
+	self.buddy.sounds = self.sounds;
+	self.buddy.solid = -1;
+	self.buddy.target = self.target;
+	self.buddy.targetname = self.targetname;
 	
+	SUB_CallAsSelf(func_train_point, self.buddy);
+	self.buddy.classname = "func_flytrain_ghost";
+	self.buddy.th_stand = train_wait;
+	
+	self.width = zeroconvertdefault(self.width, 8);
+	self.height = zeroconvertdefault(self.height, 8);
+	self.lip = zeroconvertdefault(self.lip, 64);
+
+	self.blocked = flytrain_blocked;
 	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
 	if (!self.solid)
 		self.movetype = MOVETYPE_NOCLIP;
 	else
 		self.movetype = MOVETYPE_PUSH;
-	self.blocked = train_blocked;
-	//self.classname = "train";
-		
+	
+	precache_model_safe(self.model);
 	setmodel (self, self.model);
-	setsize (self, self.mins, self.maxs);
+	setsize (self, self.mins , self.maxs);
 	setorigin (self, self.origin);
 	
-	self.movedir = self.origin - BoundsCenter(self); // offset so _point and bmodel types can work the same
+	self.think = flytrain_think;
+	self.nextthink = localtime(self) + 0.2;
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -561,13 +597,10 @@ void() func_flytrain_point =
 	precache_model_safe(self.model);
 	func_flytrain();
 	self.classname = "func_flytrain";
-	self.movedir = '0 0 0';
+	//self.movedir = '0 0 0';
 }
 
 //============================================================================
-
-const float TRAIN_INHERIT = 1;
-const float TRAIN_TOGGLE = 2;
 
 void() train_blocked =
 {
@@ -579,6 +612,7 @@ void() train_blocked =
 
 void() train_use =
 {
+	dprint("train_use\n");
 	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.mins) != self.enemy.origin)
 	{
 		if (self.state == STATE_ON)
@@ -608,15 +642,12 @@ void() train_use =
 
 void() train_wait =
 {
+	dprint("train_wait\n");
 	// trains now fire their pathcorners' targets on arrival
 	// if a player is riding the train, treat them as activator
 	if (activator.classname != "player")
 		activator = get_closest_client();
 	SUB_UseEntTargets(self.enemy);
-	
-	// inherit speed from path_corners on arrival
-	if (self.enemy.speed > 0 && self.spawnflags & TRAIN_INHERIT)
-		self.speed = self.enemy.speed;
 	
 	if (self.wait == -1)
 	{
@@ -628,7 +659,7 @@ void() train_wait =
 	{
 		self.state = STATE_OFF;	// allow triggering while waiting
 		self.think = train_next;
-		self.nextthink = self.ltime + self.wait;
+		self.nextthink = localtime(self) + self.wait;
 		if (self.wait > 0.1)
 			sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	}
@@ -640,6 +671,7 @@ void() train_wait =
 
 void() train_next =
 {
+	dprint("train_next\n");
 	entity corner, ctrl;
 	float dspeed;
 	corner = findunlockedtarget(self.enemy, world);
@@ -681,7 +713,9 @@ void() train_next =
 		self.th_stand();
 		return;
 	}
-	
+	else if (self.oldenemy.speed > 0 && self.spawnflags & TRAIN_INHERIT)
+		self.speed = self.oldenemy.speed;
+
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	
 	if (ctrl)
@@ -701,6 +735,7 @@ void() func_train_find =
 {
 	entity corner;
 
+	dprint("func_train_find\n");
 	corner = findunlockedtarget(self, world);
 	self.enemy = corner;
 	//self.target = corner.target;
@@ -710,13 +745,14 @@ void() func_train_find =
 	if (self.targetname == string_null)
 	{	// not triggered, so start immediately
 		self.state = STATE_ON;
-		self.nextthink = self.ltime + 0.1;
+		self.nextthink = localtime(self) + 0.1;
 		self.think = train_next;
 	}
 }
 
 void() func_train_setup =
 {
+	dprint("func_train_setup\n");
 	if (!self.speed)
 		self.speed = 100;
 	if (!self.target)
@@ -742,7 +778,7 @@ void() func_train_setup =
 
 	// start trains on the second frame, to make sure their targets have had
 	// a chance to spawn
-	self.nextthink = self.ltime + 0.1;
+	self.nextthink = localtime(self) + 0.1;
 	self.think = func_train_find;
 
 }
