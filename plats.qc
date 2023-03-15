@@ -536,7 +536,7 @@ void() func_flytrain =
 	//	the velocity over a few frames for rubber-bandy motion without
 	//	colliding with state changes
 	self.buddy = spawn();
-	self.buddy.spawnflags = self.spawnflags | TRAIN_INHERIT | TRAIN_SMOOTHSPEED | TRAIN_TOGGLE; // flytrains always inherit speed
+	self.buddy.spawnflags = self.spawnflags | TRAIN_INHERIT | TRAIN_SMOOTHSPEED; // flytrains always inherit speed
 	self.buddy.speed = self.speed;
 	self.dmg = zeroconvertdefault(self.dmg, 2);
 	if (!self.dmgtime)
@@ -613,7 +613,6 @@ void() train_blocked =
 
 void() train_use =
 {
-	dprint("train_use\n");
 	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.mins) != self.enemy.origin)
 	{
 		if (self.state == STATE_ON)
@@ -643,7 +642,6 @@ void() train_use =
 
 void() train_wait =
 {
-	dprint("train_wait\n");
 	// trains now fire their pathcorners' targets on arrival
 	// if a player is riding the train, treat them as activator
 	if (activator.classname != "player")
@@ -672,7 +670,6 @@ void() train_wait =
 
 void() train_next =
 {
-	dprint("train_next\n");
 	entity corner, ctrl;
 	float dspeed;
 	corner = findunlockedtarget(self.enemy, world);
@@ -744,7 +741,6 @@ void() func_train_find =
 {
 	entity corner;
 
-	dprint("func_train_find\n");
 	corner = findunlockedtarget(self, world);
 	self.enemy = corner;
 	//self.target = corner.target;
@@ -761,7 +757,6 @@ void() func_train_find =
 
 void() func_train_setup =
 {
-	dprint("func_train_setup\n");
 	if (!self.speed)
 		self.speed = 100;
 	if (!self.target)
@@ -1174,6 +1169,7 @@ void() teleball_init =
 	//dprint("in teleball_init\n");
 	if (self.spawnflags & 1)
 	{
+		self.spawnflags -= 1;
 		setmodel (self, "progs/teleport.mdl");
 		setsize (self, VEC_ORIGIN, VEC_ORIGIN);	
 	}
@@ -1186,6 +1182,16 @@ void() misc_teleball_curvy =
 {
 	//dprint("in misc_teleball\n");
 	setorigin (self, self.origin);
+	
+	// emulate old "spawn where you were placed and then move to the first pathcorner"
+	// behavior so udob_end isn't broken by the first path_corner's targets not firing
+	entity path = spawn();
+	setorigin(path, self.origin);
+	path.classname = "path_corner";
+	path.targetname = vtos(self.origin);	// dumb, but unique!
+	path.target = self.target;
+	self.target = path.targetname;
+	// do this first so train_find finds it
 	
 	if (!self.speed) self.speed = 100;
 	self.pausetime = -1;
@@ -1280,6 +1286,7 @@ void() misc_teleporttrain =
 	precache_model2 ("progs/teleport.mdl");
 	if (self.spawnflags & 2)
 	{
+		self.spawnflags -= 2;
 		misc_teleball_curvy();
 		return;
 	}
