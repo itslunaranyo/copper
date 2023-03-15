@@ -443,6 +443,14 @@ void() train_sounds =
 ]
 */
 
+void() flytrain_ghost_die =
+{
+	if (self.owner.th_die)
+		SUB_CallAsSelf(self.owner.th_die, self.owner);
+	else
+		remove(self.owner);
+	remove(self);
+}
 
 void() flytrain_ghost_resume =
 {
@@ -546,10 +554,12 @@ void() func_flytrain =
 	self.buddy.solid = -1;
 	self.buddy.target = self.target;
 	self.buddy.targetname = self.targetname;
+	self.buddy.owner = self;
 	
 	SUB_CallAsSelf(func_train_point, self.buddy);
 	self.buddy.classname = "func_flytrain_ghost";
 	self.buddy.th_stand = train_wait;
+	self.buddy.th_die = flytrain_ghost_die;
 	
 	self.width = zeroconvertdefault(self.width, 8);
 	self.height = zeroconvertdefault(self.height, 8);
