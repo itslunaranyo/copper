@@ -228,7 +228,7 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 	
 	if (dst.classname == "misc_teleporttrain")
 	{
-		if (dst.think1 == fly_idle)
+		if (dst.buddy && dst.buddy.velocity == VEC_ORIGIN)
 		{
 			vdir = vectoangles(dst.origin - traveler.origin);
 			nofwd = TRUE;

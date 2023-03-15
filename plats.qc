@@ -1197,6 +1197,7 @@ void() misc_teleball_curvy =
 	self.pausetime = -1;
 	
 	func_flytrain_point();
+	self.classname = "misc_teleporttrain";
 	self.movetype = MOVETYPE_NOCLIP;	// for avelocity
 	
 	if (!(self.spawnflags & 1))
