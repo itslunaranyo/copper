@@ -494,6 +494,8 @@ void() flytrain_think =
 		self.pos1_x = crandom() * self.width;
 		self.pos1_y = crandom() * self.width;
 		self.pos1_z = crandom() * self.height;
+		if (self.buddy.velocity != VEC_ORIGIN)
+			self.pos1 = self.pos1 * 0.5;
 	}
 	
 	delta = (self.buddy.origin + self.pos1) - self.origin - self.mins;
@@ -509,34 +511,19 @@ void() flytrain_think =
 	self.nextthink = localtime(self) + 0.05;
 }
 
-/*QUAKED func_flytrain (0 .5 .8) ?
-A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
-If the train is the target of a button or trigger, it will not begin moving until activated.
-
-"width"		Horizontal drift range, default 8 (-1 for 0)
-"height"	Vertical drift range, default 8 (-1 for 0)
-"lip"		Length of 'leash', default 64 (increase if train jumps around at high speeds)
-"sounds"
-0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
-1) ratchet metal
-2) base plat
-*/
-/*FGD
-@SolidClass base(Train) = func_flytrain : 
-"A func_train that has smoothed drifty movement. Inherits movement speed from each path_corner's 'speed' key."
-[
-	width(string) : "Horizontal drift range" : "8"
-	height(string) : "Vertical drift range" : "8"
-	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
-]
-*/
-void() func_flytrain =
+void() flytrain_init =
 {
-	if (!SUB_ShouldSpawn()) return;
+	setorigin (self, self.buddy.origin - self.mins);
+	self.think = flytrain_think;
+	flytrain_think();
+}
 
+void() flytrain_setup =
+{
 	if (!self.target)
-		objerror("func_flytrain without a target");
+		objerror("flytrain without a target");
 		
+	dprint("in flytrain_setup\n");
 	// spawn a nonsolid point ent to follow our path sensibly and 
 	//	handle all train-like logic, bc it's a func_train
 	// we shadow it at all times with floaty drifty movement to keep 
@@ -572,13 +559,40 @@ void() func_flytrain =
 	else
 		self.movetype = MOVETYPE_PUSH;
 	
+	self.think = flytrain_init;	// wait for buddy to call train_find
+	self.nextthink = localtime(self) + 0.25; // magic amount of time :|
+}
+
+/*QUAKED func_flytrain (0 .5 .8) ?
+A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
+If the train is the target of a button or trigger, it will not begin moving until activated.
+
+"width"		Horizontal drift range, default 8 (-1 for 0)
+"height"	Vertical drift range, default 8 (-1 for 0)
+"lip"		Length of 'leash', default 64 (increase if train jumps around at high speeds)
+"sounds"
+0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
+1) ratchet metal
+2) base plat
+*/
+/*FGD
+@SolidClass base(Train) = func_flytrain : 
+"A func_train that has smoothed drifty movement. Inherits movement speed from each path_corner's 'speed' key."
+[
+	width(string) : "Horizontal drift range" : "8"
+	height(string) : "Vertical drift range" : "8"
+	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
+]
+*/
+void() func_flytrain =
+{
+	if (!SUB_ShouldSpawn()) return;
+	dprint("in flytrain\n");
+	flytrain_setup();
+	
 	precache_model_safe(self.model);
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
-	setorigin (self, self.origin);
-	
-	self.think = flytrain_think;
-	self.nextthink = localtime(self) + 0.2;
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -605,8 +619,10 @@ void() func_flytrain_point =
 {	
 	if (!SUB_ShouldSpawn()) return;
 
+	flytrain_setup();
 	precache_model_safe(self.model);
-	func_flytrain();
+	setmodel (self, self.model);
+	setsize (self, self.mins , self.maxs);
 	self.classname = "func_flytrain";
 	//self.movedir = '0 0 0';
 }
@@ -1206,8 +1222,7 @@ void() misc_teleball_curvy =
 	if (!self.speed) self.speed = 100;
 	self.pausetime = -1;
 	
-	func_flytrain_point();
-	self.classname = "misc_teleporttrain";
+	flytrain_setup();
 	self.movetype = MOVETYPE_NOCLIP;	// for avelocity
 	
 	if (!(self.spawnflags & 1))
