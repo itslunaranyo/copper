@@ -393,6 +393,7 @@ void() func_plat =
 
 const float TRAIN_INHERIT = 1;
 const float TRAIN_TOGGLE = 2;
+const float TRAIN_SMOOTHSPEED = 4;
 
 void() train_sounds =
 {
@@ -535,7 +536,7 @@ void() func_flytrain =
 	//	the velocity over a few frames for rubber-bandy motion without
 	//	colliding with state changes
 	self.buddy = spawn();
-	self.buddy.spawnflags = self.spawnflags | TRAIN_INHERIT | TRAIN_TOGGLE; // flytrains always inherit speed
+	self.buddy.spawnflags = self.spawnflags | TRAIN_INHERIT | TRAIN_SMOOTHSPEED | TRAIN_TOGGLE; // flytrains always inherit speed
 	self.buddy.speed = self.speed;
 	self.dmg = zeroconvertdefault(self.dmg, 2);
 	if (!self.dmgtime)
@@ -720,7 +721,7 @@ void() train_next =
 	
 	if (ctrl)
 	{
-		if ((self.spawnflags & TRAIN_INHERIT) && corner.speed > 0)
+		if ((self.spawnflags & TRAIN_INHERIT) && (self.spawnflags & TRAIN_SMOOTHSPEED) && corner.speed > 0)
 			dspeed = corner.speed;
 		else
 			dspeed = self.speed;
@@ -728,7 +729,15 @@ void() train_next =
 		return;
 	}
 	
-	SUB_CalcMove (corner.origin - self.mins, self.speed, self.th_stand);
+	if ((self.spawnflags & TRAIN_INHERIT) && (self.spawnflags & TRAIN_SMOOTHSPEED) && self.enemy.speed > 0)
+	{
+		// 'curved' motion in a straight line, for the speed stepping
+		vector travel = (corner.origin - self.mins) - self.origin;
+		dspeed = max( 2, floor( vlen(travel) / 64 ) );	// pick an intelligent segment count
+		SUB_CalcMoveCurve(corner.origin - self.mins, self.origin + travel * 0.5, dspeed, self.speed, self.enemy.speed, self.th_stand);
+	}
+	else
+		SUB_CalcMove (corner.origin - self.mins, self.speed, self.th_stand);
 }
 
 void() func_train_find =
@@ -783,7 +792,7 @@ void() func_train_setup =
 
 }
 
-/*QUAKED func_train (0 .5 .8) ? PATH_SPEED TOGGLE
+/*QUAKED func_train (0 .5 .8) ? PATH_SPEED TOGGLE SMOOTHSPEED
 Trains are moving platforms that players can ride. Its origin is the min corner of the train. 
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
 A train will fire all targets of a pathcorner on arrival.
@@ -801,6 +810,7 @@ Spawnflags:
 PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches them
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
 TOGGLE: allow starting/stopping motion anywhere on its path (default is to ignore triggerings when in motion)
+SMOOTH_SPEED: if PATH_SPEED, train will smoothly blend to its destination's 'speed' as it travels to it
 */
 /*FGD
 @SolidClass base(Train) = func_train : "Moving platform that players can ride. 
@@ -808,13 +818,14 @@ Its origin is the min corner of the train.
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
 A train will fire all targets of a pathcorner on arrival.
 
-If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them.
+If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them. If 'blend speed smoothly' is also set, the train will instead smoothly blend to its destination's 'speed' as it travels to it.
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
 The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion)."
 [
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
 		2 : "Toggle" : 0
+		4 : "Blend speed smoothly" : 0
 	]
 ]
 */
@@ -1158,26 +1169,6 @@ void() func_bobbing_point = {func_bobbing();}
 
 // =======================================
 
-void() teleball_think = 
-{
-	self.think1();
-	self.nextthink = time + 0.1;
-}
-
-void() teleball_use =
-{
-	self.avelocity = 50 * Vector(crandom(), crandom(), crandom());
-	if (self.think1 == fly_idle)
-		fly_newgoal( 1, 0 );
-}
-
-void() teleball_init2 =
-{
-	fly_newgoal( 1, 0 );
-	self.think = teleball_think;
-	teleball_think();
-}
-
 void() teleball_init =
 {
 	//dprint("in teleball_init\n");
@@ -1188,34 +1179,31 @@ void() teleball_init =
 	}
 	
 	self.avelocity = 50 * Vector(crandom(), crandom(), crandom());
-	self.goalentity = self;		// haaax
-	self.use = teleball_use;
-	self.think = teleball_init2;
-	self.nextthink = time + 0.1;
+	self.use = SUB_Null;
 }
 
 void() misc_teleball_curvy = 
 {
 	//dprint("in misc_teleball\n");
 	setorigin (self, self.origin);
+	
+	if (!self.speed) self.speed = 100;
+	self.pausetime = -1;
+	
+	func_flytrain_point();
+	self.movetype = MOVETYPE_NOCLIP;	// for avelocity
+	
 	if (!(self.spawnflags & 1))
 	{
 		teleball_init();
 		setmodel (self, "progs/teleport.mdl");
+		setsize (self, VEC_ORIGIN, VEC_ORIGIN);	
 	}
-	setsize (self, VEC_ORIGIN, VEC_ORIGIN);	
-	self.movetype = MOVETYPE_NOCLIP;
-	
-	if (!self.speed) {
-		self.speed2 = 100;
-		self.speed = 100;
+	else
+	{
+		self.use = teleball_init;
 	}
-	
-	self.use = teleball_init;
-	self.th_die = SUB_Remove;
-	self.th_stand = SUB_Null;
 }
-
 
 void() teletrain_use =
 {
