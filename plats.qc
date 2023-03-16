@@ -460,7 +460,7 @@ void() flytrain_ghost_resume =
 		// we were stopped along a bezier curve, resume with saved values
 		SUB_CalcMoveCurveSeg();
 	else
-		SUB_CalcMove (self.enemy.origin - self.mins, self.speed, self.th_stand);
+		SUB_CalcMove (self.enemy.origin - self.movedir, self.speed, self.th_stand);
 }
 
 void() flytrain_ghost_blocked =
@@ -498,12 +498,12 @@ void() flytrain_think =
 			self.pos1 = self.pos1 * 0.5;
 	}
 	
-	delta = (self.buddy.origin + self.pos1) - self.origin - self.mins;
+	delta = (self.buddy.origin + self.pos1) - self.origin - self.movedir;
 	wishvel = self.buddy.velocity;
 	
 	// if the ghost train hits a speed -1 teleport corner we have to teleport with it, not zoom to it
 	if (vlen(delta) > self.lip)
-		setorigin(self, self.buddy.origin - self.mins);
+		setorigin(self, self.buddy.origin - self.movedir);
 	else
 		wishvel += delta;
 	
@@ -513,7 +513,7 @@ void() flytrain_think =
 
 void() flytrain_init =
 {
-	setorigin (self, self.buddy.origin - self.mins);
+	setorigin (self, self.buddy.origin - self.movedir);
 	self.think = flytrain_think;
 	flytrain_think();
 }
@@ -593,6 +593,7 @@ void() func_flytrain =
 	precache_model_safe(self.model);
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
+	self.movedir = (self.mins + self.maxs) * 0.5;
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -624,7 +625,7 @@ void() func_flytrain_point =
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
 	self.classname = "func_flytrain";
-	//self.movedir = '0 0 0';
+	self.movedir = '0 0 0';
 }
 
 //============================================================================
@@ -639,7 +640,7 @@ void() train_blocked =
 
 void() train_use =
 {
-	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.mins) != self.enemy.origin)
+	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.movedir) != self.enemy.origin)
 	{
 		if (self.state == STATE_ON)
 		{
@@ -656,7 +657,7 @@ void() train_use =
 				// we were stopped along a bezier curve, resume with saved values
 				SUB_CalcMoveCurveSeg();
 			else
-				SUB_CalcMove (self.enemy.origin - self.mins, self.speed, self.th_stand);
+				SUB_CalcMove (self.enemy.origin - self.movedir, self.speed, self.th_stand);
 		}
 		return;
 	}
@@ -733,7 +734,7 @@ void() train_next =
 	
 	if (self.oldenemy.speed == -1)
 	{
-		setorigin(self, corner.origin - self.mins);
+		setorigin(self, corner.origin - self.movedir);
 		self.th_stand();
 		return;
 	}
@@ -748,19 +749,19 @@ void() train_next =
 			dspeed = corner.speed;
 		else
 			dspeed = self.speed;
-		SUB_CalcMoveCurve(corner.origin - self.mins, ctrl.origin - self.mins, ctrl.count, self.speed, dspeed, self.th_stand);
+		SUB_CalcMoveCurve(corner.origin - self.movedir, ctrl.origin - self.movedir, ctrl.count, self.speed, dspeed, self.th_stand);
 		return;
 	}
 	
 	if ((self.spawnflags & TRAIN_INHERIT) && (self.spawnflags & TRAIN_SMOOTHSPEED) && self.enemy.speed > 0)
 	{
 		// 'curved' motion in a straight line, for the speed stepping
-		vector travel = (corner.origin - self.mins) - self.origin;
+		vector travel = (corner.origin - self.movedir) - self.origin;
 		dspeed = max( 2, floor( vlen(travel) / 64 ) );	// pick an intelligent segment count
-		SUB_CalcMoveCurve(corner.origin - self.mins, self.origin + travel * 0.5, dspeed, self.speed, self.enemy.speed, self.th_stand);
+		SUB_CalcMoveCurve(corner.origin - self.movedir, self.origin + travel * 0.5, dspeed, self.speed, self.enemy.speed, self.th_stand);
 	}
 	else
-		SUB_CalcMove (corner.origin - self.mins, self.speed, self.th_stand);
+		SUB_CalcMove (corner.origin - self.movedir, self.speed, self.th_stand);
 }
 
 void() func_train_find =
@@ -770,7 +771,7 @@ void() func_train_find =
 	corner = findunlockedtarget(self, world);
 	self.enemy = corner;
 	//self.target = corner.target;
-	setorigin (self, corner.origin - self.mins);
+	setorigin (self, corner.origin - self.movedir);
 	if ((self.spawnflags & TRAIN_INHERIT) && corner.speed > 0)
 		self.speed = corner.speed;
 	if (self.targetname == string_null)
@@ -861,6 +862,7 @@ void() func_train =
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
 	setorigin (self, self.origin);
+	self.movedir = self.mins;
 }
 
 /*QUAKED func_train_point (0 .5 .8) (-8 -8 -8) (8 8 8) PATH_SPEED
@@ -883,16 +885,19 @@ PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches the
 */
 /*FGD
 @PointClass base(Train) = func_train_point : "Moving platform that players can ride. 
-Its origin is the min corner of the train. 
+The point entity is the origin, even if a model is specified.
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
 A train will fire all targets of a pathcorner on arrival.
 
-If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them.
-If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner."
+If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them. If 'blend speed smoothly' is also set, the train will instead smoothly blend to its destination's 'speed' as it travels to it.
+If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
+The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion)."
 [
 	model(string) : "Model to use"
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
+		2 : "Toggle" : 0
+		4 : "Blend speed smoothly" : 0
 	]
 ]
 */
@@ -907,6 +912,7 @@ void() func_train_point =
 	setmodel (self, self.model);
 	setsize (self, self.mins, self.maxs);
 	setorigin (self, self.origin);
+	self.movedir = VEC_ORIGIN;
 }
 
 // =======================================
