@@ -13,7 +13,6 @@ subs_tgt.qc
 ai.qc
 meat.qc		// gibs and gore
 combat.qc	// fight.qc decrufted away
-fly.qc		// smoothed pathcorner movement
 
 items.qc
 item_health_armor.qc
