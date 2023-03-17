@@ -1010,7 +1010,7 @@ void() trigger_hurt =
 		self.delay = 1;
 }
 
-/*QUAKED trigger_hurt_box (.5 .0 .5) (-8 -8 -8) (8 8 8) ? ? TRIGGER_FIRST
+/*QUAKED trigger_hurt_box (.5 .0 .5) (-8 -8 -8) (8 8 8) KILL BIOSUIT TRIGGER_FIRST NO_MONSTERS
 Any creature touching this will be damaged.
 Quoth2-style edict-saving bounding box trigger: define size with 'size', and the trigger volume will be that size centered on the trigger's origin.
 Resist the urge to put a tiny one of these on every light_flame.
@@ -1020,7 +1020,10 @@ Keys:
 "delay" frequency of damage in seconds, default 1. use -1 for maximum host_framerate pain spam.
 
 Flags:
+"kill" always do enough damage to kill instantly
+"biosuit" the biosuit protects against this trigger
 "trigger_first" won't be touchable until triggered once by something else
+"no_monsters" trigger will only hurt players
 */
 /*FGD
 @PointClass base(Hurt,Bounds) = trigger_hurt_box : "Trigger: Hurt. Any creature touching this will be damaged.
