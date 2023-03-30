@@ -1055,6 +1055,58 @@ void() secret_touch =
 	}
 }
 
+void() secret_door_moves =
+{
+	vector firstmove, secondmove;
+	
+	if (!self.dest1 && !self.dest2)
+	{
+		// dumb old way
+		makevectors(self.mangle);
+		if (self.spawnflags & SECRET_1ST_LEFT)
+			firstmove = v_right * -1;
+		else if (self.spawnflags & SECRET_1ST_DOWN) 
+			firstmove = v_up * -1;
+		else
+			firstmove = v_right;
+		secondmove = v_forward;
+	}
+	else
+	{
+		firstmove = normalize(self.dest1);
+		secondmove = normalize(self.dest2);
+	}
+	
+	if (!self.t_width)
+		self.t_width = BoundsAngleSize(firstmove, self.size);
+		
+	if (!self.t_length)
+		self.t_length = BoundsAngleSize(secondmove, self.size);
+
+	self.dest1 = self.origin + firstmove * self.t_width;
+	self.dest2 = self.dest1 + secondmove * self.t_length;
+}
+
+void() secret_door_find =
+{
+	// ok nobody knows what vectors are? what is our children learning
+	entity p = find(world, targetname, self.target);
+
+	// now we support literal pathcorners like a literal train
+	if (p && p.classname == "path_corner" && p.target != string_null)
+	{
+		entity p2 = find(world, targetname, p.target);
+		if (p2 && p2.classname == "path_corner")
+		{
+			self.dest1 = p.origin - self.mins;
+			self.dest2 = p2.origin - self.mins;
+			
+			return;
+		}
+	}
+
+	secret_door_moves();
+}
 
 /*QUAKED func_door_secret (0 .5 .8) ? OPEN_ONCE 1ST_LEFT 1ST_DOWN NO_SHOOT ALWAYS_SHOOT
 Secret door. Slides back, then to the side. 
@@ -1183,6 +1235,11 @@ void () func_door_secret =
 	if (self.speed <= 0) self.speed = 50;
 	if (self.speed2 <= 0) self.speed2 = self.speed;
 	
+	if (self.spawnflags & SECRET_OPEN_ONCE) self.wait = -1;
+	if (!self.wait) self.wait = 5;	// 5 seconds before closing
+	
+	bmodel_lightstyle(self, "a");
+	
 	self.use = secretdoor_use;
 	if ( !self.targetname || self.spawnflags & SECRET_YES_SHOOT)
 	{
@@ -1195,63 +1252,13 @@ void () func_door_secret =
 	}
 	self.oldorigin = self.origin;
 	
-	if (self.spawnflags & SECRET_OPEN_ONCE) self.wait = -1;
-	if (!self.wait) self.wait = 5;	// 5 seconds before closing
-	
-	bmodel_lightstyle(self, "a");
-	
-	// Magic formula...
-	// lunaran: the magic formula sucked
-	// also you moved this to secret_door_use at some point, don't know why, if a secret door breaks somewhere that might be why
-	local vector firstmove, secondmove;
+	self.skin = self.frame;
 	
 	if (self.target != string_null)
 	{
-		// ok nobody knows what vectors are? what is our children learning
-		entity p = find(world, targetname, self.target);
-		// now we support literal pathcorners like a literal train
-		if (p && p.classname == "path_corner" && p.target != string_null)
-		{
-			entity p2 = find(world, targetname, p.target);
-			if (p2 && p2.classname == "path_corner")
-			{
-				self.dest1 = p.origin - self.mins;
-				self.dest2 = p2.origin - self.mins;
-				dprint("dest 1: ");
-				dprint(vtos(self.dest1));
-				dprint(" - dest 2: ");
-				dprint(vtos(self.dest2));
-				dprint("\n");
-				
-				return;
-			}
-		}		
-	}
-	if (!self.dest1 && !self.dest2)
-	{
-		// dumb old way
-		makevectors(self.mangle);
-		if (self.spawnflags & SECRET_1ST_LEFT)
-			firstmove = v_right * -1;
-		else if (self.spawnflags & SECRET_1ST_DOWN) 
-			firstmove = v_up * -1;
-		else
-			firstmove = v_right;
-		secondmove = v_forward;
+		self.think = secret_door_find;
+		self.nextthink = self.ltime + 0.1;
 	}
 	else
-	{
-		firstmove = normalize(self.dest1);
-		secondmove = normalize(self.dest2);
-	}
-	
-	if (!self.t_width)
-		self.t_width = BoundsAngleSize(firstmove, self.size);
-		
-	if (!self.t_length)
-		self.t_length = BoundsAngleSize(secondmove, self.size);
-
-	self.dest1 = self.origin + firstmove * self.t_width;
-	self.dest2 = self.dest1 + secondmove * self.t_length;
-	self.skin = self.frame;
+		secret_door_moves();
 }
