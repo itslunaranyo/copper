@@ -935,8 +935,6 @@ void () secretdoor_move0 =
 		sound(self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.nextthink = self.ltime + 0.1;
 
-	dprint(vtos(self.dest1));
-	dprint("\n");
 	SUB_CalcMove(self.dest1, self.speed, secretdoor_move1);
 	if (self.noise2 != string_null)
 		sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
@@ -953,8 +951,6 @@ void () secretdoor_move0 =
 // Wait after first movement...
 void () secretdoor_move1 = 
 {
-	dprint(vtos(self.origin));
-	dprint("\n");
 	self.nextthink = self.ltime + 1.0;
 	self.think = secretdoor_move2;
 	if (self.noise3 != string_null)
@@ -972,8 +968,6 @@ void () secretdoor_move2 =
 // Wait here until time to go back...
 void () secretdoor_move3 =
 {
-	dprint(vtos(self.origin));
-	dprint("\n");
 	if (self.noise3 != string_null)
 		sound(self, CHAN_VOICE, self.noise3, 1, ATTN_NORM);
 	if (!(self.spawnflags & SECRET_OPEN_ONCE) || self.wait > 0)
