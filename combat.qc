@@ -164,16 +164,20 @@ void(entity hit, float damage) AddMultiDamage =
 CanDamage
 
 Returns true if the inflictor can directly damage the target.  Used for
-explosions and melee attacks.
+RadiusDamage and melee attacks.
 ============
 */
 float(entity targ, vector srcorg) CanDamage =
 {
-
+	vector corner;
+	
 	// bmodels need special checking because their origin is 0,0,0
 	if (targ.movetype == MOVETYPE_PUSH)
 	{
-		traceline2(srcorg, 0.5 * (targ.absmin + targ.absmax), self, TRACE_NOMONSTERS);
+		corner = BoundsCenter(targ);
+		if (vlen(srcorg - corner) > 512)
+			return FALSE;	// too far
+		traceline2(srcorg, corner, self, TRACE_NOMONSTERS);
 		if (trace_fraction == 1)
 			return TRUE;
 		if (trace_ent == targ)
@@ -181,17 +185,27 @@ float(entity targ, vector srcorg) CanDamage =
 		return FALSE;
 	}
 	
-	vector corner;
-	
+	if (vlen(srcorg - targ.origin) > 512)
+		return FALSE;	// too far
+		
 	// center
 	traceline2(srcorg, targ.origin, self, TRACE_NOMONSTERS);
 	if (trace_fraction == 1)
 		return TRUE;
 	
+	if (vlen(srcorg - targ.origin) > 256)
+		return FALSE;	// skip extra traces beyond sensible explosion sizes 
+
 	// lunaran: adapted from maddes fix
 	
 	// do top first, as it's most likely to return a positive
 	corner = Vector(0,0,targ.maxs_z);
+	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
+	if (trace_fraction == 1)
+		return TRUE;
+	
+	// bottom
+	corner = Vector(0,0,targ.mins_z);
 	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
 	if (trace_fraction == 1)
 		return TRUE;
@@ -218,12 +232,6 @@ float(entity targ, vector srcorg) CanDamage =
 	if (trace_fraction == 1)
 		return TRUE;
 
-	// bottom
-	corner = Vector(0,0,targ.mins_z);
-	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
-	if (trace_fraction == 1)
-		return TRUE;
-	
 	return FALSE;
 }
 
