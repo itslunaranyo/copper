@@ -83,12 +83,8 @@ void(entity targ, entity attacker) Killed =
 	self = oself;
 }
 
-
-
 void(float t) PainFinished =
 {
-	if (skill == 3)
-		t *= 1.5;	// nightmare: less frequent pains
 	self.pain_finished = time + t;
 }
 
@@ -100,7 +96,6 @@ MULTI-DAMAGE
 Collects multiple small damages into a single damage. Creates a chain of 
 entities and stores damage on each one, then applies it one by one and 
 wipes the chain.
-
 
 ==============================================================================
 */
