@@ -235,7 +235,7 @@ void() CastLightning =
 	makevectors(self.angles);
 	
 	// shamblers look weird when their lightning jumps around seeking the player
-	if (has_invis(self.enemy))
+	if (has_invis(self.enemy) && (time > self.dmgtime + 1))
 	{
 		dir = v_forward;
 	}

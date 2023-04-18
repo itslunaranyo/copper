@@ -322,7 +322,7 @@ void( entity attacker ) T_ReactToDamage =
 	// don't get distracted instantly after switching targets
 	if (time < self.dmgtime) return;
 
-	if (attacker == self.enemy)
+	if (attacker == self.enemy && (attacker.flags & FL_MONSTER))
 	{
 		self.frags = 0;	// .frags used on monsters as a 'give up on infighting' timer
 		return;
