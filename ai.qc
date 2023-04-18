@@ -92,6 +92,11 @@ float(entity targ) infront =
 	vector vec;
 	float dot;
 	
+	// spawns gain all-around vision after they've been awakened the first time so they
+	// don't go to sleep facing a wall or corner and become inert
+	if (self.classname == "monster_tarbaby" && (self.customflags & CFL_OMNIVISION))
+		return TRUE;
+	
 	makevectors (self.angles);
 	vec = normalize (targ.origin - self.origin);
 	dot = vec * v_forward;

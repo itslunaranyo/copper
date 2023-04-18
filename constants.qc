@@ -36,6 +36,7 @@ const float	CFL_UNDYING			= 256;	// god mode minus one point (player)
 const float	CFL_LIQUID_IMMUNE	= 512;	// monster spawned touching slime or lava, so assume designer wants it immune to damage
 const float	CFL_MELEEONLY		= 1024;	// has no ranged attack (monster)
 const float	CFL_LIMBO			= 2048;	// waiting in teleport limbo (coop, player)
+const float	CFL_OMNIVISION		= 4096;	// eyes in back of head
 // serverflags
 const float	SVFL_EPISODE1		= 1;
 const float	SVFL_EPISODE2		= 2;
