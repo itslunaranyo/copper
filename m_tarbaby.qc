@@ -103,6 +103,10 @@ float(entity e) tar_visible =
 void() Tar_Forget =
 {
 	self.customflags |= CFL_OMNIVISION;	// gain 360 vision in case we fall asleep in a corner
+
+	// nightmare: no sleep timer to save you
+	if (skill == 3) return;
+	
 	if (!self.rad_time)	// time to be RAD
 	{
 		// we just woke up, don't forget right away, because if we were awoken
@@ -219,7 +223,7 @@ void()	tbaby_jump5		=[	$jump5,	tbaby_jump6		]
 	if (self.flags & FL_ONGROUND)
 		self.flags = self.flags - FL_ONGROUND;
 		
-	if (!tar_visible(self.enemy))
+	if (skill < 3 && !tar_visible(self.enemy))
 		self.cnt = self.cnt + 1;
 		
 	self.delay = 0;

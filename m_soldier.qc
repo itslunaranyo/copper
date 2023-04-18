@@ -98,8 +98,8 @@ void()	army_atk3	=[	$shoot3,	army_atk4	] {ai_face(); army_aim(); }
 void()	army_atk4	=[	$shoot4,	army_atk5	] {ai_face();}
 void()	army_atk5	=[	$shoot5,	army_atk6	] {ai_face(); army_fire(); }
 void()	army_atk6	=[	$shoot6,	army_atk7	] {ai_face();}
-void()	army_atk7	=[	$shoot7,	army_atk8	] {ai_face();}//ai_check_refire (army_atk3);}
-void()	army_atk8	=[	$shoot8,	army_atk9	] {ai_face();}
+void()	army_atk7	=[	$shoot7,	army_atk8	] {ai_face(); ai_check_refire (army_atk3);}
+void()	army_atk8	=[	$shoot8,	army_atk9	] {ai_face(); ai_attack_finished (0.3 + random() + random());}
 void()	army_atk9	=[	$shoot9,	army_run1	] {ai_face();}
 
 

@@ -398,11 +398,6 @@ ai_attack_finished
 lunaran: nightmare is no longer made harder by all monsters always firing. they looked 
 really stupid when they'd automatically become turrets, and it made combat much less 
 mobile and dynamic (shamblers were particularly 'cheesable')
-
-monster attack frequency is no longer used as a means to artificially inflate or
-scale difficulty. a theoretical player who begins learning Quake on Easy would gain
-skills and reflexive instincts which can be guaranteed to carry over to higher skills
-as that player improves to higher challenges.
 ============
 */
 void(float t) ai_attack_finished =
@@ -414,47 +409,33 @@ void(float t) ai_attack_finished =
 ===========
 ai_check_refire
 
-these monsters DO fire more than once on nightmare, but not infinitely over and
-over - making it random makes it uncertain and thus not cheesable
+for volley fire on nightmare from certain monsters (grunts/ogres)
 ============
 */
-void (void() th, float minf) ai_check_refire_min =
+void (void() th) ai_check_refire =
 {
+	if (skill != 3)
+		return;
 	if (!alive(self.enemy))
 		return;
 	if (!CheckClearAttack())
 		return;
 	
-	if (self.cnt < minf)
+	if ( random() < 0.6 - 0.15 * self.cnt )
 	{
 		self.cnt += 1;
 		self.think = th;
 		return;
 	}
-	
-	// no further refire unless nightmare
-	if (skill < 3)
-	{
-		self.cnt = 0;
-		return;
-	}
-	
-	// diminish chances of refire with each extra shot
-	self.cnt = max(1, (self.cnt-minf) * 2);
-	if ( random() * self.cnt > 0.5 )
-	{
-		self.cnt = 0;
-		return;
-	}
-	self.cnt += minf;
-	self.think = th;
+	self.cnt = 0;
 }
 
-void (void() th) ai_check_refire =
+// for speedy think rates on nightmare for melee monsters
+// TODO: don't use the frame[] shorthand just to then call this as an override 
+void() nmfast =
 {
-	ai_check_refire_min(th, 0);
+	if (skill == 3) self.nextthink = time + 0.075;
 }
-
 
 /*
 ===========
@@ -530,8 +511,12 @@ void() HuntTarget =
 	self.goalentity = self.enemy;
 	self.ideal_yaw = enemy_yaw();
 	self.think = self.th_run;
-	self.nextthink = time + 0.1;
-	ai_attack_finished (1);	// wait a while before first attack
+	self.nextthink = time + 0.05;
+	
+	// wait a while before first attack
+	if (skill == 3)	// nightmare: react faster to waking up
+		ai_attack_finished(0.4);
+	else ai_attack_finished (1);
 }
 
 void() SightSound =

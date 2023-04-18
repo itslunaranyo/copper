@@ -126,7 +126,10 @@ void()	WizardAttackFinished =
 	else
 	{
 		self.attack_state = AS_SLIDING;
-		self.think = wiz_side1;
+		if (skill == 3)
+			self.think = wiz_run1;
+		else
+			self.think = wiz_side1;
 	}
 }
 
@@ -140,52 +143,56 @@ FAST ATTACKS
 
 void() Wiz_FastFire =
 {
-	local vector		vec;
-	local vector		dst;
-	local entity		wsp;
+	vector vec;
+	vector dst;
+	entity wsp;
 
 	if (self.owner.health > 0)
 	{
 		self.owner.effects = self.owner.effects | EF_MUZZLEFLASH;
 
-		makevectors (self.enemy.angles);	
-		dst = enemy_vispos() - 13*self.movedir;
+		dst = enemy_vispos() - self.movedir;
 	
 		vec = normalize(dst - self.origin);
 		sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
-		wsp = launch_wizspike (self.origin, vec*600);	
+		wsp = launch_wizspike (self.origin, vec*600);
 		wsp.owner = wsp.trueowner = self.owner;
 	}
 
 	remove (self);
 }
 
+void(float when, float where) Wiz_Shot =
+{
+	entity	missile;
+	
+	missile = spawn ();
+	missile.owner = self;
+	setsize (missile, '0 0 0', '0 0 0');		
+	setorigin (missile, self.origin + '0 0 30' + v_forward * 14 + v_right * where);
+	missile.enemy = self.enemy;
+	missile.nextthink = time + when;
+	missile.think = Wiz_FastFire;
+	missile.movedir = v_right * where;
+}
 
 void() Wiz_StartFast =
 {
-	local	entity	missile;
-	
-	sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
+	//sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
 	self.v_angle = self.angles;
 	makevectors (self.angles);
 
-	missile = spawn ();
-	missile.owner = self;
-	setsize (missile, '0 0 0', '0 0 0');		
-	setorigin (missile, self.origin + '0 0 30' + v_forward*14 + v_right*14);
-	missile.enemy = self.enemy;
-	missile.nextthink = time + 0.8;
-	missile.think = Wiz_FastFire;
-	missile.movedir = v_right;
-
-	missile = spawn ();
-	missile.owner = self;
-	setsize (missile, '0 0 0', '0 0 0');		
-	setorigin (missile, self.origin + '0 0 30' + v_forward*14 + v_right* -14);
-	missile.enemy = self.enemy;
-	missile.nextthink = time + 0.3;
-	missile.think = Wiz_FastFire;
-	missile.movedir = VEC_ORIGIN - v_right;
+	// nightmare: three shots instead of two, with less anticipation
+	if (skill == 3)
+	{
+		Wiz_Shot(0.15, 15);
+		Wiz_Shot(0.55, -15);
+		Wiz_Shot(0.95, 0);
+		return;
+	}
+	
+	Wiz_Shot(0.8, 13);
+	Wiz_Shot(0.3, -13);
 }
 
 

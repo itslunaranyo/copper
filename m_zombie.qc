@@ -378,12 +378,11 @@ void() zombie_paine3	=[	$paine3,	zombie_paine4	] {ai_pain(5);}
 void() zombie_paine4	=[	$paine4,	zombie_paine5	] {ai_pain(3);}
 void() zombie_paine5	=[	$paine5,	zombie_paine6	] {ai_pain(1);}
 void() zombie_paine6	=[	$paine6,	zombie_paine7	] {ai_pain(2);}
-void() zombie_paine7	=[	$paine7,	zombie_paine8	] {ai_pain(1);}
+void() zombie_paine7	=[	$paine7,	zombie_paine8	] {ai_pain(1);self.solid = SOLID_NOT;}
 void() zombie_paine8	=[	$paine8,	zombie_paine9	] {ai_pain(1);}
 void() zombie_paine9	=[	$paine9,	zombie_paine10	] {ai_pain(2);}
 void() zombie_paine10	=[	$paine10,	zombie_paine11	] {
 	sound (self, CHAN_BODY, "zombie/z_fall.wav", 1, ATTN_NORM);
-	self.solid = SOLID_NOT;
 }
 void() zombie_paine11	=[	$paine11,	zombie_paine12	] {}
 void() zombie_paine12	=[	$paine12,	zombie_paine13	] {
@@ -537,6 +536,68 @@ void() zombie_die =
 {
 	sound (self, CHAN_VOICE, "zombie/z_gib.wav", 1, ATTN_NORM);
 	GibSpray ("progs/h_zombie.mdl", self.health);
+	
+	if (skill != 3) return;
+	
+	// respawning zombie behavior:
+	if (self.customflags & CFL_LEFTY)
+		self.flags = not(self.flags, FL_MONSTER);
+	self.think = zombie_return;
+	self.nextthink = time + random() + (1 + random()) * 30 * self.cnt + 5;
+}
+
+void() zombie_return =
+{
+	vector org;
+	
+	if (pointcontents(self.origin) < -1)
+		return;	// in something
+	
+	if (self.velocity != '0 0 0')
+	{
+		self.nextthink = time + 5;
+		return;
+	}
+	
+	self.cnt += 1;
+	self.solid = SOLID_SLIDEBOX;
+	setorigin(self,self.origin + '0 0 25');
+	setsize (self, '-16 -16 -24', '16 16 40');
+	self.movetype = MOVETYPE_STEP;
+	
+	if (walkmove(0,0))
+	{
+		self.deadflag = 0;
+		self.spawnflags |= SPAWN_LYING;
+		self.customflags |= CFL_LEFTY;	// remember not to count this as a kill again
+		self.flags |= FL_MONSTER;
+		if (!enemy_alive() || self.enemy.classname != "player")
+			self.enemy = world;
+		self.avelocity = VEC_ORIGIN;
+		
+		org = self.origin - '0 0 16';
+		particle(org, '8 8 0', 73, 16);
+		particle(org, '8 -8 0', 73, 16);
+		particle(org, '-8 8 0', 73, 16);
+		particle(org, '-8 -8 0', 73, 16);
+		sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_IDLE);
+
+		monster_zombie_spawn();
+		
+		return;
+	}
+	
+	dprint ("zreturn in wall at: ");
+	dprint (vtos(self.origin));
+	dprint ("\n");
+	
+	self.solid = SOLID_NOT;
+	self.movetype = MOVETYPE_BOUNCE;
+	setsize (self, '-16 -16 0', '16 16 56');
+	setorigin(self,self.origin - '0 0 25');
+	if (self.cnt >= 5)
+		return;
+	self.nextthink = time + 5;
 }
 
 //============================================================================

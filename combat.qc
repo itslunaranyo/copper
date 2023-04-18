@@ -79,7 +79,7 @@ void(entity targ, entity attacker) Killed =
 	}
 	else
 		self.th_die ();
-	
+
 	self = oself;
 }
 
@@ -87,6 +87,8 @@ void(entity targ, entity attacker) Killed =
 
 void(float t) PainFinished =
 {
+	if (skill == 3)
+		t *= 1.5;	// nightmare: less frequent pains
 	self.pain_finished = time + t;
 }
 

@@ -82,9 +82,13 @@ vector(vector dest, float speed) OgreAimGrenade =
 	a = vectoyaw(dest);
 	angs = '0 0 0';
 	angs_y = a;
+	
 	// clamp the perfect terminator-aim to limit deadon shots to the face, then average with 
 	// old dumb aim for "z-only-slightly-aware"ness(tm)
-	if (vlen(dest) < 160)
+	
+	if (skill == 3) // nightmare: 66% z-awareness
+		theta = (theta * 2 + 18) / 3;
+	else if (vlen(dest) < 160)
 		theta = (clamp(theta, -80, 70) + 18) / 2;
 	else
 		theta = (clamp(theta, -60, 60) + 18) / 2;
@@ -259,18 +263,14 @@ void() ogre_smash14	=[	$smash14,		ogre_run1	] {ai_charge(12);}
 void() ogre_nail1	=[	$shoot1,		ogre_nail2	] {ai_face();}
 void() ogre_nail2	=[	$shoot2,		ogre_nail3	] {ai_face();}
 void() ogre_nail3	=[	$shoot2,		ogre_nail4	] {ai_face();}
-void() ogre_nail4	=[	$shoot3,		ogre_nail5	] 
-{
-	ai_face();
-		OgreFireGrenade();
-}
-void() ogre_nail5	=[	$shoot4,		ogre_nail6	] {ai_face();}
+void() ogre_nail4	=[	$shoot3,		ogre_nail5	] {ai_face(); OgreFireGrenade();}
+void() ogre_nail5	=[	$shoot4,		ogre_nail6	] {ai_face(); ai_check_refire(ogre_nail6l);}
 void() ogre_nail6	=[	$shoot5,		ogre_nail7	] {ai_face();}
 void() ogre_nail7	=[	$shoot6,		ogre_run1	] {
 	ai_face();
-	//ai_check_refire(ogre_nail2);
 	ai_attack_finished (1 + 2*random());
 }
+void() ogre_nail6l	=[	$shoot6,		ogre_nail2	] {ai_face();}
 
 /*
 ===========
@@ -322,24 +322,24 @@ float() OgreCheckAttack =
 }
 
 
-void()	ogre_pain1	=[	$pain1,		ogre_pain2	] { }
+void()	ogre_pain1	=[	$pain1,		ogre_pain2	] {PainFinished(1); }
 void()	ogre_pain2	=[	$pain2,		ogre_pain3	] {}
 void()	ogre_pain3	=[	$pain3,		ogre_pain4	] {}
 void()	ogre_pain4	=[	$pain4,		ogre_pain5	] {}
 void()	ogre_pain5	=[	$pain5,		ogre_run1	] {}
 
-void()	ogre_painb1	=[	$painb1,	ogre_painb2	] { }
+void()	ogre_painb1	=[	$painb1,	ogre_painb2	] {PainFinished(0.5); }
 void()	ogre_painb2	=[	$painb2,	ogre_painb3	] {}
 void()	ogre_painb3	=[	$painb3,	ogre_run1	] {}
 
-void()	ogre_painc1	=[	$painc1,	ogre_painc2	] { }
+void()	ogre_painc1	=[	$painc1,	ogre_painc2	] { PainFinished(1);}
 void()	ogre_painc2	=[	$painc2,	ogre_painc3	] {}
 void()	ogre_painc3	=[	$painc3,	ogre_painc4	] {}
 void()	ogre_painc4	=[	$painc4,	ogre_painc5	] {}
 void()	ogre_painc5	=[	$painc5,	ogre_painc6	] {}
 void()	ogre_painc6	=[	$painc6,	ogre_run1	] {}
 
-void()	ogre_paind1	=[	$paind1,	ogre_paind2	] { }
+void()	ogre_paind1	=[	$paind1,	ogre_paind2	] { PainFinished(2);}
 void()	ogre_paind2	=[	$paind2,	ogre_paind3	] {ai_pain(10);}
 void()	ogre_paind3	=[	$paind3,	ogre_paind4	] {ai_pain(9);}
 void()	ogre_paind4	=[	$paind4,	ogre_paind5	] {ai_pain(4);}
@@ -347,16 +347,16 @@ void()	ogre_paind5	=[	$paind5,	ogre_paind6	] {}
 void()	ogre_paind6	=[	$paind6,	ogre_paind7	] {}
 void()	ogre_paind7	=[	$paind7,	ogre_paind8	] {}
 void()	ogre_paind8	=[	$paind8,	ogre_paind9	] {}
-void()	ogre_paind9	=[	$paind9,	ogre_paind10	] {}
-void()	ogre_paind10=[	$paind10,	ogre_paind11	] {}
-void()	ogre_paind11=[	$paind11,	ogre_paind12	] {}
-void()	ogre_paind12=[	$paind12,	ogre_paind13	] {}
-void()	ogre_paind13=[	$paind13,	ogre_paind14	] {}
-void()	ogre_paind14=[	$paind14,	ogre_paind15	] {}
-void()	ogre_paind15=[	$paind15,	ogre_paind16	] {}
+void()	ogre_paind9	=[	$paind9,	ogre_paind10] {}
+void()	ogre_paind10=[	$paind10,	ogre_paind11] {}
+void()	ogre_paind11=[	$paind11,	ogre_paind12] {}
+void()	ogre_paind12=[	$paind12,	ogre_paind13] {}
+void()	ogre_paind13=[	$paind13,	ogre_paind14] {}
+void()	ogre_paind14=[	$paind14,	ogre_paind15] {}
+void()	ogre_paind15=[	$paind15,	ogre_paind16] {}
 void()	ogre_paind16=[	$paind16,	ogre_run1	] {}
 
-void()	ogre_paine1	=[	$paine1,	ogre_paine2	] { }
+void()	ogre_paine1	=[	$paine1,	ogre_paine2	] {PainFinished(2); }
 void()	ogre_paine2	=[	$paine2,	ogre_paine3	] {ai_pain(10);}
 void()	ogre_paine3	=[	$paine3,	ogre_paine4	] {ai_pain(9);}
 void()	ogre_paine4	=[	$paine4,	ogre_paine5	] {ai_pain(4);}
@@ -364,12 +364,12 @@ void()	ogre_paine5	=[	$paine5,	ogre_paine6	] {}
 void()	ogre_paine6	=[	$paine6,	ogre_paine7	] {}
 void()	ogre_paine7	=[	$paine7,	ogre_paine8	] {}
 void()	ogre_paine8	=[	$paine8,	ogre_paine9	] {}
-void()	ogre_paine9	=[	$paine9,	ogre_paine10	] {}
-void()	ogre_paine10=[	$paine10,	ogre_paine11	] {}
-void()	ogre_paine11=[	$paine11,	ogre_paine12	] {}
-void()	ogre_paine12=[	$paine12,	ogre_paine13	] {}
-void()	ogre_paine13=[	$paine13,	ogre_paine14	] {}
-void()	ogre_paine14=[	$paine14,	ogre_paine15	] {}
+void()	ogre_paine9	=[	$paine9,	ogre_paine10] {}
+void()	ogre_paine10=[	$paine10,	ogre_paine11] {}
+void()	ogre_paine11=[	$paine11,	ogre_paine12] {}
+void()	ogre_paine12=[	$paine12,	ogre_paine13] {}
+void()	ogre_paine13=[	$paine13,	ogre_paine14] {}
+void()	ogre_paine14=[	$paine14,	ogre_paine15] {}
 void()	ogre_paine15=[	$paine15,	ogre_run1	] {}
 
 
@@ -383,31 +383,19 @@ void(entity attacker, float damage)	ogre_pain =
 		
 	sound (self, CHAN_VOICE, "ogre/ogpain1.wav", 1, ATTN_NORM);		
 	r = random();
+	if (skill == 3)
+		r *= random();	// nightmare: make the long stuns rare
+	
 	if (r < 0.25)
-	{
-		ogre_pain1 ();
-		PainFinished(1);
-	}
+		ogre_painb1 ();	// shortest
 	else if (r < 0.5)
-	{
-		ogre_painb1 ();
-		PainFinished(1);
-	}
+		ogre_pain1 ();
 	else if (r < 0.75)
-	{
 		ogre_painc1 ();
-		PainFinished(1);
-	}
 	else if (r < 0.88)
-	{
-		ogre_paind1 ();
-		PainFinished(2);
-	}
-	else
-	{
 		ogre_paine1 ();
-		PainFinished(2);
-	}
+	else
+		ogre_paind1 ();	// longest
 }
 
 void()	ogre_die1	=[	$death1,	ogre_die2	] {}

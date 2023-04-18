@@ -157,48 +157,51 @@ void()	enf_run6	=[	$run6  ,	enf_run7	] {ai_run(14);}
 void()	enf_run7	=[	$run7  ,	enf_run8	] {ai_run(7);}
 void()	enf_run8	=[	$run8  ,	enf_run1	] {ai_run(11);}
 
+float() enf_shouldbreak =
+{
+	if (!alive(self.enemy) || self.enemy.customflags & CFL_LIMBO )
+		return TRUE;
+	
+	if (angledif(self.ideal_yaw, self.angles_y) > 80)	// player got behind us
+		return TRUE;
+	
+	if (has_invis(self.enemy) && random() > 0.80)
+	{
+		ai_attack_finished(0.25 + random()); // randomly break volley if player is being sneaky
+		return TRUE;
+	}
+	if (!enforcer_clear_attack())
+	{
+		ai_attack_finished(1 + random());	// force a little maneuvering if LOS is broken
+		return TRUE;
+	}
+	return FALSE;
+}
+
 void()	enf_atk1	=[	$attack1,	enf_atk2	] {self.yaw_speed = 30; ai_face();}
 void()	enf_atk2	=[	$attack2,	enf_atk3	] {ai_face();}
 void()	enf_atk3	=[	$attack3,	enf_atk4	] {ai_face();}
 void()	enf_atk4	=[	$attack4,	enf_atk5	] {ai_face();}
 void()	enf_atk5	=[	$attack5,	enf_atk6	] {ai_face();}
 void()	enf_atk6	=[	$attack6,	enf_atk7	] {enforcer_fire();}
-void()	enf_atk7	=[	$attack7,	enf_atk8	] {ai_face();}
-void()	enf_atk8	=[	$attack8,	enf_atk9	] {ai_face();}
-void()	enf_atk9	=[	$attack9,	enf_atk10	] {ai_face(); 
-	if (!alive(self.enemy) || self.enemy.customflags & CFL_LIMBO )
-		return;
-	
-	if (angledif(self.ideal_yaw, self.angles_y) > 80)	// player got behind us
-		return;
-	
-	if (has_invis(self.enemy) && random() > 0.80)
-	{
-		ai_attack_finished(0.25 + random()); // randomly break volley if player is being sneaky
-		return;
-	}
-	if (!enforcer_clear_attack())
-	{
-		ai_attack_finished(1 + random());	// force a little maneuvering if LOS is broken
-		return;
-	}
-	self.think = enf_atk6;
-}
-
+void()	enf_atk7	=[	$attack7,	enf_atk8	] {ai_face(); nmfast(); }
+void()	enf_atk8	=[	$attack8,	enf_atk9	] {ai_face(); nmfast(); }
+void()	enf_atk9	=[	$attack9,	enf_atk10	] {ai_face(); if (!enf_shouldbreak()) self.think = enf_atk6; }
 void()	enf_atk10	=[	$attack10,	enf_run1	] {self.yaw_speed = 20; ai_face();}
 
-void()	enf_paina1	=[	$paina1,	enf_paina2	] {}
+
+void()	enf_paina1	=[	$paina1,	enf_paina2	] {PainFinished(1);}
 void()	enf_paina2	=[	$paina2,	enf_paina3	] {}
 void()	enf_paina3	=[	$paina3,	enf_paina4	] {}
 void()	enf_paina4	=[	$paina4,	enf_run1	] {}
 
-void()	enf_painb1	=[	$painb1,	enf_painb2	] {}
+void()	enf_painb1	=[	$painb1,	enf_painb2	] {PainFinished(1);}
 void()	enf_painb2	=[	$painb2,	enf_painb3	] {}
 void()	enf_painb3	=[	$painb3,	enf_painb4	] {}
 void()	enf_painb4	=[	$painb4,	enf_painb5	] {}
 void()	enf_painb5	=[	$painb5,	enf_run1	] {}
 
-void()	enf_painc1	=[	$painc1,	enf_painc2	] {}
+void()	enf_painc1	=[	$painc1,	enf_painc2	] {PainFinished(1);}
 void()	enf_painc2	=[	$painc2,	enf_painc3	] {}
 void()	enf_painc3	=[	$painc3,	enf_painc4	] {}
 void()	enf_painc4	=[	$painc4,	enf_painc5	] {}
@@ -207,7 +210,7 @@ void()	enf_painc6	=[	$painc6,	enf_painc7	] {}
 void()	enf_painc7	=[	$painc7,	enf_painc8	] {}
 void()	enf_painc8	=[	$painc8,	enf_run1	] {}
 
-void()	enf_paind1	=[	$paind1,	enf_paind2	] {}
+void()	enf_paind1	=[	$paind1,	enf_paind2	] {PainFinished(2);}
 void()	enf_paind2	=[	$paind2,	enf_paind3	] {}
 void()	enf_paind3	=[	$paind3,	enf_paind4	] {}
 void()	enf_paind4	=[	$paind4,	enf_paind5	] {ai_painforward(2);}
@@ -235,7 +238,8 @@ void(entity attacker, float damage)	enf_pain =
 	float r;
 	self.yaw_speed = 20;
 	
-	r = random ();
+	r = random();
+	if (skill == 3) r *= 0.75;	// nightmare: longest stun is very rare
 	
 	if (r < 0.5)
 		sound (self, CHAN_VOICE, "enforcer/pain1.wav", 1, ATTN_NORM);
@@ -243,25 +247,13 @@ void(entity attacker, float damage)	enf_pain =
 		sound (self, CHAN_VOICE, "enforcer/pain2.wav", 1, ATTN_NORM);
 
 	if (r < 0.2)
-	{
-		PainFinished(1);
 		enf_paina1 ();
-	}
 	else if (r < 0.4)
-	{
-		PainFinished(1);
 		enf_painb1 ();
-	}
 	else if (r < 0.7)
-	{
-		PainFinished(1);
 		enf_painc1 ();
-	}
 	else
-	{
-		PainFinished(2);
 		enf_paind1 ();
-	}
 }
 
 //============================================================================

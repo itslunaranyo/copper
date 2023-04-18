@@ -181,6 +181,7 @@ void() ShalHome =
 		return;
 	}
 	
+	self.think = ShalHome;
 	self.nextthink = time + SHAL_BALL_THINK_RATE;
 	rate = SHAL_BALL_TURN_RATE;
 	dot = normalize(self.velocity) * normalize(self.enemy.origin - self.origin);
@@ -191,50 +192,76 @@ void() ShalHome =
 	// if the projectile is inside a notrace entity at this time, it'll touch again this frame
 	// and reset anyway, so this state will pingpong until it passes out the other side
 	
-	// 'poor' homing (half turn rate):
-	if ( self.owner.health <= 0		// if our mama dies
-		|| self.owner.customflags & CFL_PLUNGE	// or falls in a hole
-		
-		//|| !visible(self.enemy)		// if we lost LOS
-		// took ^^ this one out, because it made voreballs even more effective at going
-		// around corners, which meant that high skill players had a nice new dodge move
-		// but average players who tried to fight the vore the old cautious way were punished
-		
-		// || has_invis(self.enemy)			// if target is invis
-		// 1.1: took ^^ this one out too, because projectiles auto-miss the player when
-		// invisible now so they might as well always move the same
-		
-		|| pointcontents(self.origin) < CONTENT_SOLID ) // if voreball is underwater
-	{
-		// voreballs headed straight at the player when he's hidden should maintain course, to
-		// make the dodge possible without it immediately turning to hit him
-		if (dot > 0)
-		{
-			rate *= max(1, 1.5 * (1 - dot));
-		}
-		self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.5);
-	}
-	else // good homing (full turn rate):
-	{
-		// voreballs headed straight away from the player don't normally seem to be able to pick a direction to 
-		// turn and wobble more or less straight away - amp turn rate in these cases to force a 'decision'
-		if (dot < 0)
-		{
-			rate *= min(1.4, 1.4 + fabs(dot));
-		}
-		// FIXME: figure out how to stop them veering up or down when they don't have to
-		self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate);
-	}
-	
-	self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
-	
 	// go faster at long distance to close the gap, so snipey vores have a better presence
 	dist = vlen(self.enemy.origin - self.origin);
 	dist = saturate( (dist-120) / 512 );
-	self.velocity *= 1 + dist;
 	
-	self.think = ShalHome;
-	self.oldvelocity = self.velocity;
+	if (skill < 3)
+	{
+		// 'poor' homing (half turn rate):
+		if ( self.owner.health <= 0		// if our mama dies
+			|| self.owner.customflags & CFL_PLUNGE	// or falls in a hole
+			
+			//|| !visible(self.enemy)		// if we lost LOS
+			// took ^^ this one out, because it made voreballs even more effective at going
+			// around corners, which meant that high skill players had a nice new dodge move
+			// but average players who tried to fight the vore the old cautious way were punished
+			
+			// || has_invis(self.enemy)			// if target is invis
+			// 1.1: took ^^ this one out too, because projectiles auto-miss the player when
+			// invisible now so they might as well always move the same
+			
+			|| pointcontents(self.origin) < CONTENT_SOLID ) // if voreball is underwater
+		{
+			// voreballs headed straight at the player when he's hidden should maintain course, to
+			// make the dodge possible without it immediately turning to hit him
+			if (dot > 0)
+			{
+				rate *= max(1, 1.5 * (1 - dot));
+			}
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.5);
+		}
+		else // good homing (full turn rate):
+		{
+			// voreballs headed straight away from the player don't normally seem to be able to pick a direction to 
+			// turn and wobble more or less straight away - amp turn rate in these cases to force a 'decision'
+			if (dot < 0)
+			{
+				rate *= min(1.4, 1.4 + fabs(dot));
+			}
+			// FIXME: figure out how to stop them veering up or down when they don't have to
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate);
+		}
+		
+		self.velocity *= 1 + dist;		
+		self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
+	}
+	else
+	{
+		// nightmare: vanilla-evil homing with corner following to force engagement rather than encourage it
+		if (visible(self.enemy))	// go straight to follow player around corners
+		{
+			// poor homing
+			if ( self.owner.health <= 0	 || self.owner.customflags & CFL_PLUNGE
+				|| pointcontents(self.origin) < CONTENT_SOLID )
+			{
+				if (dot > 0)
+				{
+					rate *= max(1, 1.5 * (1 - dot));
+				}
+				self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.5);
+			}
+			else // evile homing
+			{
+				self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 5);
+			}
+			
+			self.velocity *= 1 + dist;
+			self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
+		}
+	}
+
+	self.oldvelocity = self.velocity;	
 }
 
 

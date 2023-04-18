@@ -64,7 +64,7 @@ void() f_walk16 =[	$swim16, f_walk17 ] {ai_walk(8);}
 void() f_walk17 =[	$swim17, f_walk18 ] {ai_walk(7);}
 void() f_walk18 =[	$swim18, f_walk1 ] {ai_walk(6);}
 
-void() f_run1 =[	$swim1, f_run2 ] {ai_run(12);
+void() f_run1 =[	$swim1, f_run2 ] {nmfast(); ai_run(12);
 	if (random() < 0.5)
 		sound (self, CHAN_VOICE, "fish/idle.wav", 1, ATTN_NORM);
 	fish_check_attack();	// calling this after ai_run is such a hack
@@ -73,14 +73,14 @@ void() f_run1 =[	$swim1, f_run2 ] {ai_run(12);
 							// technically visible even though their eyes are
 							// above water
 }
-void() f_run2 =[	$swim3, f_run3 ] {ai_run(14); fish_check_attack();}
-void() f_run3 =[	$swim5, f_run4 ] {ai_run(16); fish_check_attack();}
-void() f_run4 =[	$swim7, f_run5 ] {ai_run(14); fish_check_attack();}
-void() f_run5 =[	$swim9, f_run6 ] {ai_run(12); fish_check_attack();}
-void() f_run6 =[	$swim11, f_run7 ] {ai_run(14); fish_check_attack();}
-void() f_run7 =[	$swim13, f_run8 ] {ai_run(16); fish_check_attack();}
-void() f_run8 =[	$swim15, f_run9 ] {ai_run(14); fish_check_attack();}
-void() f_run9 =[	$swim17, f_run1 ] {ai_run(12); fish_check_attack();}
+void() f_run2 =[	$swim3, f_run3 ] {nmfast(); ai_run(14); fish_check_attack();}
+void() f_run3 =[	$swim5, f_run4 ] {nmfast(); ai_run(16); fish_check_attack();}
+void() f_run4 =[	$swim7, f_run5 ] {nmfast(); ai_run(14); fish_check_attack();}
+void() f_run5 =[	$swim9, f_run6 ] {nmfast(); ai_run(12); fish_check_attack();}
+void() f_run6 =[	$swim11, f_run7 ] {nmfast(); ai_run(14); fish_check_attack();}
+void() f_run7 =[	$swim13, f_run8 ] {nmfast(); ai_run(16); fish_check_attack();}
+void() f_run8 =[	$swim15, f_run9 ] {nmfast(); ai_run(14); fish_check_attack();}
+void() f_run9 =[	$swim17, f_run1 ] {nmfast(); ai_run(12); fish_check_attack();}
 
 void() fish_melee =
 {
@@ -99,6 +99,10 @@ void() fish_melee =
 	sound (self, CHAN_VOICE, "fish/bite.wav", 1, ATTN_NORM);
 	ldmg = 6 + random() * 6;
 	T_DamageMelee (self.enemy, self, ldmg);
+	
+	// nightmare: rob the player of a little air
+	if (skill == 3 && !has_biosuit(self.enemy))
+		self.enemy.air_finished -= 1;
 }
 
 /*
@@ -157,24 +161,24 @@ void() f_attack =
 		f_attack13();
 }
 
-void() f_attack1 = [ $attack1, f_attack2 ] {ai_charge(10);}
-void() f_attack2 = [ $attack2, f_attack3 ] {ai_charge(10);}
-void() f_attack3 = [ $attack3, f_attack4 ] {fish_melee();}
-void() f_attack4 = [ $attack4, f_attack5 ] {ai_charge(10);}
-void() f_attack5 = [ $attack5, f_attack6 ] {ai_charge(10);}
-void() f_attack6 = [ $attack6, f_attack7 ] {ai_charge(10);}
-void() f_attack7 = [ $attack7, f_attack8 ] {ai_charge(10);}
-void() f_attack8 = [ $attack8, f_attack9 ] {ai_charge(10);}
-void() f_attack9 = [ $attack9, f_attack10] {fish_melee();}
-void() f_attack10 =[ $attack10, f_attack11] {ai_charge(10);}
-void() f_attack11 =[ $attack11, f_attack12] {ai_charge(10);}
-void() f_attack12 =[ $attack12, f_attack13] {ai_charge(10);}
-void() f_attack13 =[ $attack13, f_attack14] {ai_charge(10);}
-void() f_attack14 =[ $attack14, f_attack15] {ai_charge(10);}
-void() f_attack15 =[ $attack15, f_attack16] {fish_melee();}
-void() f_attack16 =[ $attack16, f_attack17] {ai_charge(10);}
-void() f_attack17 =[ $attack17, f_attack18] {ai_charge(10);}
-void() f_attack18 =[ $attack18, f_attack1 ] {ai_charge(10);}
+void() f_attack1 = [ $attack1, f_attack2 ]  {nmfast(); ai_charge(10);}
+void() f_attack2 = [ $attack2, f_attack3 ]  {nmfast(); ai_charge(10);}
+void() f_attack3 = [ $attack3, f_attack4 ]  {nmfast(); fish_melee();}
+void() f_attack4 = [ $attack4, f_attack5 ]  {nmfast(); ai_charge(10);}
+void() f_attack5 = [ $attack5, f_attack6 ]  {nmfast(); ai_charge(10);}
+void() f_attack6 = [ $attack6, f_attack7 ]  {nmfast(); ai_charge(10);}
+void() f_attack7 = [ $attack7, f_attack8 ]  {nmfast(); ai_charge(10);}
+void() f_attack8 = [ $attack8, f_attack9 ]  {nmfast(); ai_charge(10);}
+void() f_attack9 = [ $attack9, f_attack10]  {nmfast(); fish_melee();}
+void() f_attack10 =[ $attack10, f_attack11] {nmfast(); ai_charge(10);}
+void() f_attack11 =[ $attack11, f_attack12] {nmfast(); ai_charge(10);}
+void() f_attack12 =[ $attack12, f_attack13] {nmfast(); ai_charge(10);}
+void() f_attack13 =[ $attack13, f_attack14] {nmfast(); ai_charge(10);}
+void() f_attack14 =[ $attack14, f_attack15] {nmfast(); ai_charge(10);}
+void() f_attack15 =[ $attack15, f_attack16] {nmfast(); fish_melee();}
+void() f_attack16 =[ $attack16, f_attack17] {nmfast(); ai_charge(10);}
+void() f_attack17 =[ $attack17, f_attack18] {nmfast(); ai_charge(10);}
+void() f_attack18 =[ $attack18, f_attack1 ] {nmfast(); ai_charge(10);}
 
 void() f_death1 =[	$death1, f_death2 ] {}
 void() f_death2 =[	$death2, f_death3 ] {}
@@ -198,15 +202,15 @@ void() f_death19 =[	$death19, f_death20 ] {}
 void() f_death20 =[	$death20, f_death21 ] {}
 void() f_death21 =[	$death21, SUB_Null ] {}
 
-void() f_pain1 =[	$pain1, f_pain2 ] {ai_nop();}
-void() f_pain2 =[	$pain2, f_pain3 ] {ai_pain(6);}
-void() f_pain3 =[	$pain3, f_pain4 ] {ai_pain(6);}
-void() f_pain4 =[	$pain4, f_pain5 ] {ai_pain(6);}
-void() f_pain5 =[	$pain5, f_pain6 ] {ai_pain(6);}
-void() f_pain6 =[	$pain6, f_pain7 ] {ai_pain(6);}
-void() f_pain7 =[	$pain7, f_pain8 ] {ai_pain(6);}
-void() f_pain8 =[	$pain8, f_pain9 ] {ai_pain(6);}
-void() f_pain9 =[	$pain9, f_run1 ] {ai_pain(6);}
+void() f_pain1 =[	$pain1, f_pain2 ] {nmfast(); ai_nop();}
+void() f_pain2 =[	$pain2, f_pain3 ] {nmfast(); ai_pain(6);}
+void() f_pain3 =[	$pain3, f_pain4 ] {nmfast(); ai_pain(6);}
+void() f_pain4 =[	$pain4, f_pain5 ] {nmfast(); ai_pain(6);}
+void() f_pain5 =[	$pain5, f_pain6 ] {nmfast(); ai_pain(6);}
+void() f_pain6 =[	$pain6, f_pain7 ] {nmfast(); ai_pain(6);}
+void() f_pain7 =[	$pain7, f_pain8 ] {nmfast(); ai_pain(6);}
+void() f_pain8 =[	$pain8, f_pain9 ] {nmfast(); ai_pain(6);}
+void() f_pain9 =[	$pain9, f_run1 ]  {nmfast(); ai_pain(6);}
 
 void(entity attacker, float damage)	fish_pain =
 {

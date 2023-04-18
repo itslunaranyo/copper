@@ -87,32 +87,32 @@ float() DemonCheckCharge =
 	return TRUE;
 }
 
-void()	demon1_run1	=[	$run1,		demon1_run2	] {ai_run(20);
+void()	demon1_run1	=[	$run1,		demon1_run2	] {nmfast(); ai_run(20);
 	DemonCheckCharge();
 }
-void()	demon1_run2	=[	$run2,		demon1_run3	] {ai_run(15);}
-void()	demon1_run3	=[	$run3,		demon1_run4	] {ai_run(36);}
-void()	demon1_run4	=[	$run4,		demon1_run5	] {ai_run(20);}
-void()	demon1_run5	=[	$run5,		demon1_run6	] {ai_run(15);}
-void()	demon1_run6	=[	$run6,		demon1_run1	] {ai_run(36);
+void()	demon1_run2	=[	$run2,		demon1_run3	] {nmfast(); ai_run(15);}
+void()	demon1_run3	=[	$run3,		demon1_run4	] {nmfast(); ai_run(36);}
+void()	demon1_run4	=[	$run4,		demon1_run5	] {nmfast(); ai_run(20);}
+void()	demon1_run5	=[	$run5,		demon1_run6	] {nmfast(); ai_run(15);}
+void()	demon1_run6	=[	$run6,		demon1_run1	] {nmfast(); ai_run(36);
 	if (random() < 0.2 && time > self.show_hostile)
 		sound (self, CHAN_VOICE, "demon/idle1.wav", 1, ATTN_IDLE);
 }
 
-void()	demon1_charge1	=[	$run1,		demon1_charge2	] {ai_rush(20);DemonCheckAttack();}
-void()	demon1_charge2	=[	$run2,		demon1_charge3	] {ai_rush(15);DemonCheckAttack();}
-void()	demon1_charge3	=[	$run3,		demon1_charge4	] {ai_rush(36);DemonCheckAttack();}
-void()	demon1_charge4	=[	$run4,		demon1_charge5	] {ai_rush(20);DemonCheckAttack();}
-void()	demon1_charge5	=[	$run5,		demon1_charge6	] {ai_rush(15);DemonCheckAttack();}
-void()	demon1_charge6	=[	$run6,		demon1_run1	] {ai_rush(36);DemonCheckAttack();}
+void()	demon1_charge1	=[	$run1,		demon1_charge2	] {nmfast(); ai_rush(20); DemonCheckAttack();}
+void()	demon1_charge2	=[	$run2,		demon1_charge3	] {nmfast(); ai_rush(15); DemonCheckAttack();}
+void()	demon1_charge3	=[	$run3,		demon1_charge4	] {nmfast(); ai_rush(36); DemonCheckAttack();}
+void()	demon1_charge4	=[	$run4,		demon1_charge5	] {nmfast(); ai_rush(20); DemonCheckAttack();}
+void()	demon1_charge5	=[	$run5,		demon1_charge6	] {nmfast(); ai_rush(15); DemonCheckAttack();}
+void()	demon1_charge6	=[	$run6,		demon1_run1	]	  {nmfast(); ai_rush(36); DemonCheckAttack();}
 
 
-void()	demon1_pain1	=[	$pain1,		demon1_pain2	] {}
-void()	demon1_pain2	=[	$pain2,		demon1_pain3	] {}
-void()	demon1_pain3	=[	$pain3,		demon1_pain4	] {}
-void()	demon1_pain4	=[	$pain4,		demon1_pain5	] {}
-void()	demon1_pain5	=[	$pain5,		demon1_pain6	] {}
-void()	demon1_pain6	=[	$pain6,		demon1_run1	] {}
+void()	demon1_pain1	=[	$pain1,		demon1_pain2	] {nmfast();}
+void()	demon1_pain2	=[	$pain2,		demon1_pain3	] {nmfast();}
+void()	demon1_pain3	=[	$pain3,		demon1_pain4	] {nmfast();}
+void()	demon1_pain4	=[	$pain4,		demon1_pain5	] {nmfast();}
+void()	demon1_pain5	=[	$pain5,		demon1_pain6	] {nmfast();}
+void()	demon1_pain6	=[	$pain6,		demon1_run1	] {nmfast();}
 
 void(entity attacker, float damage)	demon1_pain =
 {
@@ -169,25 +169,27 @@ void()	demon1_jump1	=[	$leap1,		demon1_jump2	]
 	ai_attack_finished(0.5);
 	sound (self, CHAN_VOICE, "demon/djump.wav", 1, ATTN_NORM);
 	//bprint("  djump\n");
+	nmfast();
 }
-void()	demon1_jump2	=[	$leap2,		demon1_jump3	] {ai_face();}
-void()	demon1_jump3	=[	$leap3,		demon1_jump4	] {ai_face();}
+void()	demon1_jump2	=[	$leap2,		demon1_jump3	] {nmfast(); ai_face();}
+void()	demon1_jump3	=[	$leap3,		demon1_jump4	] {nmfast(); ai_face();}
 void()	demon1_jump4	=[	$leap4,		demon1_jump5	]
 {
+	nmfast();
 	ai_face();
 	Demon_Jump();
 }
-void()	demon1_jump5	=[	$leap5,		demon1_jump6	] {}
-void()	demon1_jump6	=[	$leap6,		demon1_jump7	] {}
-void()	demon1_jump7	=[	$leap7,		demon1_jump8	] {}
-void()	demon1_jump8	=[ 	$leap8,		demon1_jump9	] {}
-void()	demon1_jump9	=[ 	$leap9,		demon1_jump10	] {}
-void()	demon1_jump10	=[ 	$leap10,	demon1_airthink	] { 
+void()	demon1_jump5	=[	$leap5,		demon1_jump6	] {nmfast();}
+void()	demon1_jump6	=[	$leap6,		demon1_jump7	] {nmfast();}
+void()	demon1_jump7	=[	$leap7,		demon1_jump8	] {nmfast();}
+void()	demon1_jump8	=[ 	$leap8,		demon1_jump9	] {nmfast();}
+void()	demon1_jump9	=[ 	$leap9,		demon1_jump10	] {nmfast();}
+void()	demon1_jump10	=[ 	$leap10,	demon1_airthink	] {nmfast(); 
 	self.oldorigin = self.origin;
 	self.lifetime_finished = time + 3;
 }
-void()	demon1_jump11	=[ 	$leap11,	demon1_jump12	] {}
-void()	demon1_jump12	=[ 	$leap12,	demon1_run1	] {ai_face();}
+void()	demon1_jump11	=[ 	$leap11,	demon1_jump12	] {nmfast();}
+void()	demon1_jump12	=[ 	$leap12,	demon1_run1	] {nmfast();ai_face();}
 
 
 void() demon1_airthink =
@@ -464,23 +466,24 @@ float()	CheckDemonJump =
 
 //===========================================================================
 
-void()	demon1_atta1	=[	$attacka1,		demon1_atta2	] {ai_charge(4);}
-void()	demon1_atta2	=[	$attacka2,		demon1_atta3	] {ai_charge(0);}
-void()	demon1_atta3	=[	$attacka3,		demon1_atta4	] {ai_charge(0);}
-void()	demon1_atta4	=[	$attacka4,		demon1_atta5	] {ai_charge(1);}
-void()	demon1_atta5	=[	$attacka5,		demon1_atta6	] {ai_charge(2); Demon_Melee(200);}
-void()	demon1_atta6	=[	$attacka6,		demon1_atta7	] {ai_charge(1);}
-void()	demon1_atta7	=[	$attacka7,		demon1_atta8	] {ai_charge(6);}
-void()	demon1_atta8	=[	$attacka8,		demon1_atta9	] {ai_charge(8);}
-void()	demon1_atta9	=[	$attacka9,		demon1_atta10] {ai_charge(4);}
-void()	demon1_atta10	=[	$attacka10,		demon1_atta11] {ai_charge(2);}
-void()	demon1_atta11	=[	$attacka11,		demon1_atta12] {Demon_Melee(-200);}
-void()	demon1_atta12	=[	$attacka12,		demon1_atta13] {ai_charge(5);}
-void()	demon1_atta13	=[	$attacka13,		demon1_atta14] {ai_charge(8);}
-void()	demon1_atta14	=[	$attacka14,		demon1_atta15] {ai_charge(4);}
+void()	demon1_atta1	=[	$attacka1,		demon1_atta2	] {nmfast();ai_charge(4);}
+void()	demon1_atta2	=[	$attacka2,		demon1_atta3	] {nmfast();ai_charge(0);}
+void()	demon1_atta3	=[	$attacka3,		demon1_atta4	] {nmfast();ai_charge(0);}
+void()	demon1_atta4	=[	$attacka4,		demon1_atta5	] {nmfast();ai_charge(1);}
+void()	demon1_atta5	=[	$attacka5,		demon1_atta6	] {nmfast();ai_charge(2); Demon_Melee(200);}
+void()	demon1_atta6	=[	$attacka6,		demon1_atta7	] {nmfast();ai_charge(1);}
+void()	demon1_atta7	=[	$attacka7,		demon1_atta8	] {nmfast();ai_charge(6);}
+void()	demon1_atta8	=[	$attacka8,		demon1_atta9	] {nmfast();ai_charge(8);}
+void()	demon1_atta9	=[	$attacka9,		demon1_atta10	] {nmfast();ai_charge(4);}
+void()	demon1_atta10	=[	$attacka10,		demon1_atta11	] {nmfast();ai_charge(2);}
+void()	demon1_atta11	=[	$attacka11,		demon1_atta12	] {nmfast();Demon_Melee(-200);}
+void()	demon1_atta12	=[	$attacka12,		demon1_atta13	] {nmfast();ai_charge(5);}
+void()	demon1_atta13	=[	$attacka13,		demon1_atta14	] {nmfast();ai_charge(8);}
+void()	demon1_atta14	=[	$attacka14,		demon1_atta15	] {nmfast();ai_charge(4);}
 void()	demon1_atta15	=[	$attacka15,		demon1_run1]
 {
 	ai_charge(4);
+	nmfast();
 	enemy_range = range(self.enemy);
 	if (CheckDemonMelee()) self.think = demon1_atta1;	// skip the one flash of run1, it makes the feet jump
 }
