@@ -236,7 +236,7 @@ float() SoldierCheckAttack =
 
 	if (random () < chance)
 	{
-		self.th_missile ();
+		self.attack_state = AS_MISSILE;
 		ai_attack_finished (1 + random() + random());
 		return TRUE;
 	}

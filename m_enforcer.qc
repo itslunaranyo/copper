@@ -84,7 +84,7 @@ float() enforcer_check_attack =
 
 	if (random() < chance)
 	{
-		self.th_missile ();
+		self.attack_state = AS_MISSILE;
 		ai_attack_finished (2*random());
 		return TRUE;
 	}

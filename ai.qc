@@ -476,7 +476,7 @@ float() CheckAttack =
 	{
 		if (self.th_melee)
 		{
-			self.th_melee();
+			self.attack_state = AS_MELEE;
 			return TRUE;
 		}
 	}
@@ -509,7 +509,7 @@ float() CheckAttack =
 
 	if (random() < chance)
 	{
-		self.th_missile();
+		self.attack_state = AS_MISSILE;
 		ai_attack_finished (2*random());
 		return TRUE;
 	}
