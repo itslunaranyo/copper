@@ -155,8 +155,8 @@ void()	Tar_JumpTouchGround =
 		self.think = tbaby_run1;
 		self.cnt = 0;
 		// if the player listens to sound cues and ambushes the spawn just as it 
-		// stops, he has a full second to attack it
-		ai_attack_finished(1);	
+		// stops, he has an extra second to attack it (... outside of nightmare)
+		if (skill < 3) ai_attack_finished(1);	
 	}
 	else
 	{
@@ -208,10 +208,10 @@ void()	tbaby_fly4		=[	$fly4,	tbaby_fly1	]
 	}
 }
 
-void()	tbaby_jump1		=[	$jump1,	tbaby_jump2		] {ai_face();}
-void()	tbaby_jump2		=[	$jump2,	tbaby_jump3		] {ai_face();}
-void()	tbaby_jump3		=[	$jump3,	tbaby_jump4		] {ai_face();}
-void()	tbaby_jump4		=[	$jump4,	tbaby_jump5		] {ai_face();}
+void()	tbaby_jump1		=[	$jump1,	tbaby_jump2		] {nmfast(); ai_face();}
+void()	tbaby_jump2		=[	$jump2,	tbaby_jump3		] {nmfast(); ai_face();}
+void()	tbaby_jump3		=[	$jump3,	tbaby_jump4		] {nmfast(); ai_face();}
+void()	tbaby_jump4		=[	$jump4,	tbaby_jump5		] {nmfast(); ai_face();}
 void()	tbaby_jump5		=[	$jump5,	tbaby_jump6		]
 {	
 	self.movetype = MOVETYPE_BOUNCE;
