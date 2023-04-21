@@ -97,7 +97,7 @@ void() tbaby_run25	=[	$run25,		tbaby_run1	] {ai_run(1);}
 
 float(entity e) tar_visible =
 {
-	return (visible(e) && !has_invis(e));
+	return (alive(e) && visible(e) && !has_invis(e));
 }
 
 void() Tar_Forget =
