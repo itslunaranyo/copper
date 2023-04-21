@@ -168,7 +168,6 @@ float(entity e) alive =
 	if (e.deadflag) return FALSE;
 	return TRUE;
 }
-float() enemy_alive = {return alive(self.enemy);}
 
 /*
 =============
@@ -578,7 +577,7 @@ void() FoundTarget =
 {
 	while(!alive(self.enemy))
 	{
-		if (self.oldenemy)
+		if (self.oldenemy && alive(self.oldenemy))
 		{
 			self.enemy = self.oldenemy;
 			self.oldenemy = world;
@@ -1519,7 +1518,7 @@ void(float dist) ai_run =
 		self.enemy = world;
 		self.frags = 0;
 
-		if (self.oldenemy.health > 0)
+		if (alive(self.oldenemy))
 		{
 			self.enemy = self.oldenemy;			
 			HuntTarget();

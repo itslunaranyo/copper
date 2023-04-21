@@ -176,7 +176,7 @@ void(float num) addmonster =
 
 float(entity me) monster_check_enemy_activator =
 {
-	if ((activator.flags & (FL_CLIENT|FL_MONSTER)) && activator.health <= 0)
+	if ((activator.flags & (FL_CLIENT|FL_MONSTER)) && !alive(activator))
 		return FALSE;
 	return TRUE;
 }
@@ -185,7 +185,7 @@ float(entity me) monster_check_enemy_inheritance =
 {
 	if (!(activator.flags & FL_MONSTER))
 		return FALSE;
-	if (!(activator.enemy.health > 0 || activator.oldenemy.health > 0))
+	if (!alive(activator.enemy) && !alive(activator.oldenemy))
 		return FALSE;
 	if (!(activator.enemy.classname == "player" || activator.oldenemy.classname == "player"))
 		return FALSE;
