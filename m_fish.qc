@@ -86,7 +86,7 @@ void() fish_melee =
 {
 	float ldmg;
 
-	if (!self.enemy || !enemy_alive())
+	if (!self.enemy || !alive(self.enemy))
 		return;		// removed before stroke
 	
 	if (vlen(self.enemy.origin - self.origin) > 60)

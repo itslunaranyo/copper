@@ -97,7 +97,7 @@ void() boss_missile1	=[	$attack1, boss_missile2 ] {
 		return;
 	}
 	ai_face();
-	if (!enemy_alive()) self.enemy = get_closest_client();	// break out of infights with dead monsters
+	if (!alive(self.enemy)) self.enemy = get_closest_client();	// break out of infights with dead monsters
 	if (random() < 0.66) ReprioritizeEnemy();
 }
 void() boss_missile2	=[	$attack2, boss_missile3 ] {ai_face();}
@@ -112,7 +112,7 @@ void() boss_missile10	=[	$attack10, boss_missile11 ] {ai_face();}
 void() boss_missile11	=[	$attack11, boss_missile12 ] {ai_face();}
 void() boss_missile12	=[	$attack12, boss_missile13 ] {
 	ai_face();
-	if (!enemy_alive()) self.enemy = get_closest_client();	// break out of infights with dead monsters
+	if (!alive(self.enemy)) self.enemy = get_closest_client();	// break out of infights with dead monsters
 	if (random() < 0.66) ReprioritizeEnemy();
 }
 void() boss_missile13	=[	$attack13, boss_missile14 ] {ai_face();}
@@ -271,7 +271,7 @@ void(vector p) boss_missile =
 	sound (self, CHAN_WEAPON, "boss1/throw.wav", 1, ATTN_NORM);
 
 	// check for dead enemy
-	if (!enemy_alive())
+	if (!alive(self.enemy))
 	{
 		if (self.enemy.classname == "player")
 		{

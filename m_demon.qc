@@ -494,7 +494,7 @@ Returns TRUE if a melee attack would hit right now
 */
 float()	CheckDemonMelee =
 {
-	if ( !enemy_alive()	||						// is dead
+	if ( !alive(self.enemy)	||						// is dead
 		enemy_range > RANGE_MELEE ||			// can't reach
 		!z_overlap(self.enemy) ||				// too high or low
 		!CanDamage(self.enemy, self.origin) ) 	// can't hit
