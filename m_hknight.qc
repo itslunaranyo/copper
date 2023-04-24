@@ -68,10 +68,7 @@ void(float offset) hknight_shot =
 	vec = normalize (v_forward);
 	vec_z += crandom() * 0.05;
 	
-	if (skill == 3)	// nightmare: faster bolts, must be woven between or jumped over
-		launch_knightspike (org, vec * 550);
-	else
-		launch_knightspike (org, vec * 425);
+	launch_knightspike (org, vec * 425);
 
 	sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
 }
