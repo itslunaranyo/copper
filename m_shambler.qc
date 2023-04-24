@@ -56,27 +56,27 @@ void() sham_stand15	=[	$stand15,	sham_stand16] {ai_stand();}
 void() sham_stand16	=[	$stand16,	sham_stand17] {ai_stand();}
 void() sham_stand17	=[	$stand17,	sham_stand1	] {ai_stand();}
 
-void() sham_walk1  =[ $walk1, 	sham_walk2 ] {ai_walk(10);}
-void() sham_walk2  =[ $walk2, 	sham_walk3 ] {ai_walk(9);}
-void() sham_walk3  =[ $walk3, 	sham_walk4 ] {ai_walk(9);}
-void() sham_walk4  =[ $walk4, 	sham_walk5 ] {ai_walk(5);}
-void() sham_walk5  =[ $walk5, 	sham_walk6 ] {ai_walk(6);}
-void() sham_walk6  =[ $walk6, 	sham_walk7 ] {ai_walk(12);}
-void() sham_walk7  =[ $walk7, 	sham_walk8 ] {ai_walk(8);}
-void() sham_walk8  =[ $walk8, 	sham_walk9 ] {ai_walk(3);}
-void() sham_walk9  =[ $walk9, 	sham_walk10] {ai_walk(13);}
-void() sham_walk10 =[ $walk10,	sham_walk11] {ai_walk(9);}
-void() sham_walk11 =[ $walk11,	sham_walk12] {ai_walk(7);}
-void() sham_walk12 =[ $walk12,	sham_walk1 ] {ai_walk(7);
+void() sham_walk1		=[      $walk1,        sham_walk2 ] {ai_walk(10);}
+void() sham_walk2       =[      $walk2,        sham_walk3 ] {ai_walk(9);}
+void() sham_walk3       =[      $walk3,        sham_walk4 ] {ai_walk(9);}
+void() sham_walk4       =[      $walk4,        sham_walk5 ] {ai_walk(5);}
+void() sham_walk5       =[      $walk5,        sham_walk6 ] {ai_walk(6);}
+void() sham_walk6       =[      $walk6,        sham_walk7 ] {ai_walk(12);}
+void() sham_walk7       =[      $walk7,        sham_walk8 ] {ai_walk(8);}
+void() sham_walk8       =[      $walk8,        sham_walk9 ] {ai_walk(3);}
+void() sham_walk9       =[      $walk9,        sham_walk10] {ai_walk(13);}
+void() sham_walk10      =[      $walk10,       sham_walk11] {ai_walk(9);}
+void() sham_walk11      =[      $walk11,       sham_walk12] {ai_walk(7);}
+void() sham_walk12      =[      $walk12,       sham_walk1 ] {ai_walk(7);
 if (random() > 0.8)
 	sound (self, CHAN_VOICE, "shambler/sidle.wav", 1, ATTN_IDLE);}
 
-void() sham_run1 =[ $run1,	sham_run2	] {ai_run(20);}
-void() sham_run2 =[ $run2,	sham_run3	] {ai_run(24);}
-void() sham_run3 =[ $run3,	sham_run4	] {ai_run(20);}
-void() sham_run4 =[ $run4,	sham_run5	] {ai_run(20);}
-void() sham_run5 =[ $run5,	sham_run6	] {ai_run(24);}
-void() sham_run6 =[ $run6,	sham_run1	] {ai_run(20);
+void() sham_run1       =[      $run1,        sham_run2      ] {ai_run(20);}
+void() sham_run2       =[      $run2,        sham_run3      ] {ai_run(24);}
+void() sham_run3       =[      $run3,        sham_run4      ] {ai_run(20);}
+void() sham_run4       =[      $run4,        sham_run5      ] {ai_run(20);}
+void() sham_run5       =[      $run5,        sham_run6      ] {ai_run(24);}
+void() sham_run6       =[      $run6,        sham_run1      ] {ai_run(20);
 if (random() > 0.8 && time > self.show_hostile)
 	sound (self, CHAN_VOICE, "shambler/sidle.wav", 1, ATTN_IDLE);
 }
@@ -260,13 +260,9 @@ void() CastLightning =
 	ApplyMultiDamage();
 }
 
-void() sham_magic1     =[      $magic1,       sham_magic2    ] {ai_face();}
-void() sham_magic2     =[      $magic2,       sham_magic3    ] {ai_face();}
-void() sham_magic3     =[      $magic3,       sham_magic4    ] {ai_face();
-	self.nextthink = self.nextthink + 0.2;
+void() sham_spawn_effect =
+{
 	entity o;
-
-	self.effects = self.effects | EF_MUZZLEFLASH;
 	self.buddy = spawn();
 	o = self.buddy;
 	setmodel (o, "progs/s_light.mdl");
@@ -274,6 +270,27 @@ void() sham_magic3     =[      $magic3,       sham_magic4    ] {ai_face();
 	o.angles = self.angles;
 	o.nextthink = time + 0.7;
 	o.think = SUB_Remove;
+	
+}
+
+void() sham_magic1     =[      $magic1,       sham_magic2    ] {ai_face();
+	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
+	self.cnt = 0;
+}
+void() sham_magic2     =[      $magic2,       sham_magic3    ] {ai_face();}
+void() sham_magic3     =[      $magic3,       sham_magic4    ] {ai_face();
+	self.nextthink = self.nextthink + 0.2;
+	self.effects = self.effects | EF_MUZZLEFLASH;
+	ai_face();
+	sham_spawn_effect();
+}
+void() sham_magic3nm     =[      $magic4,       sham_magic4    ]
+{
+	self.effects = self.effects | EF_MUZZLEFLASH;
+	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
+	ai_face();
+	self.cnt = -1;	// a little melee grace
+	sham_spawn_effect();
 }
 void() sham_magic4     =[      $magic4,       sham_magic5    ]
 {
@@ -291,70 +308,25 @@ void() sham_magic6     =[      $magic6,       sham_magic9    ]
 	sound (self, CHAN_WEAPON, "shambler/sboom.wav", 1, ATTN_NORM);
 	CastLightning();
 }
-void() sham_magic9     =[      $magic9, 	sham_magic10	]{ CastLightning();}
-void() sham_magic10    =[      $magic10,	sham_magic11n	]{ CastLightning();}
-void() sham_magic11n   =[      $magic11,	sham_magic12	]{}
-void() sham_magic12    =[      $magic12,	sham_run1		]{}
+void() sham_magic9     =[      $magic9,       sham_magic10   ]{ CastLightning();}
+void() sham_magic10    =[      $magic10,      sham_magic11n   ]{ CastLightning();
+	ai_attack_finished (1 + 2*random());
+}
+void() sham_magic11n    =[      $magic11,      sham_magic12   ] {ai_check_refire(sham_magic3nm);}
+void() sham_magic12    =[      $magic12,      sham_run1	   ] {}
 
-
-// save this function with the name preserved because it's been used in past
-// maps as a secret hack way to fire nightmare-only triggers
+// shambler refire replaces 4-tick nightmare lightning, but we save this function 
+// with the name preserved because it's been used in past maps as a secret hack way 
+// to fire nightmare-only triggers
 void() sham_magic11    =[      $magic11,      sham_magic12   ]{ if (skill >= 3) CastLightning(); }
 
 
-
-void() sham_rmagic1     =[      $magic1,       sham_rmagic2    ] {ai_charge(20);}
-void() sham_rmagic2     =[      $magic2,       sham_rmagic3    ] {ai_charge(24);}
-void() sham_rmagic3     =[      $magic3,       sham_rmagic3b   ] {ai_charge(24);
-	self.effects = self.effects | EF_MUZZLEFLASH;
-}
-void() sham_rmagic3b     =[      $magic3,       sham_rmagic4    ] {ai_charge(20);
-	self.effects = self.effects | EF_MUZZLEFLASH;
-}
-void() sham_rmagic4     =[      $magic4,       sham_rmagic5    ] {
-	ai_charge(16);
-	self.effects = self.effects | EF_MUZZLEFLASH;
-}
-void() sham_rmagic5     =[      $magic5,       sham_rmagic6    ] {
-	ai_charge(16);
-	self.effects = self.effects | EF_MUZZLEFLASH;
-}
-void() sham_rmagic6     =[      $magic6,       sham_rmagic9    ] {
-	ai_charge(12);
-	sound (self, CHAN_WEAPON, "shambler/sboom.wav", 1, ATTN_NORM);
-	CastLightning();
-}
-void() sham_rmagic9     =[      $magic9, 	sham_rmagic10	]{ai_charge(12); CastLightning();}
-void() sham_rmagic10    =[      $magic10,	sham_rmagic11	]{ai_charge(12); CastLightning();}
-void() sham_rmagic11    =[      $magic11,	sham_rmagic12	]{ai_charge(16);}
-void() sham_rmagic12    =[      $magic12,	sham_run1		]{ai_charge(20);}
-
-
-void() sham_magic =
-{
-	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
-	self.cnt = 0;
-	
-	// nightmare: relentless lightning assault
-	if (skill == 3)
-	{
-		sham_rmagic1();
-		ai_attack_finished (1 + 2 * random());
-	}
-	else
-	{
-		sham_magic1();
-		ai_attack_finished (2 + 2 * random());
-	}
-}
-
-
-void() sham_pain1 = [ $pain1,	sham_pain2	] {}
-void() sham_pain2 = [ $pain2,	sham_pain3	] {}
-void() sham_pain3 = [ $pain3,	sham_pain4	] {}
-void() sham_pain4 = [ $pain4,	sham_pain5	] {}
-void() sham_pain5 = [ $pain5,	sham_pain6	] {}
-void() sham_pain6 = [ $pain6,	sham_run1 	] {}
+void() sham_pain1       =[      $pain1, sham_pain2      ] {}
+void() sham_pain2       =[      $pain2, sham_pain3      ] {}
+void() sham_pain3       =[      $pain3, sham_pain4      ] {}
+void() sham_pain4       =[      $pain4, sham_pain5      ] {}
+void() sham_pain5       =[      $pain5, sham_pain6      ] {}
+void() sham_pain6       =[      $pain6, sham_run1      ] {}
 
 // i get no kick from this function
 void(entity attacker, float damage)	sham_pain =
@@ -476,7 +448,7 @@ void() monster_shambler_spawn =
 	self.th_run = sham_run1;
 	self.th_die = sham_die;
 	self.th_melee = sham_melee;
-	self.th_missile = sham_magic;
+	self.th_missile = sham_magic1;
 	self.th_pain = sham_pain;
 	self.th_checkattack = ShamCheckAttack;
 
