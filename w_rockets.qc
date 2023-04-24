@@ -23,7 +23,7 @@ void(vector org, float rad) T_GibDownedZombies =
 			rad - vlen(head.origin - org) > 0.5 * head.health	// close enough to hurt
 			)
 		{
-			T_Damage (head, self, self, head.health + 10);
+			T_Damage (head, self, self.trueowner, head.health + 10);
 		}
 		head = head.chain;
 	}
