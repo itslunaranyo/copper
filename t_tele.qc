@@ -692,7 +692,7 @@ void() trigger_teleport_setup =
 	spawnflags(Flags) =
 	[
 		1 : "Player only" : 0
-		2 : "Push forward" : 0
+		2 : "Silent" : 0
 		8 : "Not triggerable (ignore targetname)" : 0
 		16 : "No teleflash" : 0
 		32 : "Monsters only" : 0

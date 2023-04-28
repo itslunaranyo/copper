@@ -828,8 +828,7 @@ BEZIER	Act as a bilinear control point between the previous and next pathcorner 
 	path_corner : 
 "Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
 Monsters who wait here will turn to face 'angle'.
-Checking the Bezier spawnflag will make this pathcorner act as a bilinear control point - meaning curved motion - between the previous and next pathcorner in the chain (train only, no monster patrols).
-	"count"	change number of steps of interpolation along the curve the train will make (default 10)"
+Checking the Bezier spawnflag will make this pathcorner act as a bilinear control point - meaning curved motion - between the previous and next pathcorner in the chain (train only, no monster patrols). 'count' will change the number of steps of interpolation along the curve the train will make."
 [
 	spawnflags(Flags) = [
 		16 : "Bezier point" : 0
