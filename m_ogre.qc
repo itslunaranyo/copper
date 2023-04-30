@@ -85,13 +85,16 @@ vector(vector dest, float speed) OgreAimGrenade =
 	
 	// clamp the perfect terminator-aim to limit deadon shots to the face, then average with 
 	// old dumb aim for "z-only-slightly-aware"ness(tm)
-	
-	if (skill == 3) // nightmare: 66% z-awareness
-		theta = (theta * 2 + 18) / 3;
-	else if (vlen(dest) < 160)
-		theta = (clamp(theta, -80, 70) + 18) / 2;
+	if (vlen(dest) < 160)
+		theta = clamp(theta, -80, 70);
 	else
-		theta = (clamp(theta, -60, 60) + 18) / 2;
+		theta = clamp(theta, -60, 60);
+		
+	if (skill == 3)
+		theta = (theta + theta + 18) / 3; // nightmare: 66% z-awareness
+	else
+		theta = (theta + 18) / 2;	// copper: 50% z-awareness
+		
 	angs_x = -theta;	
 	makevectors(angs);
 	
