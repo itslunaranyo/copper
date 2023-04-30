@@ -418,6 +418,19 @@ void (void() th) ai_check_refire =
 		return;
 	if (!alive(self.enemy))
 		return;
+	if (has_invis(self.enemy))
+		return;	// let the ring buy breathing room on nightmare
+		
+	// distance checks
+	enemy_range == range(self.enemy);
+	if (enemy_range == RANGE_MELEE)
+	{
+		self.attack_finished = 0;
+		return;
+	}
+	else if (enemy_range >= RANGE_FAR)
+		return;
+	
 	if (!CheckClearAttack())
 		return;
 	
