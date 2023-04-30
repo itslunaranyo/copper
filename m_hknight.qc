@@ -49,7 +49,9 @@ void(float offset) hknight_shot =
 {
 	vector	offang;
 	vector	org, vec;
-	
+
+	if (skill == 3)
+		offset -= 0.5;
 	vec = enemy_vispos() - self.origin;
 	vec += enemy_aim_vertical();
 	vec_z += crandom() * 16;
@@ -68,7 +70,10 @@ void(float offset) hknight_shot =
 	vec = normalize (v_forward);
 	vec_z += crandom() * 0.05;
 	
-	launch_knightspike (org, vec * 425);
+	if (skill == 3)
+		launch_knightspike (org, vec * 520);
+	else
+		launch_knightspike (org, vec * 400);
 
 	sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
 }
@@ -253,7 +258,7 @@ void()	hknight_magicc4 =[	$magicc4,	hknight_magicc5	] {nmfast(); ai_face();}
 void()	hknight_magicc5 =[	$magicc5,	hknight_magicc6	] {nmfast(); ai_face();}
 void()	hknight_magicc6 =[	$magicc6,	hknight_magicc7	] {nmfast(); hknight_shot(-2);}
 void()	hknight_magicc7 =[	$magicc7,	hknight_magicc8	] {nmfast(); hknight_shot(-1);}
-void()	hknight_magicc8 =[	$magicc8,	hknight_magicc9	] {nmfast(); hknight_shot(0);}
+void()	hknight_magicc8 =[	$magicc8,	hknight_magicc9	] {nmfast(); hknight_shot(0); if (skill == 3) hknight_shot(0.5);}
 void()	hknight_magicc9 =[	$magicc9,	hknight_magicc10] {nmfast(); hknight_shot(1);}
 void()	hknight_magicc10 =[	$magicc10,	hknight_magicc11] {nmfast(); hknight_shot(2);}
 void()	hknight_magicc11 =[	$magicc11,	hknight_run1]	  {nmfast(); hknight_shot(3);}
