@@ -316,7 +316,12 @@ void() monster_fish_spawn =
 	self.th_checkattack = fish_check_attack;
 
 	if (self.deathtype == string_null)
-		self.deathtype = "was fed to the Rotfish";
+	{
+		if (skill == 3 && random() < 0.5)
+			self.deathtype = "died from fish damage";
+		else
+			self.deathtype = "was fed to the Rotfish";
+	}
 
 	swimmonster_start ();
 }
