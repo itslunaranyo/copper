@@ -421,7 +421,7 @@ void (void() th) ai_check_refire =
 	if (!CheckClearAttack())
 		return;
 	
-	if ( random() < 0.6 - 0.15 * self.cnt )
+	if ( random() * 8 < 4 - self.cnt )
 	{
 		self.cnt += 1;
 		self.think = th;
