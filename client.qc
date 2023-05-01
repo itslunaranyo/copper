@@ -70,12 +70,8 @@ void() SetChangeParms =
 
 void() SetNewParms =
 {
-	//if (skill == 3)
-	//	parm2 = 50;
-	//else
-		parm2 = 100;
-
 	parm1 = IT_SHOTGUN | IT_AXE;
+	parm2 = 100;
 	parm4 = 25;
 	parm8 = IT_SHOTGUN;
 	parm3 = 0;
@@ -91,12 +87,8 @@ void() SetNewParms =
 // shells and nails are kept over on respawn
 void() SetCoopParms =
 {
-	//if (skill == 3)
-	//	parm2 = 50;
-	//else
-		parm2 = 100;
-
 	parm1 = self.items & IT_WEAPONS;
+	parm2 = 100;
 	parm4 = max(25,self.ammo_shells);
 	if (parm1 & IT_SUPER_SHOTGUN)
 		parm8 = IT_SUPER_SHOTGUN;
@@ -544,11 +536,7 @@ void() PutClientInServer =
 	spot = SelectSpawnPoint();
 	self.classname = "player";
 	
-	// new for nightmare: reduced max health instead of the manky attack time scale
-	//if (skill == 3)
-	//	self.max_health = 50;
-	//else
-		self.max_health = 100;
+	self.max_health = 100;
 	self.health = self.max_health;
 	
 	self.takedamage = DAMAGE_AIM;

@@ -754,47 +754,11 @@ void() trigger_secret_box =
 /*
 ==============================================================================
 trigger_setskill & target_setskill
-
-I have a trigger_ and a target_ for setskill and route both through one function,
-so that the skill teleporters themselves in the start map can be the 'barrier'
-that changes the skill. nightmare changes max health, and I want players to see 
-it change on the hud the instant they make their 'selection' by entering the 
-teleporter, not at the start of the next map.
 ==============================================================================
 */
 
-void(float h) skill_adjust_health =
-{
-	entity p;
-	p = nextent(world);
-	while (p.flags & FL_CLIENT)
-	{
-		p.max_health = h;
-		if (p.health > p.max_health)
-		{
-			p.deathtype = "noarmor";	// terrible
-			T_Damage(p, world, world, p.health - p.max_health);
-			p.deathtype = "";
-		}
-		else if (p.health < p.max_health)
-		{
-			T_Heal(p, p.max_health - p.health, FALSE);
-		}
-		p = nextent(p);
-	}
-}
-
 void(entity e, string sk) skill_set =
 {
-	//if (sk == "0" || sk == "1" || sk == "2" || sk == "")
-	//{
-	//	skill_adjust_health(100);
-	//}
-	//else if (sk == "3")
-	//{
-	//	skill_adjust_health(50);
-	//}
-
 	cvar_set ("skill", sk);
 	skill = cvar("skill");
 }
