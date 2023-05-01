@@ -543,6 +543,12 @@ void() zombie_die =
 	if (self.customflags & CFL_LEFTY)
 		self.flags = not(self.flags, FL_MONSTER);
 	self.think = zombie_return;
+	
+	// HACK: global activator is set to attacker in Killed(), so we can access
+	//	who killed us without parameterizing every th_die func
+	if (has_quad(activator))
+		self.cnt += 2;	// quads kill zombies hard enough to keep them away for a minute or two
+	
 	self.nextthink = time + 
 		5 + // initial min
 		random() * 3 + // randomness on initial min
