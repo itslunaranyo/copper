@@ -786,14 +786,14 @@ void(float h) skill_adjust_health =
 
 void(entity e, string sk) skill_set =
 {
-	if (sk == "0" || sk == "1" || sk == "2" || sk == "")
-	{
-		skill_adjust_health(100);
-	}
-	else if (sk == "3")
-	{
-		skill_adjust_health(50);
-	}
+	//if (sk == "0" || sk == "1" || sk == "2" || sk == "")
+	//{
+	//	skill_adjust_health(100);
+	//}
+	//else if (sk == "3")
+	//{
+	//	skill_adjust_health(50);
+	//}
 
 	cvar_set ("skill", sk);
 	skill = cvar("skill");

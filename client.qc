@@ -47,7 +47,9 @@ void() SetChangeParms =
 	// cap super health
 	self.health = min(self.health, self.max_health);		
 	// bump the player up if he's below 50 <- pretty much the only 'autobalance' in quake
-	if (skill < 3)	// nightmare players now get no help
+	if (skill == 3)	// nightmare players get just enough not to crater
+		self.health = max(self.health, 10);
+	else
 		self.health = max(self.health, 50);
 	
 	parm1 = self.items;
@@ -68,9 +70,9 @@ void() SetChangeParms =
 
 void() SetNewParms =
 {
-	if (skill == 3)
-		parm2 = 50;
-	else
+	//if (skill == 3)
+	//	parm2 = 50;
+	//else
 		parm2 = 100;
 
 	parm1 = IT_SHOTGUN | IT_AXE;
@@ -89,9 +91,9 @@ void() SetNewParms =
 // shells and nails are kept over on respawn
 void() SetCoopParms =
 {
-	if (skill == 3)
-		parm2 = 50;
-	else
+	//if (skill == 3)
+	//	parm2 = 50;
+	//else
 		parm2 = 100;
 
 	parm1 = self.items & IT_WEAPONS;
@@ -543,9 +545,9 @@ void() PutClientInServer =
 	self.classname = "player";
 	
 	// new for nightmare: reduced max health instead of the manky attack time scale
-	if (skill == 3)
-		self.max_health = 50;
-	else
+	//if (skill == 3)
+	//	self.max_health = 50;
+	//else
 		self.max_health = 100;
 	self.health = self.max_health;
 	
