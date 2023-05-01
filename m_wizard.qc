@@ -185,14 +185,14 @@ void() Wiz_StartFast =
 	// nightmare: three shots instead of two, with less anticipation
 	if (skill == 3)
 	{
-		Wiz_Shot(0.15, 15);
-		Wiz_Shot(0.55, -15);
-		Wiz_Shot(0.95, 0);
+		Wiz_Shot(0.2, -15);
+		Wiz_Shot(0.6, 15);
+		Wiz_Shot(1, 0);
 		return;
 	}
 	
-	Wiz_Shot(0.8, 13);
 	Wiz_Shot(0.3, -13);
+	Wiz_Shot(0.8, 13);
 }
 
 
