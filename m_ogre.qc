@@ -331,7 +331,7 @@ void()	ogre_pain3	=[	$pain3,		ogre_pain4	] {}
 void()	ogre_pain4	=[	$pain4,		ogre_pain5	] {}
 void()	ogre_pain5	=[	$pain5,		ogre_run1	] {}
 
-void()	ogre_painb1	=[	$painb1,	ogre_painb2	] {PainFinished(0.5); }
+void()	ogre_painb1	=[	$painb1,	ogre_painb2	] {PainFinished(1); }
 void()	ogre_painb2	=[	$painb2,	ogre_painb3	] {}
 void()	ogre_painb3	=[	$painb3,	ogre_run1	] {}
 
