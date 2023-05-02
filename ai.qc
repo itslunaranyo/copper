@@ -1450,6 +1450,13 @@ void() ai_run_missile =
 		self.th_missile ();
 		self.attack_state = AS_STRAIGHT;
 	}
+	else
+	{
+		// *CheckAttack usually sets attack_finished, but FacingIdeal() can still cause 
+		// the attack to fail, usually when a monster is bumping around on a pillar or
+		// a high ledge and facing unpredictable directions, so we just reset it here
+		self.attack_finished = 0;
+	}
 }
 
 
