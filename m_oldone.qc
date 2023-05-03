@@ -201,7 +201,7 @@ void() shub_finale_4 =
 	float	x, y, z;
 	float	r;
 
-	sound (n, CHAN_VOICE, "boss2/pop2.wav", 1, ATTN_NONE);
+	sound (self, CHAN_VOICE, "boss2/pop2.wav", 1, ATTN_NONE);
 
 	// throw tons of meat chunks	
 	org = self.origin;
