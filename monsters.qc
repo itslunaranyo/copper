@@ -543,7 +543,13 @@ void() monster_start_go =
 	self.ideal_yaw = self.angles * '0 1 0';
 	self.use = monster_use;
 	self.flags = self.flags | FL_MONSTER;
-	
+	// default speedup rate for monsters with fast nightmare frames
+	if (!self.walkframe)
+	{
+		if (skill == 3) self.walkframe = 0.075;
+		else self.walkframe = 0.1;
+	}
+
 	// check if the mapper placed them touching a killer liquid and grant them immunity to it
 	vector wtt;
 	wtt = WaterTest();

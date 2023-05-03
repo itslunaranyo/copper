@@ -265,6 +265,8 @@ void() monster_knight_spawn =
 	if (self.deathtype == string_null)
 		self.deathtype = "was slashed by a Knight";
 
+	nmspeed(0.078);
+
 	walkmonster_start ();
 }
 

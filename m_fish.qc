@@ -65,6 +65,8 @@ void() f_walk17 =[	$swim17, f_walk18 ] {ai_walk(7);}
 void() f_walk18 =[	$swim18, f_walk1 ] {ai_walk(6);}
 
 void() f_run1 =[	$swim1, f_run2 ] {nmfast(); ai_run(12);
+	float r = 0.5;
+	if (skill == 3) r = 0.25;	// lots of fast fish on nightmare makes a racket
 	if (random() < 0.5)
 		sound (self, CHAN_VOICE, "fish/idle.wav", 1, ATTN_NORM);
 	fish_check_attack();	// calling this after ai_run is such a hack
@@ -322,6 +324,8 @@ void() monster_fish_spawn =
 		else
 			self.deathtype = "was fed to the Rotfish";
 	}
+
+	nmspeed(0.06); // look at 'em go
 
 	swimmonster_start ();
 }

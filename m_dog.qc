@@ -139,11 +139,9 @@ void() dog_walk6	=[	$walk6 ,	dog_walk7	] {ai_walk(8);}
 void() dog_walk7	=[	$walk7 ,	dog_walk8	] {ai_walk(8);}
 void() dog_walk8	=[	$walk8 ,	dog_walk1	] {ai_walk(8);}
 
-void() dog_run1		=[	$run1  ,	dog_run2	] {
+void() dog_run1		=[	$run1  ,	dog_run2	] {ai_run(16);nmfast();
 	if (random() < 0.2 && time > self.show_hostile)
 		sound (self, CHAN_VOICE, "dog/idle.wav", 1, ATTN_IDLE);
-	ai_run(16);
-	nmfast();
 }
 void() dog_run2		=[	$run2  ,	dog_run3	] {ai_run(32);nmfast();}
 void() dog_run3		=[	$run3  ,	dog_run4	] {ai_run(32);nmfast();}
@@ -370,6 +368,8 @@ void() monster_dog_spawn =
 
 	if (self.deathtype == string_null)
 		self.deathtype = "was mauled by a Rottweiler";
+
+	nmspeed(0.072);
 
 	walkmonster_start();
 }

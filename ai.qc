@@ -443,11 +443,17 @@ void (void() th) ai_check_refire =
 	self.cnt = 0;
 }
 
-// for speedy think rates on nightmare for melee monsters
-// TODO: don't use the frame[] shorthand just to then call this as an override 
+// for speedy nightmare think rates on melee monsters
+void(float rate) nmspeed =
+{
+	if (skill == 3)
+		self.walkframe = rate;
+	else
+		self.walkframe = 0.1;
+}
 void() nmfast =
 {
-	if (skill == 3) self.nextthink = time + 0.075;
+	self.nextthink = time + self.walkframe;
 }
 
 /*
