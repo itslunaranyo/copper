@@ -1228,6 +1228,7 @@ void() misc_teleball_curvy =
 	if (!self.speed) self.speed = 100;
 	self.pausetime = -1;
 	
+	self.solid = -1;
 	flytrain_setup();
 	self.movetype = MOVETYPE_NOCLIP;	// for avelocity
 	
