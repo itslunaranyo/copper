@@ -251,6 +251,11 @@ void(string tname) target_lock_do =
 				c = c.enemy;
 			} while (c != t);
 		}
+		else if (t.classname == "train")
+		{
+			if (self.state) train_unlock(t);
+			else train_lock(t);
+		}
 		else if (t.classname == "func_plat")
 		{
 			if (self.state) plat_unlock(t);
@@ -276,13 +281,19 @@ void(string tname) target_lock_do =
 			if (self.state)
 			{
 				t.customflags = not(t.customflags, CFL_LOCKED);
-				dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
 			}
 			else
 			{
 				t.customflags |= CFL_LOCKED;
-				dprint4(t.classname, " with targetname ", t.targetname, " is locked\n");
 			}
+		}
+		if (self.state)
+		{
+			dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
+		}
+		else
+		{
+			dprint4(t.classname, " with targetname ", t.targetname, " is locked\n");
 		}
 	} while ( t );
 }
