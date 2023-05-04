@@ -675,7 +675,8 @@ void() train_off =
 void() train_on =
 {
 	self.state = STATE_ON;
-	self.takedamage = DAMAGE_NO;
+	if (self.max_health && !(self.spawnflags & TRAIN_TOGGLE))
+		self.takedamage = DAMAGE_NO;
 }
 
 void() train_use =
@@ -709,12 +710,6 @@ void() train_use =
 
 void() train_wait =
 {
-	// trains now fire their pathcorners' targets on arrival
-	// if a player is riding the train, treat them as activator
-	if (activator.classname != "player")
-		activator = get_closest_client();
-	SUB_UseEntTargets(self.enemy);
-	
 	if (self.wait == -1)
 	{
 		train_off();
@@ -733,6 +728,12 @@ void() train_wait =
 	{
 		train_next();
 	}
+	
+	// trains now fire their pathcorners' targets on arrival
+	// if a player is riding the train, treat them as activator
+	if (activator.classname != "player")
+		activator = get_closest_client();
+	SUB_UseEntTargets(self.enemy);
 }
 
 void() train_next =
