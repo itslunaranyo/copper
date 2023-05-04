@@ -638,20 +638,60 @@ void() train_blocked =
 	T_Damage (other, self, self, self.dmg);
 }
 
+void() train_killed =
+{
+	if (self.customflags & CFL_LOCKED) return;
+	activator = damage_attacker;
+	self.health = self.max_health;
+	train_use();
+}
+
+void(entity t) train_lock =
+{
+	dprint("in train_lock\n");
+	t.customflags |= CFL_LOCKED;
+	t.takedamage = DAMAGE_NO;
+}
+void(entity t) train_unlock =
+{
+	t.customflags = not(t.customflags, CFL_LOCKED);
+	if (t.max_health)
+	{
+		t.health = t.max_health;
+		t.takedamage = DAMAGE_YES;
+	}
+}
+
+void() train_off =
+{
+	self.state = STATE_OFF;
+	if (self.customflags & CFL_LOCKED) return;
+	if (self.max_health)
+	{
+		self.health = self.max_health;
+		self.takedamage = DAMAGE_YES;
+	}
+}
+void() train_on =
+{
+	self.state = STATE_ON;
+	self.takedamage = DAMAGE_NO;
+}
+
 void() train_use =
 {
 	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.movedir) != self.enemy.origin)
 	{
 		if (self.state == STATE_ON)
 		{
-			self.state = STATE_OFF;
+			train_off();
 			self.velocity = VEC_ORIGIN;
 			self.nextthink = 0;
 			sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 		}
 		else
 		{
-			self.state = STATE_ON;
+			train_on();
 			sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 			if (self.pos2)
 				// we were stopped along a bezier curve, resume with saved values
@@ -677,13 +717,13 @@ void() train_wait =
 	
 	if (self.wait == -1)
 	{
-		self.state = STATE_OFF;
+		train_off();
 		self.use = train_use;
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	}
 	else if (self.wait > 0)
 	{
-		self.state = STATE_OFF;	// allow triggering while waiting
+		train_off();	// allow triggering while waiting
 		self.think = train_next;
 		self.nextthink = localtime(self) + self.wait;
 		if (self.wait > 0.1)
@@ -730,7 +770,7 @@ void() train_next =
 		self.wait = self.pausetime;
 	
 	self.enemy = corner;
-	self.state = STATE_ON;
+	train_on();
 	
 	if (self.oldenemy.speed == -1)
 	{
@@ -776,7 +816,7 @@ void() func_train_find =
 		self.speed = corner.speed;
 	if (self.targetname == string_null)
 	{	// not triggered, so start immediately
-		self.state = STATE_ON;
+		train_on();
 		self.nextthink = localtime(self) + 0.1;
 		self.think = train_next;
 	}
@@ -805,7 +845,15 @@ void() func_train_setup =
 	self.blocked = train_blocked;
 	self.use = train_use;
 	self.classname = "train";
-	self.state = STATE_OFF;
+	
+	self.max_health = 0;
+	if (self.health)
+	{
+		self.max_health = self.health;
+		self.th_die = train_killed;
+		self.takedamage = DAMAGE_YES;
+	}
+	train_off();
 
 	// start trains on the second frame, to make sure their targets have had
 	// a chance to spawn
