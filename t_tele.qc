@@ -228,12 +228,19 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 	
 	if (dst.classname == "misc_teleporttrain")
 	{
-		if (dst.buddy && dst.buddy.velocity == VEC_ORIGIN)
+		// monsters get pooped out of a teleport train facing their enemy
+		if ((traveler.flags & FL_MONSTER) && traveler.enemy)
+		{
+			vdir = vectoangles(traveler.enemy.origin - dst.origin);
+		}
+		// if the teleball isn't moving, emerge facing the direction you traveled to help orientation
+		else if (dst.buddy && dst.buddy.velocity == VEC_ORIGIN)
 		{
 			vdir = vectoangles(dst.origin - traveler.origin);
 			nofwd = TRUE;
 		}
-		else
+		// if the teleball is moving, face the direction the teleball is moving
+		else 
 		{
 			vdir = vectoangles(dst.velocity);
 		}
