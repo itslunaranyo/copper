@@ -486,6 +486,14 @@ void() flytrain_blocked =
 	T_Damage (other, self, self, self.dmg);
 }
 
+void() flytrain_killed =
+{
+	if (self.customflags & CFL_LOCKED) return;
+	activator = damage_attacker;
+	self.health = self.max_health;
+	SUB_CallAsSelf(train_use, self.buddy);
+}
+
 void() flytrain_think =
 {
 	vector delta, wishvel;
@@ -502,6 +510,8 @@ void() flytrain_think =
 	
 	delta = (self.buddy.origin + self.pos1) - self.origin - self.movedir;
 	wishvel = self.buddy.velocity;
+	
+	self.takedamage = self.buddy.takedamage;
 	
 	// if the ghost train hits a speed -1 teleport corner we have to teleport with it, not zoom to it
 	if (vlen(delta) > self.lip)
@@ -539,6 +549,7 @@ void() flytrain_setup =
 	if (!self.dmgtime)
 		self.dmgtime = 0.5;
 	self.buddy.pausetime = self.pausetime;
+	self.buddy.health = self.health;
 	self.buddy.sounds = self.sounds;
 	self.buddy.solid = -1;
 	self.buddy.target = self.target;
@@ -553,6 +564,7 @@ void() flytrain_setup =
 	self.width = zeroconvertdefault(self.width, 8);
 	self.height = zeroconvertdefault(self.height, 8);
 	self.lip = zeroconvertdefault(self.lip, 64);
+	self.max_health = 0;
 
 	self.blocked = flytrain_blocked;
 	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
@@ -561,13 +573,19 @@ void() flytrain_setup =
 	else
 	{
 		self.movetype = MOVETYPE_PUSH;
+		if (self.health)
+		{
+			self.max_health = self.health;
+			self.th_die = flytrain_killed;
+			self.takedamage = DAMAGE_YES;
+		}
 	}
 	
 	self.think = flytrain_init;	// wait for buddy to call train_find
 	self.nextthink = localtime(self) + 0.25; // magic amount of time :|
 }
 
-/*QUAKED func_flytrain (0 .5 .8) ?
+/*QUAKED func_flytrain (0 .5 .8) ? - TOGGLE
 A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
 If the train is the target of a button or trigger, it will not begin moving until activated.
 
@@ -600,7 +618,7 @@ void() func_flytrain =
 	self.movedir = (self.mins + self.maxs) * 0.5;
 }
 
-/*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8)
+/*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8) - TOGGLE
 A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
 If the train is the target of a button or trigger, it will not begin moving until activated.
 
