@@ -2026,6 +2026,16 @@ void() info_player_deathmatch =
 	fog_fixKeys();
 }
 
+// dumb way to make coop starts visible/invisible to the cyclical spawnpoint search 
+// code without making that code overly complex
+void(float unlock) coop_lock =
+{
+	if (unlock)
+		self.classname = "info_player_coop";
+	else
+		self.classname = "info_player_coop_notyet";
+}
+
 void() coop_enable =
 {
 	self.classname = "info_player_coop";
@@ -2055,6 +2065,7 @@ void() info_player_coop =
 		self.classname = "info_player_coop_notyet";
 		self.use = coop_enable;
 	}
+	self.lock = coop_lock;
 	fog_fixKeys();
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);	// for telefrag testing
 }

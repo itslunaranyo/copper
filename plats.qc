@@ -247,21 +247,22 @@ void() plat_use =
 	plat_go_down();
 }
 
-void(entity p) plat_lock =
+void(float unlock) plat_lock =
 {
-	p.trigger_field.touch = SUB_Null;
-	p.use = SUB_Null;
-	p.customflags |= CFL_LOCKED;
+	if (unlock)
+	{
+		self.trigger_field.touch = plat_center_touch;
+		if (self.targetname != string_null)
+			self.use = plat_use;
+		self.customflags = not(self.customflags, CFL_LOCKED);
+	}
+	else
+	{
+		self.trigger_field.touch = SUB_Null;
+		self.use = SUB_Null;
+		self.customflags |= CFL_LOCKED;
+	}
 }
-
-void(entity p) plat_unlock =
-{
-	p.trigger_field.touch = plat_center_touch;
-	if (p.targetname != string_null)
-		p.use = plat_use;
-	p.customflags = not(p.customflags, CFL_LOCKED);
-}
-
 
 /*QUAKED func_plat (0 .5 .8) ? PLAT_LOW_TRIGGER
 Plats are always drawn in the extended position, so they will light correctly.
@@ -372,6 +373,7 @@ void() func_plat =
 			self.pos2_z = self.origin_z - self.size_z + 8;
 	}
 	self.use = plat_trigger_use;
+	self.lock = plat_lock;
 
 	plat_spawn_inside_trigger ();	// the "start moving" trigger	
 
@@ -445,8 +447,8 @@ void() train_sounds =
 
 void() flytrain_ghost_die =
 {
-	if (self.owner.th_die)
-		SUB_CallAsSelf(self.owner.th_die, self.owner);
+	if (self.owner.th_melee)
+		SUB_CallAsSelf(self.owner.th_melee, self.owner);
 	else
 		remove(self.owner);
 	remove(self);
@@ -546,7 +548,7 @@ void() flytrain_setup =
 	SUB_CallAsSelf(func_train_point, self.buddy);
 	self.buddy.classname = "func_flytrain_ghost";
 	self.buddy.th_stand = train_wait;
-	self.buddy.th_die = flytrain_ghost_die;
+	self.buddy.th_melee = flytrain_ghost_die;
 	
 	self.width = zeroconvertdefault(self.width, 8);
 	self.height = zeroconvertdefault(self.height, 8);
@@ -557,7 +559,9 @@ void() flytrain_setup =
 	if (!self.solid)
 		self.movetype = MOVETYPE_NOCLIP;
 	else
+	{
 		self.movetype = MOVETYPE_PUSH;
+	}
 	
 	self.think = flytrain_init;	// wait for buddy to call train_find
 	self.nextthink = localtime(self) + 0.25; // magic amount of time :|
@@ -646,19 +650,21 @@ void() train_killed =
 	train_use();
 }
 
-void(entity t) train_lock =
+void(float unlock) train_lock =
 {
-	dprint("in train_lock\n");
-	t.customflags |= CFL_LOCKED;
-	t.takedamage = DAMAGE_NO;
-}
-void(entity t) train_unlock =
-{
-	t.customflags = not(t.customflags, CFL_LOCKED);
-	if (t.max_health)
+	if (unlock)
 	{
-		t.health = t.max_health;
-		t.takedamage = DAMAGE_YES;
+		self.customflags = not(self.customflags, CFL_LOCKED);
+		if (self.max_health)
+		{
+			self.health = self.max_health;
+			self.takedamage = DAMAGE_YES;
+		}
+	}
+	else
+	{
+		self.customflags |= CFL_LOCKED;
+		self.takedamage = DAMAGE_NO;
 	}
 }
 
@@ -744,8 +750,10 @@ void() train_next =
 	if (!corner)
 	{
 		dprint("train_next: no next target\n");
-		if (self.th_die)
-			self.th_die();
+		// .th_melee is a train's "expire at end of path" function, because .th_die
+		// has to be reserved for shootable trains to work with T_Damage()/Killed()
+		if (self.th_melee)
+			self.th_melee();
 		else
 			remove(self);
 		return;
@@ -758,8 +766,8 @@ void() train_next =
 		if (!corner)
 		{
 			dprint("train_next: no next target after curve point\n");
-			if (self.th_die)
-				self.th_die();
+			if (self.th_melee)
+				self.th_melee();
 			else
 				remove(self);
 			return;
@@ -845,6 +853,7 @@ void() func_train_setup =
 		self.movetype = MOVETYPE_PUSH;
 	self.blocked = train_blocked;
 	self.use = train_use;
+	self.lock = train_lock;
 	self.classname = "train";
 	
 	self.max_health = 0;
@@ -876,6 +885,7 @@ Keys:
 	1) ratchet metal
 	2) base plat
 "pausetime"	pausetime at a pathcorner that doesn't specify a wait, default 0.1, -1 for continuous motion
+"health" allow the train to be shot to trigger it whenever it could normally be triggered (toggle spawnflag applies)
 
 Spawnflags:
 PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches them
@@ -891,13 +901,15 @@ A train will fire all targets of a pathcorner on arrival.
 
 If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them. If 'blend speed smoothly' is also set, the train will instead smoothly blend to its destination's 'speed' as it travels to it.
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
-The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion)."
+The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion).
+Setting 'health' will allow the train to be shot to trigger it whenever it could normally be triggered (toggle spawnflag applies)."
 [
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
 		2 : "Toggle" : 0
 		4 : "Blend speed smoothly" : 0
 	]
+	health(integer) : "Health (shootable if > 0)"
 ]
 */
 void() func_train =

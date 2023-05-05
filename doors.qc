@@ -263,9 +263,26 @@ void() door_touch =
 	door_use ();
 }
 
-
-void(entity d) door_lock =
+void(float unlock) door_lock =
 {
+	entity c;
+	
+	dprint("door_lock\n");
+	if (unlock) door_unlock_do(self);
+	else door_lock_do(self);
+	// inner loop checks for doors that are linked by touch and not targetname
+	c = self.enemy;
+	do {
+		if (c.targetname != self.targetname)	// outer loop will find this one
+			if (unlock) door_unlock_do(c);
+			else door_lock_do(c);
+		c = c.enemy;
+	} while (c != self);
+}
+
+void(entity d) door_lock_do =
+{
+	dprint("door_lock_do\n");
 	entity e;
 	if (d.customflags & CFL_LOCKED)
 		return;
@@ -295,8 +312,9 @@ void(entity d) door_lock =
 	}
 }
 
-void(entity d) door_unlock =
+void(entity d) door_unlock_do =
 {
+	dprint("door_unlock_do\n");
 	if (!(d.customflags & CFL_LOCKED))
 		return;
 		
@@ -815,6 +833,7 @@ void() func_door =
 	}
 	
 	self.touch = door_touch;
+	self.lock = door_lock;
 
 	// door_link can't be done until all of the doors have been spawned, so
 	// the sizes can be detected properly.

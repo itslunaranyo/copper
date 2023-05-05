@@ -230,71 +230,39 @@ void(string tname) target_lock_do =
 {
 	if (tname == string_null) return;
 
-	local entity t, c;
+	entity t, oself;
 	t = world;
+	
+		if (self.state)
+			dprint("target_lock_do TRUE\n");
+		else
+			dprint("target_lock_do FALSE\n");
 	
 	do	{
 		t = find (t, targetname, tname);
 		if (!t) break;
 		
-		// outer loop finds doors targeted directly
-		if (t.classname == "func_door")
+		oself = self;
+		self = t;
+		if (self.lock)
 		{
-			if (self.state) door_unlock(t);
-			else door_lock(t);
-			// inner loop checks for doors that are linked by touch and not targetname
-			c = t.enemy;
-			do {
-				if (c.targetname != t.targetname)	// outer loop will find this one
-					if (self.state) door_unlock(t);
-					else door_lock(t);
-				c = c.enemy;
-			} while (c != t);
-		}
-		else if (t.classname == "train")
-		{
-			if (self.state) train_unlock(t);
-			else train_lock(t);
-		}
-		else if (t.classname == "func_plat")
-		{
-			if (self.state) plat_unlock(t);
-			else plat_lock(t);
-		}
-		else if (t.classname == "func_button")
-		{
-			if (self.state) button_unlock(t);
-			else button_lock(t);
-		}
-		// dumb way to make coop starts visible/invisible to the cyclical spawnpoint search 
-		// code without making that code overly complex
-		else if (t.classname == "info_player_coop")
-		{
-			t.classname = "info_player_coop_notyet";
-		}
-		else if (t.classname == "info_player_coop_notyet")
-		{
-			t.classname = "info_player_coop";
-		}
-		else //if (t.classname == "trigger_relay" || t.classname == "func_button")
-		{
-			if (self.state)
-			{
-				t.customflags = not(t.customflags, CFL_LOCKED);
-			}
-			else
-			{
-				t.customflags |= CFL_LOCKED;
-			}
-		}
-		if (self.state)
-		{
-			dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
+			dprint("calling custom lock func\n");
+			self.lock(oself.state);
 		}
 		else
 		{
-			dprint4(t.classname, " with targetname ", t.targetname, " is locked\n");
+			dprint("doing default flag-only lock\n");
+			if (oself.state)
+				t.customflags = not(t.customflags, CFL_LOCKED);
+			else
+				t.customflags |= CFL_LOCKED;
 		}
+		self = oself;
+		
+		if (self.state)
+			dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
+		else
+			dprint4(t.classname, " with targetname ", t.targetname, " is locked\n");
 	} while ( t );
 }
 

@@ -75,33 +75,28 @@ void() button_touch =
 	button_fire ();
 }
 
-void(entity b) button_lock =
+void(float unlock) button_lock =
 {
-	entity oself;
-	b.customflags |= CFL_LOCKED;
-	if (b.max_health)
-		b.takedamage = DAMAGE_NO;
-	b.state = STATE_UP;
-	oself = self;
-	self = b;
-	SUB_CalcMove (self.pos2, self.speed, button_wait);
-	self = oself;
-}
-void(entity b) button_unlock =
-{
-	entity oself;
-	b.customflags = not(b.customflags,CFL_LOCKED);
-	if (b.max_health)
+	if (unlock)
 	{
-		b.takedamage = DAMAGE_YES;
-		b.health = b.max_health;
+		self.customflags = not(self.customflags,CFL_LOCKED);
+		if (self.max_health)
+		{
+			self.takedamage = DAMAGE_YES;
+			self.health = self.max_health;
+		}
+		self.frame = 0;			// use normal textures
+		self.state = STATE_DOWN;
+		SUB_CalcMove (self.pos1, self.speed, button_done);
 	}
-	b.frame = 0;			// use normal textures
-	b.state = STATE_DOWN;
-	oself = self;
-	self = b;
-	SUB_CalcMove (self.pos1, self.speed, button_done);
-	self = oself;
+	else
+	{
+		self.customflags |= CFL_LOCKED;
+		if (self.max_health)
+			self.takedamage = DAMAGE_NO;
+		self.state = STATE_UP;
+		SUB_CalcMove (self.pos2, self.speed, button_wait);
+	}
 }
 
 // failed experiment: this check kept moving farther and farther away from 
@@ -223,6 +218,7 @@ void() func_button =
 
 	self.blocked = button_blocked;
 	self.use = button_use;
+	self.lock = button_lock;
 
 	if (self.health)
 	{

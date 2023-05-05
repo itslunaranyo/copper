@@ -377,6 +377,7 @@ string	keyType;
 .float		notrace;		// entity will be invisible to traceline2()
 .vector		oldvelocity;	// necessary for getting projectiles to pass through .notrace entities
 .entity		trueowner;		// now this is getting dumb
+.void(float unlock) lock;	// so entities can define their own target_lock cleanup
 
 // OVERLOADS:
 .float rand = healamount;	// for trigger_timer
