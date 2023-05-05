@@ -525,6 +525,7 @@ void() flytrain_think =
 
 void() flytrain_init =
 {
+	dprint("in flytrain_init\n");
 	setorigin (self, self.buddy.origin - self.movedir);
 	self.think = flytrain_think;
 	flytrain_think();
@@ -586,8 +587,7 @@ void() flytrain_setup =
 }
 
 /*QUAKED func_flytrain (0 .5 .8) ? - TOGGLE
-A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
-If the train is the target of a button or trigger, it will not begin moving until activated.
+Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners.
 
 "width"		Horizontal drift range, default 8 (-1 for 0)
 "height"	Vertical drift range, default 8 (-1 for 0)
@@ -598,8 +598,13 @@ If the train is the target of a button or trigger, it will not begin moving unti
 2) base plat
 */
 /*FGD
-@SolidClass base(Train) = func_flytrain : 
-"A func_train that has smoothed drifty movement. Inherits movement speed from each path_corner's 'speed' key."
+@baseclass base(Train) = Flytrain [
+	width(string) : "Horizontal drift range" : "8"
+	height(string) : "Vertical drift range" : "8"
+	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
+]
+@SolidClass base(Flytrain) = func_flytrain : 
+"Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners."
 [
 	width(string) : "Horizontal drift range" : "8"
 	height(string) : "Vertical drift range" : "8"
@@ -619,21 +624,20 @@ void() func_flytrain =
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8) - TOGGLE
-A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's "speed" key.  
-If the train is the target of a button or trigger, it will not begin moving until activated.
+Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners.
 
-Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
-
+"model"		model to use
+"width"		Horizontal drift range, default 8 (-1 for 0)
+"height"	Vertical drift range, default 8 (-1 for 0)
+"lip"		Length of 'leash', default 64 (increase if train jumps around at high speeds)
 "sounds"
 0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
 1) ratchet metal
 2) base plat
 */
 /*FGD
-@PointClass base(Train) size(16 16 16) = func_flytrain_point : 
-"A func_train that follows a curved flypath and variable speed rules. Inherits movement speed from each path_corner's 'speed' key.
-
-Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it."
+@PointClass base(Flytrain) size(16 16 16) = func_flytrain_point : 
+"Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners."
 [
 	model(string) : "Model to use"
 ]
@@ -734,6 +738,8 @@ void() train_use =
 
 void() train_wait =
 {
+	entity corner = self.enemy;
+	
 	if (self.wait == -1)
 	{
 		train_off();
@@ -757,7 +763,9 @@ void() train_wait =
 	// if a player is riding the train, treat them as activator
 	if (activator.classname != "player")
 		activator = get_closest_client();
-	SUB_UseEntTargets(self.enemy);
+	SUB_UseEntTargets(corner);
+	// fire them after sorting corner wait stuff, in case the corner triggers
+	// the train itself (useful for wait-locking a pathcorner with a relay)
 }
 
 void() train_next =
@@ -1289,13 +1297,34 @@ void() teleball_init =
 	self.use = SUB_Null;
 }
 
-void() misc_teleball_curvy = 
-{
-	//dprint("in misc_teleball\n");
-	setorigin (self, self.origin);
+/*QUAKED misc_teleporttrain (0 .5 .8) (-16 -16 -16) (16 16 16) START_INVIS
+Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
+
+Inherits movement speed from each path_corner's "speed" key. 
+
+Spawnflags
+START_INVIS	Invisible until triggered
+*/
+/*FGD
+@PointClass base(Flytrain) size(32 32 32) color(0 128 200) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
+Annoying spiky ball which players who have beaten Quake understand as a moving teleport target. The teleball itself behaves like a func_flytrain."
+[
+	target(string) : "First stop target"
+	spawnflags(flags) =
+	[
+		1 : "Start invisible" : 0
+	]
+]
+*/
+void() misc_teleporttrain =
+{	
+	if (!SUB_ShouldSpawn()) return;
+	
+	precache_model2 ("progs/teleport.mdl");
 	
 	// emulate old "spawn where you were placed and then move to the first pathcorner"
 	// behavior so udob_end isn't broken by the first path_corner's targets not firing
+	setorigin (self, self.origin);
 	entity path = spawn();
 	setorigin(path, self.origin);
 	path.classname = "path_corner";
@@ -1306,8 +1335,8 @@ void() misc_teleball_curvy =
 	
 	if (!self.speed) self.speed = 100;
 	self.pausetime = -1;
-	
 	self.solid = -1;
+	
 	flytrain_setup();
 	self.movetype = MOVETYPE_NOCLIP;	// for avelocity
 	
@@ -1321,105 +1350,5 @@ void() misc_teleball_curvy =
 	{
 		self.use = teleball_init;
 	}
-}
-
-void() teletrain_use =
-{
-	self.state = !self.state;
-	if (self.state)
-	{
-		teletrain_go();
-	}
-	else
-	{
-		self.velocity = VEC_ORIGIN;
-		self.target = self.enemy.targetname;
-		self.nextthink = 0;
-	}
-}
-
-// special linear move function for the dumb teletrain so it doesn't have to be MOVETYPE_PUSH
-void() teletrain_go =
-{
-	float l;
-	vector dir;
-	
-	if (self.spawnflags & 1)
-	{
-		setmodel (self, "progs/teleport.mdl");
-		setsize (self, VEC_ORIGIN, VEC_ORIGIN);	
-		self.spawnflags -= 1;
-	}
-
-	self.enemy = find(world, targetname, self.target);
-	self.target = self.enemy.target;
-	
-	dir = (self.enemy.origin + self.pos1) - self.origin;
-	l = vlen(dir);
-	self.velocity = normalize(dir) * self.speed;
-	self.nextthink = time + (l / self.speed);
-	self.think = teletrain_go;
-}
-
-void() teletrain_find =
-{
-	self.enemy = find(world, targetname, self.target);
-	//self.target = self.enemy.target;
-	setorigin(self, self.enemy.origin + self.pos1);
-}
-
-/*QUAKED misc_teleporttrain (0 .5 .8) (-16 -16 -16) (16 16 16) START_INVIS CURVY
-Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
-
-Inherits movement speed from each path_corner's "speed" key. 
-
-Spawnflags
-START_INVIS	Invisible until triggered
-CURVY	behaves like a func_flytrain, following path_corners, waiting at them (a wait of -1 on a path_corner will stop the ball until triggered again), then disappearing at the last path_corner. Movement is smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it.
-*/
-/*FGD
-@PointClass base(Appearflags, Targetname) size(32 32 32) color(0 128 200) model({ "path": ":progs/teleport.mdl" }) = misc_teleporttrain : "Flying teleporter destination
-Annoying spiky ball which players who have beaten Quake understand as a moving teleport target.
-
-If the 'curving path' spawnflag is set, the teleball behaves like a func_flytrain, smoothed out so it doesn't move in straight lines between waypoints. Sharp turns near walls could make it clip out of the level and disappear for a moment, so place pathcorners carefully. Generally, expect it to overshoot every pathcorner after passing through it."
-[
-	target(string) : "First stop target"
-	spawnflags(flags) =
-	[
-		1 : "Start invisible" : 0
-		2 : "Curving path" : 0
-	]
-]
-*/
-void() misc_teleporttrain =
-{	
-	if (!SUB_ShouldSpawn()) return;
-	
-	precache_model2 ("progs/teleport.mdl");
-	if (self.spawnflags & 2)
-	{
-		self.spawnflags -= 2;
-		misc_teleball_curvy();
-		return;
-	}
-	
-	if (!self.speed)
-		self.speed = 100;
-	if (!self.target)
-		objerror("misc_teleporttrain without a target");
-
-	self.solid = SOLID_NOT;
-	self.movetype = MOVETYPE_NOCLIP;
-	self.use = teletrain_use;
-	self.state = 0;
-
-	if (!(self.spawnflags & 1))
-		setmodel (self, "progs/teleport.mdl");
-	setsize (self, self.mins, self.maxs);
-	self.pos1 = 0.5 * (self.maxs - self.mins);
-	setorigin (self, self.origin);
-	
-	self.think = teletrain_find;
-	self.nextthink = time + 0.1;
 }
 
