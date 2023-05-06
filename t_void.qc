@@ -211,9 +211,9 @@ void() void_fallthink =
 {
 	local float plummet;
 	
-	if ( self.enemy.origin_z > self.oldorigin_z )
-	{
-		// player rose back up out of the pit, mostly convenience for noclipping around
+	if ( self.enemy.origin_z > self.oldorigin_z		// player rose back up out of the pit, mostly convenience for noclipping around
+		|| self.owner.flags & CFL_LOCKED )			// player fell into a void as it was LOCKed :(
+	{		
 		void_fall_unplunge();
 		SUB_RemoveSoon();
 		return;
@@ -387,6 +387,33 @@ entity(entity me) void_find_teleport =
 	return world;
 }
 
+void(float unlock) void_lock =
+{
+	// self: solid bottom surface, invisible
+	// self.buddy: nonsolid bottom cover, visible
+	// self.enemy: plunge trigger
+	
+	if (unlock)
+	{
+		self.solid = SOLID_TRIGGER;
+		self.enemy.touch = void_trigger_touch;
+		self.buddy.modelindex = self.modelindex;
+		
+		self.flags = not(self.flags, CFL_LOCKED);
+		self.enemy.flags = not(self.flags, CFL_LOCKED);
+		self.buddy.flags = not(self.flags, CFL_LOCKED);
+	}
+	else
+	{
+		self.solid = SOLID_NOT;
+		self.enemy.touch = SUB_Null;
+		self.buddy.modelindex = 0;
+		
+		self.flags |= CFL_LOCKED;
+		self.enemy.flags |= CFL_LOCKED;
+		self.buddy.flags |= CFL_LOCKED;
+	}
+}
 
 /*QUAKED func_void (.5 .2 0) ?
 for holes into which one should not fall
@@ -426,7 +453,6 @@ If the func_void's first target is an info_teleport_destination, it will hurt th
 void() func_void =
 {
 	if (!SUB_ShouldSpawn()) return;
-	entity trig, ghost;
 	vector offset;
 	
 	precache_sound3("player/q3fall.wav");
@@ -441,13 +467,14 @@ void() func_void =
 	// recycle the same model on a nonsolid entity 32 units higher to hide detritus
 	self.lip = zeroconvertdefault(self.lip, 32);
 	offset = VEC_UP * self.lip;
-	ghost = spawn();
-	ghost.solid = SOLID_NOT;
-	ghost.movetype = MOVETYPE_NONE;
-	setorigin(ghost, offset);
-	setmodel (ghost, self.model);
-	ghost.modelindex = self.modelindex;
-	ghost.classname = "void_ghost";
+	self.buddy = spawn();
+	self.buddy.solid = SOLID_NOT;
+	self.buddy.movetype = MOVETYPE_NONE;
+	setorigin(self.buddy, offset);
+	setmodel (self.buddy, self.model);
+	self.buddy.modelindex = self.modelindex;
+	self.buddy.classname = "void_ghost";
+	self.buddy.owner = self;
 
 	self.model = string_null;
 	
@@ -460,22 +487,23 @@ void() func_void =
 	self.dmg = zeroconvertdefault(self.dmg, 60);
 	
 	// create another solid entity with the same bounds with solid_trigger as a catch on the way down
-	trig = spawn();
-	trig.movetype = MOVETYPE_NONE;
-	trig.solid = SOLID_TRIGGER;
-	trig.owner = self;
-	//trig.buddy = self.buddy;
-	trig.touch = void_trigger_touch;
-	trig.height = self.height - 32;
-	trig.wait = self.delay;	// if trigger has 'delay' field it adds a delay to its own usetargets
-	trig.deathtype = self.deathtype;
-	trig.fadecolor = self.fadecolor;
+	self.enemy = spawn();
+	self.enemy.movetype = MOVETYPE_NONE;
+	self.enemy.solid = SOLID_TRIGGER;
+	self.enemy.owner = self;
+	self.enemy.touch = void_trigger_touch;
+	self.enemy.height = self.height - 32;
+	self.enemy.wait = self.delay;	// if trigger has 'delay' field it adds a delay to its own usetargets
+	self.enemy.deathtype = self.deathtype;
+	self.enemy.fadecolor = self.fadecolor;
 	
-	SUB_CopyTargets(trig);
-	trig.targetname = self.targetname;
+	SUB_CopyTargets(self.enemy);
+	self.enemy.targetname = self.targetname;
 
 	offset = VEC_UP * self.height;
 	
 	// fatten by 64u vertically to make it hard to fall through it at high speed without touching it
-	setsize (trig, self.mins + offset - '0 0 32', self.maxs + offset + '0 0 32');
+	setsize (self.enemy, self.mins + offset - '0 0 32', self.maxs + offset + '0 0 32');
+	
+	self.lock = void_lock;
 }
