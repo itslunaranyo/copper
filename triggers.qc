@@ -1106,6 +1106,15 @@ void() trigger_push_touch =
 		SUB_Remove();
 }
 
+void() trigger_push_find =
+{
+	entity n;
+	vector dir;
+	n = find(world, targetname, self.target);
+	if (!n) return;
+	
+	self.movedir = normalize(n.origin - BoundsCenter(self));
+}
 
 /*QUAKED trigger_push (.5 .0 .5) ? PUSH_ONCE ADD_VEL TRIGGER_FIRST TUNNEL
 Pushes the player, grenades, and gibs.
@@ -1155,6 +1164,11 @@ void() trigger_push =
 	self.touch = trigger_push_touch;
 	if (!self.speed)
 		self.speed = 1000;
+	if (self.target != string_null)
+	{
+		self.think = trigger_push_find;
+		self.nextthink = time + 0.1;
+	}
 }
 
 
