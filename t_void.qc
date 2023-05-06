@@ -307,7 +307,7 @@ void() void_trigger_touch =
 		e = other;
 		if (e.customflags & CFL_PLUNGE) return;	// don't touch the trigger a bunch of times on the way down
 		// we could set a refire time on the trigger but players in coop could go over the edge simultaneously
-		sound (e, CHAN_VOICE, "player/q3fall.wav", 1, ATTN_NONE);
+		sound (e, CHAN_VOICE, self.noise, 1, ATTN_NONE);
 	}
 	
 	if (time > self.attack_finished)
@@ -427,6 +427,7 @@ Keyvalues
 "height" how high above the func_void the plunge trigger should spawn. do not make this high enough that players will touch it without falling in or they'll hear random screaming noises as they walk around and that'll be strange. default 128
 "lip" distance to raise the visual model, default 32
 "fadecolor" color to fade the screen to while falling, default black
+"noise"/"noise2" override fall and splat sounds
 
 Fires all "target"s/"killtarget"s when a client touches the plunge trigger (ie the yell, not the splat).
 If the func_void's first target is an info_teleport_destination, it will hurt the player for "dmg" damage and teleport him to the destination. If "dmg" is enough to kill the player when he falls in, it continues with the fade and splat as normal.
@@ -448,6 +449,8 @@ If the func_void's first target is an info_teleport_destination, it will hurt th
 	lip(integer) : "distance to raise the visual model" : 32
 	dmg(integer) : "pain to apply before salvation teleport" : 60
 	fadecolor(string) : "color to fade the screen to while falling" : "0 0 0"
+	noise(string) : "fall sound" : "player/q3fall.wav"
+	noise2(string) : "splat sound" : "player/splat1.wav"
 ]
 */
 void() func_void =
@@ -455,8 +458,10 @@ void() func_void =
 	if (!SUB_ShouldSpawn()) return;
 	vector offset;
 	
-	precache_sound3("player/q3fall.wav");
-	precache_sound3("player/splat1.wav");
+	if (self.noise == string_null) self.noise = "player/q3fall.wav";
+	if (self.noise2 == string_null) self.noise2 = "player/splat1.wav";
+	precache_sound3(self.noise);
+	precache_sound3(self.noise2);
 	
 	// set own model to link into world, then set to null to be solid but invisible
 	self.solid = SOLID_TRIGGER;
@@ -496,6 +501,8 @@ void() func_void =
 	self.enemy.wait = self.delay;	// if trigger has 'delay' field it adds a delay to its own usetargets
 	self.enemy.deathtype = self.deathtype;
 	self.enemy.fadecolor = self.fadecolor;
+	self.enemy.noise = self.noise;
+	self.enemy.noise2 = self.noise2;
 	
 	SUB_CopyTargets(self.enemy);
 	self.enemy.targetname = self.targetname;
