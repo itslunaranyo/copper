@@ -1109,7 +1109,6 @@ void() trigger_push_touch =
 void() trigger_push_find =
 {
 	entity n;
-	vector dir;
 	n = find(world, targetname, self.target);
 	if (!n) return;
 	
