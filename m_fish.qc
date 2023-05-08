@@ -325,7 +325,7 @@ void() monster_fish_spawn =
 			self.deathtype = "was fed to the Rotfish";
 	}
 
-	nmspeed(0.06); // look at 'em go
+	nmspeed(0.055); // look at 'em go
 
 	swimmonster_start ();
 }
