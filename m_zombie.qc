@@ -580,7 +580,7 @@ void() zombie_return =
 		self.spawnflags |= SPAWN_LYING;
 		self.customflags |= CFL_LEFTY;	// remember not to count this as a kill again
 		self.flags |= FL_MONSTER;
-		if (!enemy_alive() || self.enemy.classname != "player")
+		if (!alive(self.enemy) || self.enemy.classname != "player")
 			self.enemy = world;
 		self.avelocity = VEC_ORIGIN;
 		
