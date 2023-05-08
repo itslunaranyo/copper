@@ -435,15 +435,12 @@ void (void() th) ai_check_refire =
 		return;
 	
 	float r = random() * 5;
-	bprint5("ROLLED ", ftos(r), " BUT MY CNT IS ", ftos(self.cnt + 1), "\n");
 	if ( r > self.cnt + 1 )
 	{
-		bprint("  SO I'M FIRING AGAIN\n");
 		self.cnt += 1;
 		self.think = th;
 		return;
 	}
-	bprint("  SO I'M DONE\n");
 	self.cnt = 0;
 }
 
