@@ -312,8 +312,9 @@ void() sham_magic6     =[      $magic6,       sham_magic9    ]
 void() sham_magic9     =[      $magic9,       sham_magic10   ]{ CastLightning();}
 void() sham_magic10    =[      $magic10,      sham_magic11n   ]{ CastLightning();
 	ai_attack_finished (1 + 2*random());
+	ai_check_refire(sham_magic3nm);
 }
-void() sham_magic11n    =[      $magic11,      sham_magic12   ] {ai_check_refire(sham_magic6);}
+void() sham_magic11n    =[      $magic11,      sham_magic12   ] {}
 void() sham_magic12    =[      $magic12,      sham_run1	   ] {}
 
 // shambler refire replaces 4-tick nightmare lightning, but we save this function 
