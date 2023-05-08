@@ -44,10 +44,7 @@ void() plat_spawn_inside_trigger =
 	{
 		dprint("overriding plat trigger\n");
 		// find overridden trigger for custom trigger zones
-		// if the plat spawns before the trigger this will fail, so delay the search to let triggers spawn
-		self.think = plat_try_find_trigger;
-		self.nextthink = time + 0.1;
-		
+		plat_try_find_trigger();
 		return;
 	}
 	else
@@ -264,6 +261,25 @@ void(float unlock) plat_lock =
 	}
 }
 
+void() plat_finalize =
+{
+	plat_spawn_inside_trigger ();	// the "start moving" trigger	
+	// delayed to finalize() bc if the plat spawns before the trigger this will fail
+
+	// also delayed so all targeters can spawn:
+	if (self.targetname != string_null && !door_getslocked(self))
+	{
+		setorigin (self, self.pos1);
+		self.state = STATE_UP;
+		self.use = plat_use;
+	}
+	else
+	{
+		setorigin (self, self.pos2);
+		self.state = STATE_BOTTOM;
+	}
+}
+
 /*QUAKED func_plat (0 .5 .8) ? PLAT_LOW_TRIGGER
 Plats are always drawn in the extended position, so they will light correctly.
 If the plat is the target of another trigger or button, it will start out disabled in the top position until it is triggered, when it will lower and become a normal plat.
@@ -353,7 +369,6 @@ void() func_plat =
 	setmodel (self, self.model);
 	setsize (self, self.mins, self.maxs);
 
-	self.blocked = plat_crush;
 	if (!self.speed)
 		self.speed = 150;
 	if (!self.wait)
@@ -372,23 +387,12 @@ void() func_plat =
 		else
 			self.pos2_z = self.origin_z - self.size_z + 8;
 	}
+	self.blocked = plat_crush;
 	self.use = plat_trigger_use;
 	self.lock = plat_lock;
 
-	plat_spawn_inside_trigger ();	// the "start moving" trigger	
-
-	//if (self.targetname)
-	if (self.targetname != string_null)
-	{
-		setorigin (self, self.pos1);
-		self.state = STATE_UP;
-		self.use = plat_use;
-	}
-	else
-	{
-		setorigin (self, self.pos2);
-		self.state = STATE_BOTTOM;
-	}
+	self.think = plat_finalize;
+	self.nextthink = self.ltime + 0.1;
 }
 
 //============================================================================
