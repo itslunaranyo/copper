@@ -133,6 +133,29 @@ void() barrel_explode =
 
 //============================================================================
 
+void() explobox_appear =
+{
+	if (self.solid != -1)
+	{
+		self.solid = SOLID_BSP;
+		self.movetype = MOVETYPE_PUSH;
+	}
+	setorigin (self, self.origin);	
+	setmodel (self, self.model);
+	bmodel_lightstyle(self,"a");
+	
+	self.use = explobox_explode_go;
+}
+
+void() explobox_start_invis =
+{
+	self.use = explobox_appear;
+	self.solid = SOLID_NOT;
+	self.movetype = MOVETYPE_NONE;
+	self.modelindex = 0;
+	bmodel_lightstyle(self,"m");
+}
+
 
 void() explobox_setup =
 {
@@ -147,6 +170,12 @@ void() explobox_setup =
 		self.takedamage = DAMAGE_AIM;
 	self.type = "explobox";
 	self.max_health = self.health;
+	
+	if (self.spawnflags & 128)
+	{
+		explobox_start_invis();
+		return;
+	}
 	
 	// no droptofloor for mapper-built func
 	if (self.classname=="func_explobox")
@@ -176,7 +205,7 @@ void() explobox_setup =
 	setorigin(self, bottom);
 }
 
-/*QUAKED misc_explobox (.8 .2 0) (0 0 0) (32 32 64)
+/*QUAKED misc_explobox (.8 .2 0) (0 0 0) (32 32 64) - - - - - - - START_INVIS
 Large exploding box. 150 damage. 
 will do enough damage to set off other barrels at up to ~172u distance (center to center)
 
@@ -187,7 +216,7 @@ will do enough damage to set off other barrels at up to ~172u distance (center t
 "count"		will only respawn 'count' times
 */
 /*FGD
-@PointClass base(Explobox) size(0 0 0, 32 32 64) model({ "path": ":maps/b_explob.bsp" }) = misc_explobox : 
+@PointClass base(Explobox, FuncInvis) size(0 0 0, 32 32 64) model({ "path": ":maps/b_explob.bsp" }) = misc_explobox : 
 "Large exploding container, 150 damage. 
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~172u distance (center to center)." 
@@ -206,7 +235,7 @@ void() misc_explobox =
 	explobox_setup();
 }
 
-/*QUAKED misc_explobox2 (0 .5 .8) (0 0 0) (32 32 32)
+/*QUAKED misc_explobox2 (0 .5 .8) (0 0 0) (32 32 32) - - - - - - - START_INVIS
 Smaller exploding box. 100 damage. REGISTERED ONLY
 will do enough damage to set off other barrels at up to ~128u distance (center to center)
 
@@ -217,7 +246,7 @@ will do enough damage to set off other barrels at up to ~128u distance (center t
 "count"		will only respawn 'count' times
 */
 /*FGD
-@PointClass base(Explobox) size(0 0 0, 32 32 32) model({ "path": ":maps/b_exbox2.bsp" }) = misc_explobox2 : "Small exploding container, 100 damage. 
+@PointClass base(Explobox, FuncInvis) size(0 0 0, 32 32 32) model({ "path": ":maps/b_exbox2.bsp" }) = misc_explobox2 : "Small exploding container, 100 damage. 
 Explodes when triggered or shot. Fires targets when it explodes.
 will do enough damage to set off other barrels at up to ~128u distance (center to center)." 
 []
@@ -234,7 +263,7 @@ void() misc_explobox2 =
 	explobox_setup();
 }
 
-/*QUAKED func_explobox (.8 .2 0) ? TARBABY PUFF
+/*QUAKED func_explobox (.8 .2 0) ? TARBABY PUFF - - - - - START_INVIS
 Build your own exploding box!
 
 Keyvalues:
@@ -246,7 +275,7 @@ Keyvalues:
 "count"		will only respawn 'count' times
 */
 /*FGD
-@SolidClass base(Explobox) = func_explobox : "Customizable exploding container. 
+@SolidClass base(Explobox, FuncInvis) = func_explobox : "Customizable exploding container. 
 Explodes when triggered or shot. Fires targets when it explodes." 
 [
 	dmg(integer) : "Explosion damage (-1 will force 0)" : 150

@@ -63,6 +63,7 @@ void() door_hit_bottom =
 
 void() door_go_down =
 {
+	dprint("door_go_down\n");
 	sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	if (self.max_health)
 	{
@@ -76,6 +77,7 @@ void() door_go_down =
 
 void() door_go_up =
 {
+	dprint("door_go_up\n");
 	if (self.state == STATE_UP)
 		return;		// already going up
 
@@ -108,6 +110,7 @@ void() door_fire =
 	local entity 	oself;
 	local entity	starte;
 		
+	dprint("door_fire\n");
 	if (self.owner != self)
 		objerror ("door_fire: self.owner != self");
 
@@ -153,6 +156,7 @@ void() door_fire =
 
 void() door_use =
 {
+	dprint("door_use\n");
 	if (self.customflags & CFL_LOCKED) return;
 	if (!( self.spawnflags & DOOR_TOGGLE ) ) 
 	{
@@ -481,6 +485,9 @@ void(vector cmins, vector cmaxs) door_finalize =
 			return;
 	
 	self.trigger_field = door_spawn_field(cmins, cmaxs);
+	
+	if (self.customflags & CFL_LOCKED)
+		door_lock(FALSE);
 }
 
 float(entity door, entity master) door_can_link =
@@ -508,6 +515,8 @@ void() door_link =
 	entity	t, masterdoor;
 	vector	cmins, cmaxs;
 
+	dprint("linky dink\n");
+	
 	if (self.enemy)
 		return;		// already linked by another door
 	if (self.spawnflags & DOOR_DONT_LINK)
@@ -731,7 +740,7 @@ Key doors are always wait -1.
 6) base secret door
 */
 /*FGD
-@SolidClass base(Angle, Appearflags, Targetname, Target, Func) = func_door : 
+@SolidClass base(Angle, Appearflags, Targetname, Target, Func, FuncInvis) = func_door : 
 "Door. Opens; closes. 
 If two doors touch, they are assumed to be connected and operate as a unit. Targets, targetnames, and the Crusher and Toggle spawnflags are safely shared between linked doors automatically.
 Doors will not link if either has the 'don't link' spawnflag, if they have different targetnames, or different key requirements." 
@@ -777,15 +786,8 @@ void() func_door =
 	SetMovedir ();
 
 	self.max_health = self.health;
-	self.solid = SOLID_BSP;
-	self.movetype = MOVETYPE_PUSH;
-	setorigin (self, self.origin);	
-	setmodel (self, self.model);
 	//self.classname = "door";
 
-	self.blocked = door_blocked;
-	self.use = door_use;
-	
 	if (!self.speed)
 		self.speed = 100;
 	if (!self.speed2)
@@ -793,10 +795,6 @@ void() func_door =
 	self.dmg = zeroconvertdefault(self.dmg, 2);
 	if (!self.lip)
 		self.lip = 8;
-	self.distance = zeroconvertdefault(self.distance, 
-		BoundsAngleSize( self.movedir, self.size ) - self.lip);
-		// ^^ janky for non-cardinal angles
-
 	if (self.spawnflags & DOOR_SILVER_KEY)
 	{
 		self.items = IT_KEY1;
@@ -813,6 +811,23 @@ void() func_door =
 	
 	if (!self.wait)
 		self.wait = 3;
+	
+	if (self.spawnflags & 128)
+		self.use = func_door_spawn;
+	else
+		func_door_spawn();
+}
+
+void() func_door_spawn =
+{
+	self.solid = SOLID_BSP;
+	self.movetype = MOVETYPE_PUSH;
+	setorigin (self, self.origin);	
+	setmodel (self, self.model);
+
+	self.distance = zeroconvertdefault(self.distance, 
+		BoundsAngleSize( self.movedir, self.size ) - self.lip);
+		// ^^ janky for non-cardinal angles
 		
 	if (self.pos1 && self.pos2)
 	{
@@ -832,6 +847,8 @@ void() func_door =
 		self.th_die = door_killed;
 	}
 	
+	self.blocked = door_blocked;
+	self.use = door_use;
 	self.touch = door_touch;
 	self.lock = door_lock;
 

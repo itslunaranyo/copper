@@ -1165,7 +1165,7 @@ void() func_bobbing_think =
 	self.nextthink = self.ltime + self.length;
 }
 
-/*QUAKED func_bobbing (0 .5 .8) ? START_OFF CRUSHER STOP_LOW STOP_MID STOP_HIGH
+/*QUAKED func_bobbing (0 .5 .8) ? START_OFF CRUSHER STOP_LOW STOP_MID STOP_HIGH - - START_INVIS
 Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
 Trigger to freeze/reactivate.
 
@@ -1185,7 +1185,7 @@ CRUSHER		don't reverse when blocked
 STOP_*		when triggered off, keep oscillating until reaching the low/high/midpoint and stop there. checking more than one adds eligible stopping places, and the bobber will stop at the first one reached.
 */
 /*FGD
-@baseclass base(Appearflags, Targetname, TrainSounds, Angle, Func) = Bob
+@baseclass base(Appearflags, Targetname, TrainSounds, Angle, Func, FuncInvis) = Bob
 [
 	spawnflags(flags) = [
 		1 : "Start off" : 0
@@ -1212,12 +1212,9 @@ Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to
 void() func_bobbing =
 {
 	if (!SUB_ShouldSpawn()) return;
-
-	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
-	if (!self.solid)
-		self.movetype = MOVETYPE_NOCLIP;
-	else
-		self.movetype = MOVETYPE_PUSH;
+	
+	precache_model_safe(self.model);
+	train_sounds();
 
 	SetMovedir();
 	if (!self.distance)
@@ -1232,26 +1229,38 @@ void() func_bobbing =
 		self.pos1 = self.origin + self.distance * 0.5 * self.movedir;
 		self.pos2 = self.origin - self.distance * 0.5 * self.movedir;
 	}
-	self.use = func_bobbing_use;
-	self.blocked = func_bobbing_blocked;
-	
 	self.length = min(0.1, self.wait / 6);
-	
-	train_sounds();
-	
+
+	if (self.spawnflags & 128)
+		self.use = func_bobbing_spawn;
+	else
+		func_bobbing_spawn();
+}
+
+void() func_bobbing_spawn =
+{
 	if (!(self.spawnflags & START_OFF))
 	{
 		self.think = func_bobbing_use;
 		self.nextthink = 0.3;	// wait for items and monsters to rest on it
 	}
 	
-	precache_model_safe(self.model);
+	self.use = func_bobbing_use;
+	self.blocked = func_bobbing_blocked;
+	
+	self.solid = zeroconvertdefault(self.solid, SOLID_BSP);
+	if (!self.solid)
+		self.movetype = MOVETYPE_NOCLIP;
+	else
+		self.movetype = MOVETYPE_PUSH;
+
 	setmodel (self, self.model);
 	setsize (self, self.mins, self.maxs);
 	setorigin (self, func_bobbing_pos(self.delay));
 }
 
-/*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER STOP_LOW STOP_MID STOP_HIGH
+
+/*QUAKED func_bobbing_point (0 .5 .8) (-8 -8 -8) (8 8 8) START_OFF CRUSHER STOP_LOW STOP_MID STOP_HIGH - - START_INVIS
 Bobbing platform. Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units.
 Trigger to freeze/reactivate.
 

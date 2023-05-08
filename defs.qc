@@ -547,4 +547,10 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 ]
 
 @baseclass base(Phong) color(0 120 180) = Func []
+
+@baseclass = FuncInvis [
+	spawnflags(flags) = [
+		128 : "Start Invisible" : 0
+	]
+]
 */

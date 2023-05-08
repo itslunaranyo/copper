@@ -145,7 +145,7 @@ void(entity b) button_force =
 	SUB_CallAsSelf(button_fire, b);
 }
 
-/*QUAKED func_button (0 .5 .8) ? 
+/*QUAKED func_button (0 .5 .8) ? - - - - - - - START_INVIS
 When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
 Acts as if touched when triggered. Will depress itself when locked by a target_lock to look inactive.
 
@@ -163,7 +163,7 @@ Acts as if touched when triggered. Will depress itself when locked by a target_l
 4) trigger noise (big light switch)
 */
 /*FGD
-@SolidClass base(Appearflags, Angle, Target, Targetname, Func) = func_button : 
+@SolidClass base(Appearflags, Angle, Target, Targetname, Func, FuncInvis) = func_button : 
 "Button. When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
 Acts as if touched when triggered. Depresses itself when locked by a target_lock to look inactive." 
 [
@@ -192,19 +192,19 @@ void() func_button =
 	{
 		self.noise = "buttons/airbut1.wav";
 	}
-	if (self.sounds == 1)
+	else if (self.sounds == 1)
 	{
 		self.noise = "buttons/switch21.wav";
 	}
-	if (self.sounds == 2)
+	else if (self.sounds == 2)
 	{
 		self.noise = "buttons/switch02.wav";
 	}
-	if (self.sounds == 3)
+	else if (self.sounds == 3)
 	{
 		self.noise = "buttons/switch04.wav";
 	}
-	if (self.sounds == 4)
+	else if (self.sounds == 4)
 	{
 		self.noise = "misc/trigger1.wav";
 	}
@@ -212,9 +212,32 @@ void() func_button =
 	
 	SetMovedir ();
 
+	if (!self.speed)
+		self.speed = 40;
+	if (!self.wait)
+		self.wait = 1;
+	if (!self.lip)
+		self.lip = 4;
+
+	self.state = STATE_BOTTOM;
+	
+	if (self.spawnflags & 128)
+		self.use = func_button_spawn;
+	else
+		func_button_spawn();
+}
+
+void() func_button_spawn =
+{
 	self.movetype = MOVETYPE_PUSH;
 	self.solid = SOLID_BSP;
 	setmodel (self, self.model);
+
+	// after setmodel so self.size is set
+	self.distance = zeroconvertdefault(self.distance, 
+		fabs(self.movedir*self.size) - self.lip);
+	self.pos1 = self.origin;
+	self.pos2 = self.pos1 + self.movedir * self.distance;
 
 	self.blocked = button_blocked;
 	self.use = button_use;
@@ -229,21 +252,8 @@ void() func_button =
 	else
 		self.touch = button_touch;
 
-	if (!self.speed)
-		self.speed = 40;
-	if (!self.wait)
-		self.wait = 1;
-	if (!self.lip)
-		self.lip = 4;
-
-	if (!self.lip)
-		self.lip = 4;
-	self.distance = zeroconvertdefault(self.distance, 
-		fabs(self.movedir*self.size) - self.lip);
-
-	self.state = STATE_BOTTOM;
-
-	self.pos1 = self.origin;
-	self.pos2 = self.pos1 + self.movedir * self.distance;
+	// do proper lock stuff in case the untriggered entity was locked
+	if (self.customflags & CFL_LOCKED)
+		button_lock(FALSE);
 }
 
