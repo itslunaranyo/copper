@@ -226,40 +226,37 @@ void() target_state =
 
 //=============================================================================
 
-void(string tname) target_lock_do =
+const float SPAWN_LOCK_START = 1;
+const float SPAWN_LOCK_LOCK_ONLY = 2;
+const float SPAWN_LOCK_UNLOCK_ONLY = 4;
+
+void(string tname, float s) target_lock_do =
 {
 	if (tname == string_null) return;
 
 	entity t, oself;
 	t = world;
 	
-		if (self.state)
-			dprint("target_lock_do TRUE\n");
-		else
-			dprint("target_lock_do FALSE\n");
-	
 	do	{
 		t = find (t, targetname, tname);
 		if (!t) break;
 		
-		oself = self;
-		self = t;
-		if (self.lock)
+		if (t.lock)
 		{
-			dprint("calling custom lock func\n");
-			self.lock(oself.state);
+			oself = self;
+			self = t;
+			self.lock(s);
+			self = oself;
 		}
 		else
 		{
-			dprint("doing default flag-only lock\n");
-			if (oself.state)
+			if (s)
 				t.customflags = not(t.customflags, CFL_LOCKED);
 			else
 				t.customflags |= CFL_LOCKED;
 		}
-		self = oself;
 		
-		if (self.state)
+		if (s)
 			dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
 		else
 			dprint4(t.classname, " with targetname ", t.targetname, " is locked\n");
@@ -268,15 +265,42 @@ void(string tname) target_lock_do =
 
 void() target_lock_use =
 {
-	//bprint("in target lock use\n");
-	target_lock_do(self.target);
-	target_lock_do(self.target2);
-	target_lock_do(self.target3);
-	target_lock_do(self.target4);
+	float s = self.state;
 	
-	if (self.spawnflags & 4) self.state = 1;
-	else if (self.spawnflags & 2) self.state = 0;
-	else self.state = 1 - self.state;
+	dprint("in target lock use\n");
+	if (self.attack_finished && time >= self.attack_finished)
+	{
+		dprint("  attack finished late-do\n");
+		s = 1 - s;
+		self.attack_finished = 0;
+	}
+	else
+	{
+		dprint("  direct do\n");
+		if (self.spawnflags & SPAWN_LOCK_UNLOCK_ONLY) self.state = 1;
+		else if (self.spawnflags & SPAWN_LOCK_LOCK_ONLY) self.state = 0;
+		else self.state = 1 - self.state;
+		if (self.wait || self.rand)
+		{
+			dprint("  direct do undo scheduled\n");
+			self.think = target_lock_use;
+			self.nextthink = time + self.wait + random() * self.rand;
+			self.attack_finished = self.nextthink;
+		}
+	}
+	
+	target_lock_do(self.target, s);
+	target_lock_do(self.target2, s);
+	target_lock_do(self.target3, s);
+	target_lock_do(self.target4, s);
+}
+
+void() target_lock_init =
+{
+	target_lock_do(self.target, 0);
+	target_lock_do(self.target2, 0);
+	target_lock_do(self.target3, 0);
+	target_lock_do(self.target4, 0);
 }
 
 /*QUAKED target_lock (0 .5 .8) (-8 -8 -8) (8 8 8) START_LOCKED LOCK_ONLY UNLOCK_ONLY
@@ -286,6 +310,8 @@ Locks and unlocks targeted entities independent of their toggle/start_open/etc s
   - A locked trigger_relay will not fire or evaluate at all
   - Locked path_corners are not considered valid patrol/train destinations
   - Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered
+
+If 'wait' or 'rand' are set, will automatically undo itself after 'wait' seconds plus up to 'rand' additional seconds.
 
 Spawnflags:
 "start_locked"	Targeted entities start out locked. 
@@ -299,26 +325,28 @@ Spawnflags:
   - A locked func_plat behaves as an unreleased LOW_TRIGGER plat
   - A locked trigger_relay will not fire or evaluate at all
   - Locked path_corners are not considered valid patrol/train destinations
-  - Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered"
+  - Locked trigger volumes (once/multi/teleport/secret/changelevel/push/monsterjump) will not activate when touched or triggered
+If 'wait' is set, will automatically undo itself after 'wait' seconds."
 [
 	spawnflags(flags) = [
 		1: "Targeted entities start locked" : 0
 		2: "Lock only" : 0
 		4: "Unlock only" : 0
 	]
+	wait(string) : "Wait before undoing" : 0
+	rand(string) : "Additional random wait" : 0
 ]
 */
 void() target_lock =
 {
 	if (!SUB_ShouldSpawn()) return;
 	self.use = target_lock_use;
-	if (self.spawnflags & 4) self.state = 1;
+	if (self.spawnflags & SPAWN_LOCK_UNLOCK_ONLY) self.state = 1;
 	else self.state = 0;
 	
-	if (self.spawnflags & 1)
+	if (self.spawnflags & SPAWN_LOCK_START)
 	{
-		self.state = 0;
-		self.think = target_lock_use;
+		self.think = target_lock_init;
 		self.nextthink = time + 0.25;
 	}
 }
