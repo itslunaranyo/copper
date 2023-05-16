@@ -534,9 +534,10 @@ void() trigger_timer =
 	self.think = timer_think;
 	self.use = timer_use;
 
-	if (self.spawnflags & 1)
+	if (self.spawnflags & 1)	// start on
 	{
 		self.nextthink = time + self.wait;
+		self.owner = nextent(world);	// use first player as activator since we're never triggered by an activator
 	}
 	
 	if (!self.count)
