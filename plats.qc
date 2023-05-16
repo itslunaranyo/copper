@@ -462,7 +462,7 @@ void() train_sounds =
 		2: "Base Lift"
 	]
 ]
-@baseclass base(Appearflags, Targetname, TrainSounds, Func) = Train [
+@baseclass base(Appearflags, Targetname, TrainSounds, Func, AltTarget) = Train [
 	speed(integer) : "Speed (units per second)" : 64
 	target(target_source) : "Target to start at"
 	dmg(integer) : "Damage on block" : 2
@@ -580,7 +580,7 @@ void() flytrain_setup =
 	self.buddy.health = self.health;
 	self.buddy.sounds = self.sounds;
 	self.buddy.solid = -1;
-	self.buddy.target = self.target;
+	SUB_CopyTargets(self.buddy);
 	self.buddy.targetname = self.targetname;
 	self.buddy.owner = self;
 	
@@ -631,7 +631,9 @@ Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional rando
 	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
 ]
 @SolidClass base(Flytrain) = func_flytrain : 
-"Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners."
+"Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners. Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination"
 [
 	width(string) : "Horizontal drift range" : "8"
 	height(string) : "Vertical drift range" : "8"
@@ -664,7 +666,9 @@ Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional rando
 */
 /*FGD
 @PointClass base(Flytrain) size(16 16 16) = func_flytrain_point : 
-"Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners."
+"Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners. Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination"
 [
 	model(string) : "Model to use"
 ]
@@ -763,10 +767,16 @@ void() train_use =
 	train_next();
 }
 
-void() train_wait =
+void() train_wait =	// arrival at a pathcorner
 {
 	entity corner = self.enemy;
 	
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
+		else SUB_UseTargetsByField(target2);
+	}
+
 	if (self.wait == -1)
 	{
 		train_off();
@@ -795,7 +805,7 @@ void() train_wait =
 	// the train itself (useful for wait-locking a pathcorner with a relay)
 }
 
-void() train_next =
+void() train_next =	// departure for next pathcorner
 {
 	entity corner, ctrl;
 	float dspeed;
@@ -809,6 +819,11 @@ void() train_next =
 			self.th_melee();
 		else
 			remove(self);
+		if (self.spawnflags & SPAWN_ALT_TARG)
+		{
+			if (self.delay) SUB_UseTargetsByFieldDelay(target4);
+			else SUB_UseTargetsByField(target4);
+		}
 		return;
 	}
 	self.oldenemy = self.enemy;
@@ -823,6 +838,11 @@ void() train_next =
 				self.th_melee();
 			else
 				remove(self);
+			if (self.spawnflags & SPAWN_ALT_TARG)
+			{
+				if (self.delay) SUB_UseTargetsByFieldDelay(target4);
+				else SUB_UseTargetsByField(target4);
+			}
 			return;
 		}
 	}
@@ -832,6 +852,11 @@ void() train_next =
 		self.wait = self.pausetime;
 	
 	self.enemy = corner;
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
+		else SUB_UseTargetsByField(target3);
+	}
 	train_on();
 	
 	if (self.oldenemy.speed == -1)
@@ -950,12 +975,15 @@ SMOOTH_SPEED: if PATH_SPEED, train will smoothly blend to its destination's 'spe
 @SolidClass base(Train) = func_train : "Moving platform that players can ride. 
 Its origin is the min corner of the train. 
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
-A train will fire all targets of a pathcorner on arrival.
+Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
+
 
 If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them. If 'blend speed smoothly' is also set, the train will instead smoothly blend to its destination's 'speed' as it travels to it.
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
 The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion).
-Setting 'health' will allow the train to be shot to trigger it whenever it could normally be triggered (toggle spawnflag applies)."
+Setting 'health' will allow the train to be shot to trigger it whenever it could normally be triggered (toggle spawnflag applies). 
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination"
 [
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
@@ -1001,11 +1029,13 @@ PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches the
 @PointClass base(Train) = func_train_point : "Moving platform that players can ride. 
 The point entity is the origin, even if a model is specified.
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
-A train will fire all targets of a pathcorner on arrival.
+Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
 
 If 'Speed from path' is set, the train will inherit the 'speed' value from path_corners as it reaches them. If 'blend speed smoothly' is also set, the train will instead smoothly blend to its destination's 'speed' as it travels to it.
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
-The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion)."
+The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the train's path (default is to ignore triggerings when in motion).
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination"
 [
 	model(string) : "Model to use"
 	spawnflags(Flags) = [
