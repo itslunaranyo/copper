@@ -7,7 +7,7 @@ for all your button
 ===========================================
 */
 
-void() button_wait =
+void() button_wait =	// hit top
 {
 	self.state = STATE_TOP;
 	self.nextthink = self.ltime + self.wait;
@@ -15,16 +15,26 @@ void() button_wait =
 	activator = self.enemy;
 	self.frame = 1;			// use alternate textures
 	if (self.customflags & CFL_LOCKED) return;
-	SUB_UseTargets();
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
+		else SUB_UseTargetsByField(target2);
+	}
+	else SUB_UseTargets();
 }
 
-void() button_done =
+void() button_done =	// hit bottom
 {
 	self.frame = 0;			// use normal textures
 	self.state = STATE_BOTTOM;
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target4);
+		else SUB_UseTargetsByField(target4);
+	}
 }
 
-void() button_return =
+void() button_return =	// go down
 {
 	if (self.customflags & CFL_LOCKED) return;
 	self.state = STATE_DOWN;
@@ -32,6 +42,11 @@ void() button_return =
 	self.frame = 0;			// use normal textures
 	if (self.health)
 		self.takedamage = DAMAGE_YES;	// can be shot again
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
+		else SUB_UseTargetsByField(target3);
+	}
 }
 
 
@@ -40,7 +55,7 @@ void() button_blocked =
 }
 
 
-void() button_fire =
+void() button_fire =	// go up
 {
 	if (self.customflags & CFL_LOCKED) return;
 	if (self.state == STATE_UP || self.state == STATE_TOP)
@@ -50,6 +65,12 @@ void() button_fire =
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
 	self.state = STATE_UP;
+
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target);
+		else SUB_UseTargetsByField(target);
+	}
 	SUB_CalcMove (self.pos2, self.speed, button_wait);
 }
 
@@ -163,9 +184,11 @@ Acts as if touched when triggered. Will depress itself when locked by a target_l
 4) trigger noise (big light switch)
 */
 /*FGD
-@SolidClass base(Appearflags, Angle, Target, Targetname, Func, FuncInvis) = func_button : 
+@SolidClass base(Appearflags, Angle, Target, Targetname, Func, FuncInvis, AltTarget) = func_button : 
 "Button. When a button is touched, it moves some distance in the direction of its angle, triggers all of its targets, waits some time, then returns to its original position where it can be triggered again.
-Acts as if touched when triggered. Depresses itself when locked by a target_lock to look inactive." 
+Acts as if touched when triggered. Depresses itself when locked by a target_lock to look inactive.
+
+Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'target3' when returning, 'target4' when fully out." 
 [
 	speed(integer) : "Speed" : 40
 	health(integer) : "Health (shootable if > 0)"
