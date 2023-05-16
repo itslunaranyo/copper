@@ -8,20 +8,19 @@ LIFTS AND TRAINS
 
 float PLAT_LOW_TRIGGER = 1;
 
-void() plat_try_find_trigger =
+float() plat_try_find_trigger =
 {
 	entity t;
 	t = find (world, targetname, self.target);
-	self.target = "";
 	if (!t)
 	{
-		dprint("plat with unmatched target");
-		plat_spawn_inside_trigger();
+		dprint("plat with unmatched target\n");
+		return FALSE;
 	}
 	else if ( (t.classname != "trigger_once") && (t.classname != "trigger_multiple") && (t.classname != "trigger_multiple_box") ) 
 	{
-		dprint("plat targets a non-trigger");
-		plat_spawn_inside_trigger();
+		dprint("plat targets a non-trigger\n");
+		return FALSE;
 	}
 	else
 	{
@@ -31,8 +30,10 @@ void() plat_try_find_trigger =
 		t.movetype = MOVETYPE_NONE;
 		t.enemy = self;
 		self.trigger_field = t;
+		self.target = "";
 	}
 	self.think = SUB_Null;
+	return TRUE;
 }
 
 void() plat_spawn_inside_trigger =
@@ -44,50 +45,46 @@ void() plat_spawn_inside_trigger =
 	{
 		dprint("overriding plat trigger\n");
 		// find overridden trigger for custom trigger zones
-		plat_try_find_trigger();
-		return;
+		if (plat_try_find_trigger())
+			return;
 	}
-	else
+	
+	// touch zone should extend from the top of the plat in its lowest position
+	// to 8 units above the top of the plat in its highest position. pos1 cannot
+	// be assumed to be the highest position.
+	t = spawn();
+	local float high, low;
+	
+	high = max(self.pos1_z, self.pos2_z) + self.maxs_z;
+	low = min(self.pos1_z, self.pos2_z) + self.maxs_z;
+	
+	tmin = self.mins + '25 25 0';
+	tmax = self.maxs - '25 25 0';
+	if (self.size_x <= 50)
 	{
-		// touch zone should extend from the top of the plat in its lowest position
-		// to 8 units above the top of the plat in its highest position. pos1 cannot
-		// be assumed to be the highest position.
-		t = spawn();
-		local float high, low;
-		
-		high = max(self.pos1_z, self.pos2_z) + self.maxs_z;
-		low = min(self.pos1_z, self.pos2_z) + self.maxs_z;
-		
-		tmin = self.mins + '25 25 0';
-		tmax = self.maxs - '25 25 0';
-		if (self.size_x <= 50)
-		{
-			tmin_x = (self.mins_x + self.maxs_x) / 2;
-			tmax_x = tmin_x + 1;
-		}
-		if (self.size_y <= 50)
-		{
-			tmin_y = (self.mins_y + self.maxs_y) / 2;
-			tmax_y = tmin_y + 1;
-		}
-		
-		tmin_z = low;
-		if (self.spawnflags & PLAT_LOW_TRIGGER)
-			tmax_z = low + 8;
-		else
-			tmax_z = high + 8;
-		
-		t.solid = SOLID_TRIGGER;
-		setsize (t, tmin, tmax);
+		tmin_x = (self.mins_x + self.maxs_x) / 2;
+		tmax_x = tmin_x + 1;
 	}
+	if (self.size_y <= 50)
+	{
+		tmin_y = (self.mins_y + self.maxs_y) / 2;
+		tmax_y = tmin_y + 1;
+	}
+	
+	tmin_z = low;
+	if (self.spawnflags & PLAT_LOW_TRIGGER)
+		tmax_z = low + 8;
+	else
+		tmax_z = high + 8;
+	
+	t.solid = SOLID_TRIGGER;
+	setsize (t, tmin, tmax);
 	
 	t.touch = plat_center_touch;
 	t.think = SUB_Null;
 	t.movetype = MOVETYPE_NONE;
 	t.enemy = self;
 	self.trigger_field = t;
-	
-	self.target = "";
 }
 
 void() plat_hit_top =
@@ -96,12 +93,24 @@ void() plat_hit_top =
 	self.state = STATE_TOP;
 	self.think = plat_go_down;
 	self.nextthink = self.ltime + self.wait;
+	
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
+		else SUB_UseTargetsByField(target2);
+	}
 }
 
 void() plat_hit_bottom =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_BOTTOM;
+	
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target4);
+		else SUB_UseTargetsByField(target4);
+	}
 }
 
 void() plat_go_down =
@@ -109,6 +118,12 @@ void() plat_go_down =
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos2, self.speed, plat_hit_bottom);
+
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
+		else SUB_UseTargetsByField(target3);
+	}
 }
 
 void() plat_go_up =
@@ -116,6 +131,12 @@ void() plat_go_up =
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_UP;
 	SUB_CalcMove (self.pos1, self.speed, plat_hit_top);
+
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target);
+		else SUB_UseTargetsByField(target);
+	}
 }
 
 // ---------------------------------------------------------
@@ -297,14 +318,16 @@ If the plat targets a trigger once/multiple/multiple_box, it will override the p
 	-1: silent
 */
 /*FGD
-@SolidClass base(Appearflags, Targetname, Func) = func_plat : "Elevator platform.
+@SolidClass base(Appearflags, Targetname, Func, Target, AltTarget) = func_plat : "Elevator platform.
 Plats are always drawn in the extended position, so they will light correctly.
 If the plat is the target of another trigger or button, it will start out disabled in the top position until it is triggered, when it will lower and become a normal plat.
 If the plat targets a trigger once/multiple/multiple_box, it will override the plat's default activation zone (consuming the trigger).
 
 By setting 'pos1' & 'pos2' you can directly override the top and bottom positions, allowing the plat to be built anywhere else in the map. This is useful for building a plat where it will be lit the best.
 
-The 'low trigger volume' spawnflag will put the activation zone only at the bottom of the movement course, instead of the whole vertical." 
+The 'low trigger volume' spawnflag will put the activation zone only at the bottom of the movement course, instead of the whole vertical.
+
+Alt Target Pattern: 'target' upon rising, 'target2' upon reaching top, 'target3' upon descending, 'target4' upon reaching bottom." 
 [	
 	spawnflags(Flags) =
 	[
