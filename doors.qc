@@ -538,8 +538,6 @@ void() door_link =
 	entity	t, masterdoor;
 	vector	cmins, cmaxs;
 
-	dprint("linky dink\n");
-	
 	if (self.enemy)
 		return;		// already linked by another door
 	if (self.spawnflags & DOOR_DONT_LINK)
