@@ -50,10 +50,15 @@ void(entity targ, entity attacker) Killed =
 	self.takedamage = DAMAGE_NO;
 	self.touch = SUB_Null;
 
-	// bump the monster counter
 	if (self.flags & FL_MONSTER)
 	{
-		killed_monster();
+		// fall to ground
+		if (self.flags & FL_FLY)
+			self.flags = self.flags - FL_FLY;
+		if (self.flags & FL_SWIM)
+			self.flags = self.flags - FL_SWIM;
+
+		killed_monster();	// bump the monster counter
 		monster_death_use();
 	}
 
@@ -313,6 +318,15 @@ T_ReactToDamage
 */
 void( entity attacker ) T_ReactToDamage =
 {
+	if (self.flags & FL_MONSTER)
+	{
+		monster_alt_use(
+			(attacker.flags & (FL_MONSTER|FL_CLIENT)), // waketarget if attacker isn't world
+			TRUE, 	// pain target obviously
+			(self.health <= floor(self.max_health * 0.5)), // half health threshold
+			FALSE);	// not dead yet
+	}
+	
 	// ignore doors and nailshooters and so on
 	if (!(attacker.flags & (FL_MONSTER|FL_CLIENT))) return;
 	// ignore self dmg

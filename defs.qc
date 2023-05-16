@@ -277,8 +277,6 @@ string	keyType;
 .string		target2;
 .string		target3;
 .string		target4;
-//.string		pretarget;		// to be fired before ... things
-//.string		posttarget;		// to be fired after them
 
 .float		alpha;
 
@@ -551,6 +549,11 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 @baseclass = FuncInvis [
 	spawnflags(flags) = [
 		128 : "Start Invisible" : 0
+	]
+]
+@baseclass = AltTarget [
+	spawnflags(flags) = [
+		16384 : "Alt Target Pattern" : 0
 	]
 ]
 */

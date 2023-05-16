@@ -92,19 +92,12 @@ const float	TRACE_WATER				= 2;
 // monsters
 const float	SPAWN_AMBUSH		= 1;
 const float	SPAWN_CRUCIFIEDX	= 1;
-/*
-const float	SPAWN_TRIGGERED		= 2;
-const float	SPAWN_TFOG			= 4;
-const float	SPAWN_NO_TFRAG		= 8;
-const float	SPAWN_INSTAWAKE		= 16;
-const float	SPAWN_LYING			= 32;	// zombies
-*/
 const float	SPAWN_TRIGGERED		= 16;
 const float	SPAWN_NO_TFOG		= 32;
 const float	SPAWN_NO_TFRAG		= 64;
 const float	SPAWN_INSTAWAKE		= 128;
 const float	SPAWN_LYING			= 2;	// zombies
-const float	SPAWN_CRUCIFIED		= 16384;	// was 128, but random zombies in stock quake have spawnflags&128 left over from something :P
+const float	SPAWN_CRUCIFIED		= 32768;	// was 128, but random zombies in stock quake have spawnflags&128 left over from something :P
 
 // mode flags
 const float	SPAWN_NOTEASY		= 256;
@@ -113,6 +106,8 @@ const float	SPAWN_NOTHARD		= 1024;
 const float	SPAWN_NOTDM			= 2048;
 const float	SPAWN_COOPONLY		= 4096;
 const float	SPAWN_NOTCOOP		= 8192;
+
+const float	SPAWN_ALT_TARG		= 16384;	// fire the four target keys at different times
 
 // items
 const float	IT_AXE					= 4096;

@@ -590,6 +590,8 @@ void() FoundTarget =
 		}
 	}
 	
+	monster_alt_use(TRUE, FALSE, FALSE, FALSE);	// fire wake target if applicable
+
 	if (self.enemy.classname == "player")
 	{	// let other monsters see this monster for a while
 		sight_entity = self;
