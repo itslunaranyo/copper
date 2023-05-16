@@ -330,7 +330,8 @@ float(float hush) SUB_UseCheck =
 	{
 		//error("activator was null. globals are bad, kids.\n");
 		//return;
-		dprint3("WARNING: Activator was null!\nuser (self): ", self.classname, "\n");
+		dprint3("  WARNING: Activator was null!\n  user (self): ", self.classname, ", using player 1\n");
+		activator = nextent(world);
 	}
 	
 	if (self.delay)
