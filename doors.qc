@@ -48,10 +48,16 @@ void() door_hit_top =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_TOP;
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
+		else SUB_UseTargetsByField(target2);
+	}
 	if (self.spawnflags & DOOR_TOGGLE)
 		return;		// don't come down automatically
 	self.think = door_go_down;
 	self.nextthink = self.ltime + self.wait;
+	
 }
 
 void() door_hit_bottom =
@@ -59,6 +65,12 @@ void() door_hit_bottom =
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.frame = self.skin;
 	self.state = STATE_BOTTOM;
+	
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target4);
+		else SUB_UseTargetsByField(target4);
+	}
 }
 
 void() door_go_down =
@@ -73,6 +85,12 @@ void() door_go_down =
 	
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos1, self.speed2, door_hit_bottom);
+	
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
+		else SUB_UseTargetsByField(target3);
+	}
 }
 
 void() door_go_up =
@@ -94,7 +112,12 @@ void() door_go_up =
 	SUB_CalcMove (self.pos2, self.speed, door_hit_top);
 	self.frame = !self.skin;
 
-	SUB_UseTargetsSilent();	// door messages are for when they *don't* open
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		if (self.delay) SUB_UseTargetsByFieldDelay(target);
+		else SUB_UseTargetsByField(target);
+	}
+	else SUB_UseTargetsSilent();	// door messages are for when they *don't* open
 }
 
 /*
@@ -740,10 +763,12 @@ Key doors are always wait -1.
 6) base secret door
 */
 /*FGD
-@SolidClass base(Angle, Appearflags, Targetname, Target, Func, FuncInvis) = func_door : 
+@SolidClass base(Angle, Appearflags, Targetname, Target, Func, FuncInvis, AltTarget) = func_door : 
 "Door. Opens; closes. 
 If two doors touch, they are assumed to be connected and operate as a unit. Targets, targetnames, and the Crusher and Toggle spawnflags are safely shared between linked doors automatically.
-Doors will not link if either has the 'don't link' spawnflag, if they have different targetnames, or different key requirements." 
+Doors will not link if either has the 'don't link' spawnflag, if they have different targetnames, or different key requirements.
+
+Alt Target Pattern: 'target' when starting to open, 'target2' when opened, 'target3' when starting to close, 'target4' when closed." 
 [
 	speed(integer) : "Speed" : 100
 	speed2(integer) : "Close Speed (if different from open speed)" : 0
