@@ -48,11 +48,7 @@ void() door_hit_top =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_TOP;
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
-		else SUB_UseTargetsByField(target2);
-	}
+	SUB_UseTargetsAlt(target2);
 	if (self.spawnflags & DOOR_TOGGLE)
 		return;		// don't come down automatically
 	self.think = door_go_down;
@@ -66,11 +62,7 @@ void() door_hit_bottom =
 	self.frame = self.skin;
 	self.state = STATE_BOTTOM;
 	
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target4);
-		else SUB_UseTargetsByField(target4);
-	}
+	SUB_UseTargetsAlt(target4);
 }
 
 void() door_go_down =
@@ -86,11 +78,7 @@ void() door_go_down =
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos1, self.speed2, door_hit_bottom);
 	
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
-		else SUB_UseTargetsByField(target3);
-	}
+	SUB_UseTargetsAlt(target3);
 }
 
 void() door_go_up =
@@ -112,12 +100,8 @@ void() door_go_up =
 	SUB_CalcMove (self.pos2, self.speed, door_hit_top);
 	self.frame = !self.skin;
 
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target);
-		else SUB_UseTargetsByField(target);
-	}
-	else SUB_UseTargetsSilent();	// door messages are for when they *don't* open
+	if (!SUB_UseTargetsAlt(target))
+		SUB_UseTargetsSilent();	// door messages are for when they *don't* open
 }
 
 /*

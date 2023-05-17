@@ -227,27 +227,33 @@ void(entity t) SUB_UseEntTargets =
 
 /*
 =============
-SUB_UseTargetsByFieldDelay
+SUB_UseTargetsAlt
 
 for selective use by alternate targeters
 ===============
 */
-void(.string fld) SUB_UseTargetsByFieldDelay =
+float(.string fld) SUB_UseTargetsAlt =
 {
-	if (self.fld == string_null) return;
-	entity t;
+	if (!(self.spawnflags & SPAWN_ALT_TARG))
+		return FALSE;
+	if (self.fld == string_null)
+		return TRUE;
+	if (!self.delay)
+	{
+		SUB_UseTargetsByField(fld);
+		return TRUE;
+	}
+
 	// create a temp object to fire at a later time
+	entity t;
 	t = spawn();
 	t.classname = "DelayedUse";
 	t.nextthink = time + self.delay;
 	t.think = SUB_UseTargetsGo;
 	t.enemy = activator;
 	t.message = self.message;
-	t.noise = self.noise;
-	
 	t.target = self.fld;
-
-	t.cnt = self.cnt;
+	return TRUE;
 }
 
 /*

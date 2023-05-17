@@ -15,23 +15,15 @@ void() button_wait =	// hit top
 	activator = self.enemy;
 	self.frame = 1;			// use alternate textures
 	if (self.customflags & CFL_LOCKED) return;
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
-		else SUB_UseTargetsByField(target2);
-	}
-	else SUB_UseTargets();
+	if (!SUB_UseTargetsAlt(target2))
+		SUB_UseTargets();
 }
 
 void() button_done =	// hit bottom
 {
 	self.frame = 0;			// use normal textures
 	self.state = STATE_BOTTOM;
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target4);
-		else SUB_UseTargetsByField(target4);
-	}
+	SUB_UseTargetsAlt(target4);
 }
 
 void() button_return =	// go down
@@ -42,11 +34,7 @@ void() button_return =	// go down
 	self.frame = 0;			// use normal textures
 	if (self.health)
 		self.takedamage = DAMAGE_YES;	// can be shot again
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
-		else SUB_UseTargetsByField(target3);
-	}
+	SUB_UseTargetsAlt(target3);
 }
 
 
@@ -65,12 +53,7 @@ void() button_fire =	// go up
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
 	self.state = STATE_UP;
-
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target);
-		else SUB_UseTargetsByField(target);
-	}
+	SUB_UseTargetsAlt(target);
 	SUB_CalcMove (self.pos2, self.speed, button_wait);
 }
 

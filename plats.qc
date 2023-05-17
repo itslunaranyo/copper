@@ -93,24 +93,14 @@ void() plat_hit_top =
 	self.state = STATE_TOP;
 	self.think = plat_go_down;
 	self.nextthink = self.ltime + self.wait;
-	
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
-		else SUB_UseTargetsByField(target2);
-	}
+	SUB_UseTargetsAlt(target2);
 }
 
 void() plat_hit_bottom =
 {
 	sound (self, CHAN_VOICE, self.noise1, 1, ATTN_NORM);
 	self.state = STATE_BOTTOM;
-	
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target4);
-		else SUB_UseTargetsByField(target4);
-	}
+	SUB_UseTargetsAlt(target4);
 }
 
 void() plat_go_down =
@@ -118,12 +108,7 @@ void() plat_go_down =
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_DOWN;
 	SUB_CalcMove (self.pos2, self.speed, plat_hit_bottom);
-
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
-		else SUB_UseTargetsByField(target3);
-	}
+	SUB_UseTargetsAlt(target3);
 }
 
 void() plat_go_up =
@@ -131,12 +116,7 @@ void() plat_go_up =
 	sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	self.state = STATE_UP;
 	SUB_CalcMove (self.pos1, self.speed, plat_hit_top);
-
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target);
-		else SUB_UseTargetsByField(target);
-	}
+	SUB_UseTargetsAlt(target);
 }
 
 // ---------------------------------------------------------
@@ -771,11 +751,7 @@ void() train_wait =	// arrival at a pathcorner
 {
 	entity corner = self.enemy;
 	
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target2);
-		else SUB_UseTargetsByField(target2);
-	}
+	SUB_UseTargetsAlt(target2);
 
 	if (self.wait == -1)
 	{
@@ -819,11 +795,7 @@ void() train_next =	// departure for next pathcorner
 			self.th_melee();
 		else
 			remove(self);
-		if (self.spawnflags & SPAWN_ALT_TARG)
-		{
-			if (self.delay) SUB_UseTargetsByFieldDelay(target4);
-			else SUB_UseTargetsByField(target4);
-		}
+		SUB_UseTargetsAlt(target4);
 		return;
 	}
 	self.oldenemy = self.enemy;
@@ -838,11 +810,7 @@ void() train_next =	// departure for next pathcorner
 				self.th_melee();
 			else
 				remove(self);
-			if (self.spawnflags & SPAWN_ALT_TARG)
-			{
-				if (self.delay) SUB_UseTargetsByFieldDelay(target4);
-				else SUB_UseTargetsByField(target4);
-			}
+			SUB_UseTargetsAlt(target4);
 			return;
 		}
 	}
@@ -852,11 +820,7 @@ void() train_next =	// departure for next pathcorner
 		self.wait = self.pausetime;
 	
 	self.enemy = corner;
-	if (self.spawnflags & SPAWN_ALT_TARG)
-	{
-		if (self.delay) SUB_UseTargetsByFieldDelay(target3);
-		else SUB_UseTargetsByField(target3);
-	}
+	SUB_UseTargetsAlt(target3);
 	train_on();
 	
 	if (self.oldenemy.speed == -1)
