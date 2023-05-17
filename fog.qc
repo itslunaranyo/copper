@@ -118,6 +118,14 @@ void( entity client, float density, vector color, float sky ) fog_set =
 
 	//dprint5("fog ",ftos(density*1000),vtos(color),ftos(sky*100),"\n");
 
+	if (noTint && (client.customflags & CFL_PLUNGE))	// don't interfere with no-tint void fog
+	{
+		client.fog_density2 = density;
+		client.fog_color2 = color;
+		if (sky) client.fog_sky2 = sky;
+		return;
+	}
+	
 	stuffcmd(client, "\nfog ");
 	stuffcmd_float(client, density);
 	stuffcmd(client, " ");
@@ -136,7 +144,6 @@ void( entity client, float density, vector color, float sky ) fog_set =
 		stuffcmd(client, "\n");
 	}
 	fog_save(client, density, color, sky);
-
 }
 
 /*

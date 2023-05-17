@@ -101,7 +101,6 @@ void(entity who, float amt, vector color) TintScreenFog
 	if (color_x > 1 || color_y > 1 || color_z > 1)
 		color /= 255;
 	
-	
 	c = lerpVector(who.fog_color2, color, amt);
 	s = lerp(who.fog_sky2, 1, amt);
 	
@@ -118,7 +117,9 @@ void(entity who, float amt, vector color) TintScreenFog
 		d += dx*dx*20;
 	}
 	
+	noTint = 0;	// hack
 	fog_set(who, d, c, s);
+	noTint = 1;
 }
 
 
@@ -412,7 +413,8 @@ void() void_trigger_touch =
 	// gl_cshiftpercent isn't native to OG quake, so the cvar call fails and returns 0 
 	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
 	// at the same time to determine if that 0 is valid
-	noTint = (cvar("gl_cshiftpercent") < CSHIFT_CUTOFF && cvar("gl_farclip"));
+	noTint = (cvar("gl_cshiftpercent") < CSHIFT_CUTOFF) && cvar("gl_farclip") && !coop;
+	// doesn't work in coop bc the server's values will be used to determine tint/fog for clients
 }
 
 
