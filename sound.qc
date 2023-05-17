@@ -21,24 +21,24 @@ void(float vol) sound_setup =
 	else if (self.distance == 2) self.distance = ATTN_NORM;
 	else if (self.distance == 3) self.distance = ATTN_NONE;
 	
-	self.cnt = 0;
+	self.width = 0;
 	precache_sound_safe(self.noise);
 	
 	if (self.noise1 == string_null) return;
 	precache_sound_safe(self.noise1);
-	self.cnt++;
+	self.width++;
 
 	if (self.noise2 == string_null) return;
 	precache_sound_safe(self.noise2);
-	self.cnt++;
+	self.width++;
 
 	if (self.noise3 == string_null) return;
 	precache_sound_safe(self.noise3);
-	self.cnt++;
+	self.width++;
 
 	if (self.noise4 == string_null) return;
 	precache_sound_safe(self.noise4);
-	self.cnt++;
+	self.width++;
 }
 
 void(float vol) ambient_setup =
@@ -294,22 +294,22 @@ void(entity on, string _noise, float _volume, float _distance, float _delay) sou
 string() target_sound_next =
 {
 	float r;
-	if (self.cnt == 0) return self.noise;
+	if (self.width == 0) return self.noise;
 	
 	if (self.spawnflags & 1)
 	{
-		r = self.rand;
-		while (r == self.rand)	// don't play the same sound twice
+		r = self.lip;
+		while (r == self.lip)	// don't play the same sound twice
 		{
-			self.rand = floor(random() * (self.cnt + 0.98));
+			self.lip = floor(random() * (self.width + 0.98));
 		}
 	}
 	else
 	{
-		self.rand = (self.rand + 1) % (self.cnt + 1);
+		self.lip = (self.lip + 1) % (self.width + 1);
 	}
 	
-	switch(self.rand)
+	switch(self.lip)
 	{
 		case 0:
 			return self.noise;
@@ -325,32 +325,84 @@ string() target_sound_next =
 	return self.noise;
 }
 
-void() target_sound_use =
+void() target_sound_find =
+{
+	if (self.buddy != world) return;
+	
+	if ((self.spawnflags & 2) && activator.classname == "player")
+	{
+		self.buddy = activator;
+		return;
+	}
+	if (self.target != string_null)
+	{
+		self.buddy = find(world, targetname, self.target);
+		if (!self.buddy) self.buddy = self;
+		return;
+	}
+	self.buddy = self;
+}
+
+void() target_sound_go =
 {
 	string snd = target_sound_next();
-	entity wh;
-	if ((self.spawnflags & 2) && activator.classname == "player")
-		wh = activator;
-	else
-		wh = self;
-	
-	playercount_convert(count);
-	if (self.count > 0)
-	{
-		self.count -= 1;
-		if (self.count <= 0)
-			SUB_RemoveSoon();
-	}
 	
 	if (self.delay > 0)
 	{
-		sound_delayed(wh, snd, self.volume, self.distance, self.delay);
+		sound_delayed(self.buddy, snd, self.volume, self.distance, self.delay);
 		return;
 	}
-	sound(wh, CHAN_AUTO, snd, self.volume, self.distance);
+	sound(self.buddy, CHAN_AUTO, snd, self.volume, self.distance);
 }
 
-/*QUAKED target_sound (0.3 0.1 0.6) (-8 -8 -8) (8 8 8) SHUFFLE ON_PLAYER
+void() target_sound_think =
+{
+	target_sound_go();
+	if (self.count > 0)
+	{
+		self.cnt += 1;
+		if (self.cnt == self.count)
+		{
+			self.cnt = 0;
+			self.state = 0;
+			return;
+		}
+	}
+	self.nextthink = time + self.wait + random() * self.rand;
+}
+
+void() target_sound_use =
+{
+	playercount_convert(count);
+	if (self.spawnflags & 4)	// toggle
+	{
+		self.state = !self.state;
+		if (self.state)
+		{
+			target_sound_find();
+			self.think = target_sound_think;
+			self.nextthink = time;
+		}
+		else
+		{
+			self.nextthink = 0;
+			self.buddy = world;
+		}
+		return;
+	}
+	
+	if (self.count > 0)
+	{
+		self.cnt += 1;
+		if (self.cnt == self.count)
+			SUB_RemoveSoon();
+	}
+	target_sound_find();
+	target_sound_go();
+	self.buddy = world;
+}
+
+/*QUAKED target_sound (0.3 0.1 0.6) (-8 -8 -8) (8 8 8) SHUFFLE ON_PLAYER TOGGLE
 play a sound when triggered.
 
 "distance" attenuation (integer) - defaults to 0, which is the same as other ambient sounds.
@@ -362,10 +414,13 @@ play a sound when triggered.
 "noise1-4"  add additional wavs to cycle through
 "delay"	delay sound after trigger
 "count" limit number of uses before self destruction
+"wait" time between plays, if TOGGLE
+"rand" random extra time between plays, if TOGGLE
 
 Spawnflags:
 "SHUFFLE"	select next sound randomly if more than one noise is specified
 "ON_PLAYER"	use activating player as source of sound
+"TOGGLE"	trigger to turn on/off instead of firing once ('count' will limit use per activation if set)
 */
 /*FGD
 @PointClass base(Ambient, Targetname) color(150 0 150) = target_sound : "Custom triggered sound. Will play one sound every time it is triggered.
@@ -379,11 +434,15 @@ You can set up to five sounds on this entity to cycle through in order (or shuff
 	volume(string) : "Volume" : "1"
 	delay(string) : "Delay" : "1"
 	count(integer) : "Limit Uses" : 0
+	wait(string) : "Time between sounds, if toggle" : 0
+	rand(string) : "Random extra time between sounds, if toggle" : 0
 	spawnflags(flags) = 
 	[
 		1 : "Random next sound" : 0
 		2 : "Play on player" : 0
+		4 : "Toggle" : 0
 	]
+	target(target_source) : "Optional target to play sound on"
 ]
 */
 void() target_sound =
