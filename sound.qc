@@ -279,7 +279,7 @@ void(entity on, string _noise, float _volume, float _distance, float _delay) sou
 {
 	if (!_delay)
 	{
-		sound(on, CHAN_AUTO, _noise, _volume, _distance);
+		sound(on, self.style, _noise, _volume, _distance);
 		return;
 	}
 	entity snd = spawn();
@@ -287,6 +287,7 @@ void(entity on, string _noise, float _volume, float _distance, float _delay) sou
 	snd.noise = _noise;
 	snd.volume = _volume;
 	snd.distance = _distance;
+	snd.style = self.style;	// hrrrrrm
 	snd.think = target_sound_use;
 	snd.nextthink = time + _delay;
 }
@@ -352,7 +353,7 @@ void() target_sound_go =
 		sound_delayed(self.buddy, snd, self.volume, self.distance, self.delay);
 		return;
 	}
-	sound(self.buddy, CHAN_AUTO, snd, self.volume, self.distance);
+	sound(self.buddy, self.style, snd, self.volume, self.distance);
 }
 
 void() target_sound_think =
@@ -416,6 +417,7 @@ play a sound when triggered.
 "count" limit number of uses before self destruction
 "wait" time between plays, if TOGGLE
 "rand" random extra time between plays, if TOGGLE
+"style" force single sound channel (0 = any)
 
 Spawnflags:
 "SHUFFLE"	select next sound randomly if more than one noise is specified
@@ -436,6 +438,7 @@ You can set up to five sounds on this entity to cycle through in order (or shuff
 	count(integer) : "Limit Uses" : 0
 	wait(string) : "Time between sounds, if toggle" : 0
 	rand(string) : "Random extra time between sounds, if toggle" : 0
+	style(integer) : "Force sound channel" : 0
 	spawnflags(flags) = 
 	[
 		1 : "Random next sound" : 0
@@ -449,6 +452,7 @@ void() target_sound =
 {
 	sound_setup(1);
 	self.use = target_sound_use;
+	if ((self.style < 0) || (self.style > 7)) self.style = 0;
 }
 
 //============================================================================
