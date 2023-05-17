@@ -23,6 +23,9 @@ it really is (often not that deep).
 ===============
 */
 
+const float CSHIFT_CUTOFF = 90;
+float noTint;
+
 /*
 ============
 TintScreen
@@ -63,13 +66,68 @@ void(entity who, float amt, vector color) TintScreenColor
 	stuffcmd(who, "\n");
 }
 
+/*
+============
+TintScreenFog
+
+for people who turn off cshift because it ruins their stream quality, or because
+they're just super wrong
+
+and 'amt' better be 0-1, pal
+============
+*/
+void(entity who, float amt, vector color) TintScreenFog
+{
+	float s, d, dx;
+	vector c;
+	
+	// initially store player's existing fog so we know what we're blending from
+	if (!who.fog_density2)
+	{
+		if (!who.fog_density)
+		{
+			who.fog_density2 = -1;
+			who.fog_color = color;
+		}
+		else
+		{
+			who.fog_color2 = who.fog_color;
+			who.fog_density2 = who.fog_density;
+			who.fog_sky2 = who.fog_sky;
+		}
+	}
+	
+	// fog is 0-1
+	if (color_x > 1 || color_y > 1 || color_z > 1)
+		color /= 255;
+	
+	
+	c = lerpVector(who.fog_color2, color, amt);
+	s = lerp(who.fog_sky2, 1, amt);
+	
+	// the fog density ramp in fitzquakes is astounding
+	// this doesn't match it, but it looks right for the usual range of fogs maps have
+	d = sqrt(sqrt(who.fog_density2));	// un-steepen the existing value so we can map it linearly
+	d = lerp(d, 1, amt);
+	d = d * d * d * d;	// the re-steepening
+	if (d > 0.5)
+	{
+		// add additional even more density, bc density 1 is only opaque at ~128u 
+		// away and we want a solid screen by the time we hit bottom
+		dx = (d-0.5) * 2;
+		d += dx*dx*20;
+	}
+	
+	fog_set(who, d, c, s);
+}
+
+
 // --------------------------------
 // void_unplunge
 // player was rescued, somehow, probably by being a noclipping whore
 // --------------------------------
 void(entity e) void_unplunge =
 {
-
 	e.customflags &~= CFL_PLUNGE;
 	//e.flags &~= FL_NOTARGET;
 	e.takedamage = DAMAGE_AIM;
@@ -79,7 +137,16 @@ void(entity e) void_unplunge =
 	e.model = "progs/player.mdl";
 
 	SUB_CallAsSelf(W_ResetWeaponState, e);	// restore weaponmodel
-	TintScreen(e,0);
+	if (noTint)
+	{
+		TintScreenFog(e, 0, '0.5 0.5 0.5');
+		e.fog_color2 = VEC_ORIGIN;
+		e.fog_density2 = 0;
+		e.fog_sky2 = 0;
+		noTint = 0;
+	}
+	else
+		TintScreen(e,0);
 }
 
 // --------------------------------
@@ -127,7 +194,10 @@ void() void_func_touch =
 	//	other.customflags = not(other.customflags, CFL_UNDYING);
 	//	other.customflags = not(other.customflags, CFL_PLUNGE);
 		
-		TintScreenColor(other,255,self.fadecolor);
+		if (noTint)
+			TintScreenFog(other, 1, self.fadecolor);
+		else
+			TintScreenColor(other, 255, self.fadecolor);
 		other.velocity = '0 0 0';
 		other.solid = SOLID_NOT;
 		other.movetype = MOVETYPE_NONE;
@@ -245,7 +315,10 @@ void() void_fallthink =
 	plummet = 1 - plummet * plummet;	// exponential falloff seems to look more linear, since the player accelerates exponentially
 	plummet = min( ceil( plummet * 255 ), 255);
 	
-	TintScreenColor(self.enemy,plummet,self.fadecolor);
+	if (noTint)
+		TintScreenFog(self.enemy, plummet/255, self.fadecolor);
+	else
+		TintScreenColor(self.enemy, plummet, self.fadecolor);
 	
 	self.nextthink = time + 0.0333;
 }
@@ -335,6 +408,11 @@ void() void_trigger_touch =
 	fall.lip = e.origin_z - self.height; // z at bottom
 	fall.pain_finished = time + self.wait;
 	fall.fadecolor = self.fadecolor;
+	
+	// gl_cshiftpercent isn't native to OG quake, so the cvar call fails and returns 0 
+	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
+	// at the same time to determine if that 0 is valid
+	noTint = (cvar("gl_cshiftpercent") < CSHIFT_CUTOFF && cvar("gl_farclip"));
 }
 
 
