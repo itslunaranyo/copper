@@ -142,7 +142,7 @@ float() particlefield_should_sleep =
 	for (float i = 0; i < clients; i++)
 	{
 		client = nextent(client);
-		if (vlen(self.origin - client.origin) < self.distance)
+		if (vlen(BoundsCenter(self.buddy) - client.origin) < self.distance)
 		{
 			return FALSE;
 		}
@@ -193,6 +193,7 @@ void(float num) particlefield_sweep =
 		if (self.spawnflags & PFIELD_BURST)
 		{
 			self.state = 0;
+			self.buddy = world;
 			return;	// done with a loop
 		}
 		frac = 0;
@@ -224,7 +225,7 @@ void(float num) particlefield_sweep =
 		}
 
 		// add self.origin and go
-		particle (porg + self.origin, particlefield_dir(porg), self.health, self.speed2);
+		particle (porg + BoundsCenter(self.buddy), particlefield_dir(porg), self.health, self.speed2);
 	}
 }
 
@@ -239,7 +240,7 @@ void(float num) particlefield_burst =
 		org = Vector(crandom(), crandom(), crandom());
 		org2 = vec_scale(org, self.size);
 		
-		particle (org2 + self.origin, particlefield_dir(org), self.health, self.speed2);
+		particle (org2 + BoundsCenter(self.buddy), particlefield_dir(org), self.health, self.speed2);
 	}
 }
 
@@ -254,13 +255,30 @@ void() particlefield_think =
 		self.nextthink = time + self.wait;
 }
 
+void() particlefield_get_spot =
+{
+	if (self.buddy) return;
+	
+	if (self.target == string_null)
+	{
+		self.buddy = self;
+	}
+	else
+	{
+		self.buddy = find(world, targetname, self.target);
+		if (!self.buddy) self.buddy = self;
+	}
+}
+
 void() particlefield_use =
 {
 	if (self.spawnflags & PFIELD_BURST)
 	{
+		particlefield_get_spot();
 		if (self.finaldest == VEC_ORIGIN)
 		{
 			particlefield_burst(self.speed);
+			self.buddy = world;
 		}
 		else
 		{
@@ -274,7 +292,15 @@ void() particlefield_use =
 	
 	self.state = !self.state;
 	if (self.state)
+	{
+		particlefield_get_spot();
+		self.think = particlefield_think;
 		self.nextthink = time + self.wait;
+	}
+	else
+	{
+		self.buddy = world;
+	}
 }
 
 
@@ -326,6 +352,7 @@ void() particlefield_use =
 	wait(string) : "Interval" : "0.1"
 	velocity(string) : "Direction of optional sweep effect (x y z)"
 	distance(integer) : "Sleep if all players are further than this distance"
+	target(target_source) : "Optional name of entity to center effect on"
 ]
 
 @Pointclass base(Targetname, Appearflags, Bounds, Particlefield) size(16 16 16) = misc_particlefield_box : 
@@ -426,9 +453,11 @@ void() misc_particlefield_box =
 		}
 	}
 
-	self.state = self.spawnflags & PFIELD_START_ON;
-	if (self.state)
+	if (self.spawnflags & PFIELD_START_ON)
+	{
+		self.think = particlefield_use;
 		self.nextthink = time + self.wait;
+	}
 	
 	// innie and outie cancel
 	if (self.spawnflags & (PFIELD_INWARD | PFIELD_OUTWARD) == (PFIELD_INWARD | PFIELD_OUTWARD))
