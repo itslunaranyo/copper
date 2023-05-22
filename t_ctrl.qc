@@ -301,6 +301,8 @@ void() target_lock_init =
 	target_lock_do(self.target2, 0);
 	target_lock_do(self.target3, 0);
 	target_lock_do(self.target4, 0);
+	if (self.spawnflags & SPAWN_LOCK_UNLOCK_ONLY) self.state = 1;
+	else self.state = 0;
 }
 
 /*QUAKED target_lock (0 .5 .8) (-8 -8 -8) (8 8 8) START_LOCKED LOCK_ONLY UNLOCK_ONLY
