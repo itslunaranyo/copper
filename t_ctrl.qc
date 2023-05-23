@@ -229,8 +229,12 @@ void() target_state =
 const float SPAWN_LOCK_START = 1;
 const float SPAWN_LOCK_LOCK_ONLY = 2;
 const float SPAWN_LOCK_UNLOCK_ONLY = 4;
+const float SPAWN_LOCK_NOTOGGLE = 6;
 
-void(string tname, float s) target_lock_do =
+// state 1 = targets are currently locked
+// state 0 = targets are currently unlocked
+
+void(string tname, float locking) target_lock_do =
 {
 	if (tname == string_null) return;
 
@@ -245,64 +249,69 @@ void(string tname, float s) target_lock_do =
 		{
 			oself = self;
 			self = t;
-			self.lock(s);
+			self.lock(!locking);
 			self = oself;
 		}
 		else
 		{
-			if (s)
-				t.customflags = not(t.customflags, CFL_LOCKED);
-			else
+			if (locking)
 				t.customflags |= CFL_LOCKED;
+			else
+				t.customflags = not(t.customflags, CFL_LOCKED);
 		}
 		
-		if (s)
-			dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
-		else
+		if (locking)
 			dprint4(t.classname, " with targetname ", t.targetname, " is locked\n");
+		else
+			dprint4(t.classname, " with targetname ", t.targetname, " is unlocked\n");
 	} while ( t );
+}
+
+void() lock_targets =
+{
+	target_lock_do(self.target,  TRUE);
+	target_lock_do(self.target2, TRUE);
+	target_lock_do(self.target3, TRUE);
+	target_lock_do(self.target4, TRUE);
+	self.state = TRUE;
+}
+void() unlock_targets =
+{
+	target_lock_do(self.target,  FALSE);
+	target_lock_do(self.target2, FALSE);
+	target_lock_do(self.target3, FALSE);
+	target_lock_do(self.target4, FALSE);
+	self.state = FALSE;
 }
 
 void() target_lock_use =
 {
-	float s = self.state;
-	
-	dprint("in target lock use\n");
-	if (self.attack_finished && time >= self.attack_finished)
+	float locking, undoing;
+	if (self.wait || self.rand)
 	{
-		dprint("  attack finished late-do\n");
-		s = 1 - s;
-		self.attack_finished = 0;
+		undoing = TRUE;
+		self.nextthink = time + self.wait + random() * self.rand;
 	}
+	
+	if (!(self.spawnflags & SPAWN_LOCK_NOTOGGLE))
+	{
+		self.state = !self.state;
+		locking = self.state;
+	}
+	else if (self.spawnflags & SPAWN_LOCK_LOCK_ONLY)
+		locking = TRUE;
 	else
-	{
-		dprint("  direct do\n");
-		if (self.spawnflags & SPAWN_LOCK_UNLOCK_ONLY) self.state = 1;
-		else if (self.spawnflags & SPAWN_LOCK_LOCK_ONLY) self.state = 0;
-		else self.state = 1 - self.state;
-		if (self.wait || self.rand)
-		{
-			dprint("  direct do undo scheduled\n");
-			self.think = target_lock_use;
-			self.nextthink = time + self.wait + random() * self.rand;
-			self.attack_finished = self.nextthink;
-		}
-	}
+		locking = FALSE;
 	
-	target_lock_do(self.target, s);
-	target_lock_do(self.target2, s);
-	target_lock_do(self.target3, s);
-	target_lock_do(self.target4, s);
-}
-
-void() target_lock_init =
-{
-	target_lock_do(self.target, 0);
-	target_lock_do(self.target2, 0);
-	target_lock_do(self.target3, 0);
-	target_lock_do(self.target4, 0);
-	if (self.spawnflags & SPAWN_LOCK_UNLOCK_ONLY) self.state = 1;
-	else self.state = 0;
+	
+	if (locking)
+	{
+		lock_targets();
+		if (undoing) self.think = unlock_targets;
+		return;
+	}
+	unlock_targets();
+	if (undoing) self.think = lock_targets;
 }
 
 /*QUAKED target_lock (0 .5 .8) (-8 -8 -8) (8 8 8) START_LOCKED LOCK_ONLY UNLOCK_ONLY
@@ -343,12 +352,11 @@ void() target_lock =
 {
 	if (!SUB_ShouldSpawn()) return;
 	self.use = target_lock_use;
-	if (self.spawnflags & SPAWN_LOCK_UNLOCK_ONLY) self.state = 1;
-	else self.state = 0;
+	self.state = 0;
 	
 	if (self.spawnflags & SPAWN_LOCK_START)
 	{
-		self.think = target_lock_init;
+		self.think = lock_targets;
 		self.nextthink = time + 0.25;
 	}
 }
