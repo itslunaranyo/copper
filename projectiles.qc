@@ -32,11 +32,25 @@ void(vector start, vector end, entity ignore, float traceflags) traceline2 =
 	float	t_inopen = -1;
 	float	t_inwater = -1;
 
-	if (trace_debug) dprint5("tracing from ", vtos(src), " to ", vtos(end), "\n");
+	if (trace_debug)
+	{
+		dprint("tracing from ");
+		dprint_vector(src);
+		dprint( " to ");
+		dprint_vector(end);
+		dprint("\n");
+	}
 
 	// check for trace-through cases and repeat
 	do {
-		if (trace_debug) dprint5("  trace: ", vtos(src), " to ", vtos(end), "\n");
+		if (trace_debug)
+		{
+			dprint("  trace ");
+			dprint_vector(src);
+			dprint( " to ");
+			dprint_vector(end);
+			dprint("\n");
+		}
 		traceline (src, end, nomonsters, ig);
 		
 		// preserve the accuracy of the trace result flags
