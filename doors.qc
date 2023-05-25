@@ -407,8 +407,16 @@ void() door_shadowmonitor_go =
 		frac = 1 - frac;
 
 	bmodel_lightstyle(o, light_str(frac));
+	
+	// pay attention to owner state so we stop thinking when the door is done moving
+	if ((o.state == STATE_TOP) && (o.spawnflags & DOOR_TOGGLE) || o.state == STATE_BOTTOM)
+		return;
 
-	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
+	if (o.state == STATE_TOP)
+		self.nextthink = time + (o.nextthink - o.ltime);
+	else
+		self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
+		
 	self.think = door_shadowmonitor_go;
 }
 
