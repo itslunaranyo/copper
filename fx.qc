@@ -947,6 +947,15 @@ entity(vector org) bubble_spawn =
 
 //============================================================================
 
+// back compat named function, mostly for sock maps
+void() make_bubbles =
+{
+	bubble_spawn(self.origin);
+	self.nextthink = time + random() + 0.5;
+	self.think = make_bubbles;
+};
+
+
 void() air_bubbles_make =
 {
 	vector org;
