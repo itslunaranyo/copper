@@ -414,7 +414,7 @@ entity(vector org, entity death_owner) spawn_tdeath =
 	setorigin (death, org);
 	death.angles = '0 0 0';
 	death.touch = tdeath_touch;
-	death.nextthink = time + 0.2;
+	death.nextthink = time + 2 * frametime;
 	death.think = SUB_Remove;
 	death.owner = death_owner;
 	
