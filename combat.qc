@@ -50,18 +50,6 @@ void(entity targ, entity attacker) Killed =
 	self.takedamage = DAMAGE_NO;
 	self.touch = SUB_Null;
 
-	if (self.flags & FL_MONSTER)
-	{
-		// fall to ground
-		if (self.flags & FL_FLY)
-			self.flags = self.flags - FL_FLY;
-		if (self.flags & FL_SWIM)
-			self.flags = self.flags - FL_SWIM;
-
-		killed_monster();	// bump the monster counter
-		monster_death_use();
-	}
-
 	if (coop && attacker.classname == "player")
 	{
 		if (self.classname == "player")
@@ -79,6 +67,20 @@ void(entity targ, entity attacker) Killed =
 	}
 	else
 		self.th_die ();
+
+	// call this after th_die in case the monster wants to do anything in die() first
+	// nightmare zombies unflag themselves as MONSTER if they've been killed and res'd
+	if (self.flags & FL_MONSTER)
+	{
+		// fall to ground
+		if (self.flags & FL_FLY)
+			self.flags = self.flags - FL_FLY;
+		if (self.flags & FL_SWIM)
+			self.flags = self.flags - FL_SWIM;
+
+		killed_monster();	// bump the monster counter
+		monster_death_use();
+	}
 
 	self = oself;
 }
