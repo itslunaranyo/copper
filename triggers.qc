@@ -230,7 +230,7 @@ float() multi_trigger =
 	
 	// sub_usetargets plays the sound if there's a message, doesn't if not
 	if (self.noise != string_null)
-		sound_delayed (self, self.noise, 1, ATTN_NORM, self.delay);
+		sound_delayed (self, CHAN_VOICE, self.noise, 1, ATTN_NORM, self.delay);
 
 // don't trigger again until reset
 	self.takedamage = DAMAGE_NO;

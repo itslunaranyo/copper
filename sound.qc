@@ -275,11 +275,11 @@ void() ambient_swamp2 =
 
 //============================================================================
 
-void(entity on, string _noise, float _volume, float _distance, float _delay) sound_delayed =
+void(entity on, float _chan, string _noise, float _volume, float _distance, float _delay) sound_delayed =
 {
 	if (!_delay)
 	{
-		sound(on, self.style, _noise, _volume, _distance);
+		sound(on, _chan, _noise, _volume, _distance);
 		return;
 	}
 	entity snd = spawn();
@@ -287,7 +287,7 @@ void(entity on, string _noise, float _volume, float _distance, float _delay) sou
 	snd.noise = _noise;
 	snd.volume = _volume;
 	snd.distance = _distance;
-	snd.style = self.style;	// hrrrrrm
+	snd.style = _chan;
 	snd.think = target_sound_use;
 	snd.nextthink = time + _delay;
 }
@@ -350,7 +350,7 @@ void() target_sound_go =
 	
 	if (self.delay > 0)
 	{
-		sound_delayed(self.buddy, snd, self.volume, self.distance, self.delay);
+		sound_delayed(self.buddy, self.style, snd, self.volume, self.distance, self.delay);
 		return;
 	}
 	sound(self.buddy, self.style, snd, self.volume, self.distance);
