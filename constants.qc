@@ -25,11 +25,12 @@ const float	FL_UNDERWATER			= 8192;	// for dive/surface water sounds
 
 // edict.customflags
 const float	CFL_LEFTY			= 1;	// used by slidemovers (scrags) to alternate strafe direction
+const float	CFL_RETURNED		= 1;	// zombie has already respawned in nightmare
 const float	CFL_ZAPPED			= 2;
 const float	CFL_AXEHITME		= 4;
 const float	CFL_LOCKED			= 16;	// special state-independent deactivation
-const float	CFL_INPAIN			= 16;	// zombie behavior
-const float	CFL_KNOCKEDDOWN		= 32;	// zombie behavior
+const float	CFL_INPAIN			= 16;	// zombie should knockdown soon
+const float	CFL_KNOCKEDDOWN		= 32;	// zombie is down
 const float	CFL_PLUNGE			= 64;	// has fallen in a death pit
 const float	CFL_SPAWNER			= 128;	// is a generator of monsters
 const float	CFL_UNDYING			= 256;	// god mode minus one point (player)

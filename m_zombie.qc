@@ -540,8 +540,10 @@ void() zombie_die =
 	if (skill != 3) return;
 	
 	// respawning zombie behavior:
-	if (self.customflags & CFL_LEFTY)
+	if (self.customflags & CFL_RETURNED)
 		self.flags = not(self.flags, FL_MONSTER);
+	else
+		self.customflags |= CFL_RETURNED;	// remember not to count this as a kill again
 	self.think = zombie_return;
 	
 	// HACK: global activator is set to attacker in Killed(), so we can access
@@ -558,8 +560,9 @@ void() zombie_die =
 void() zombie_return =
 {
 	vector org;
-	
-	if (pointcontents(self.origin) < -1)
+	float pc;
+	pc = pointcontents(self.origin);
+	if (pc == CONTENT_SOLID || pc == CONTENT_LAVA || pc == CONTENT_SKY)
 		return;	// in something
 	
 	if (self.velocity != '0 0 0')
@@ -578,7 +581,6 @@ void() zombie_return =
 	{
 		self.deadflag = 0;
 		self.spawnflags |= SPAWN_LYING;
-		self.customflags |= CFL_LEFTY;	// remember not to count this as a kill again
 		self.flags |= FL_MONSTER;
 		if (!alive(self.enemy) || self.enemy.classname != "player")
 			self.enemy = world;
@@ -592,6 +594,7 @@ void() zombie_return =
 		sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_IDLE);
 
 		monster_zombie_spawn();
+		self.skin = 1;
 		
 		return;
 	}
@@ -670,6 +673,7 @@ void() monster_zombie_spawn =
 		self.th_die = zombie_die;
 		self.th_missile = zombie_missile;
 		self.th_checkattack = CheckAttack;
+		self.skin = 0;
 		
 		walkmonster_start();
 	}
