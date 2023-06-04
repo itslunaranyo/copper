@@ -289,7 +289,8 @@ If the plat targets a trigger once/multiple/multiple_box, it will override the p
 "PLAT_LOW_TRIGGER" activation zone will only be at the bottom of the movement course, instead of the whole vertical
 
 "speed"		default 150
-"height"	implicitly determine the distance the plat moves
+"lip"		implicitly determine the distance the plat moves
+"height"	explicitly determine the distance the plat moves
 "pos1"&"pos2"	directly override top and bottom positions - plat can be built anywhere else in the map
 "wait"		time to pause at apex in seconds, default 3
 "sounds"
@@ -303,7 +304,7 @@ Plats are always drawn in the extended position, so they will light correctly.
 If the plat is the target of another trigger or button, it will start out disabled in the top position until it is triggered, when it will lower and become a normal plat.
 If the plat targets a trigger once/multiple/multiple_box, it will override the plat's default activation zone (consuming the trigger).
 
-By setting 'pos1' & 'pos2' you can directly override the top and bottom positions, allowing the plat to be built anywhere else in the map. This is useful for building a plat where it will be lit the best.
+Movement distance can be defined with 'height' or 'lip'. By instead setting 'pos1' & 'pos2' you can directly override the top and bottom positions, allowing the plat to be built anywhere else in the map. This is useful for building a plat where it will be lit the best.
 
 The 'low trigger volume' spawnflag will put the activation zone only at the bottom of the movement course, instead of the whole vertical.
 
@@ -316,6 +317,7 @@ Alt Target Pattern: 'target' upon rising, 'target2' upon reaching top, 'target3'
 	target(target_destination) : "Custom activation trigger"
 	speed(integer) : "Speed" : 150
 	height(integer) : "Travel altitude (can be negative)" : 0
+	lip(integer) : "Lip remaining at bottom of move" : 8
 	wait(string) : "Apex pause time" : "3"
 	pos1(string) : "Override top position (x y z)"
 	pos2(string) : "Override bottom position (x y z)"
@@ -376,9 +378,17 @@ void() func_plat =
 		self.speed = 150;
 	if (!self.wait)
 		self.wait = 3;
-
-	if (!self.height && self.distance)
-		self.height = self.distance;
+	
+	if (!self.height)
+	{
+		if (self.distance)
+			self.height = self.distance;
+		else
+		{
+			if (!self.lip) self.lip = 8;
+			self.height = self.size_z - self.lip;
+		}
+	}	
 		
 	if (!self.pos1 && !self.pos2)
 	{
@@ -387,8 +397,6 @@ void() func_plat =
 		self.pos2 = self.origin;
 		if (self.height)
 			self.pos2_z = self.origin_z - self.height;
-		else
-			self.pos2_z = self.origin_z - self.size_z + 8;
 	}
 	self.blocked = plat_crush;
 	self.use = plat_trigger_use;
