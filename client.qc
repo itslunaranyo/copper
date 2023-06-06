@@ -767,10 +767,7 @@ void() PlayerHealthTick =
 		{
 			// recover damage taken from drowning
 			//T_Heal(self, self.dmg, 0);
-			if (skill > 2)
-				self.health = min(hmax, self.health + ceil(self.dmg/4));
-			else
-				self.health = min(hmax, self.health + ceil(self.dmg/2));
+			self.health = min(hmax, self.health + ceil(self.dmg/2));
 			self.dmg = max(0, self.dmg - 1);
 			self.healthtime = time + 0.5;
 		}	
@@ -1115,10 +1112,7 @@ void() WaterMove =
 			if (self.pain_finished < time)
 			{
 				self.deathtype = "drowning";
-				if (skill > 2)
-					T_Damage (self, world, world, ceil(max(self.dmg, 1)/2));
-				else
-					T_Damage (self, world, world, max(self.dmg, 1));
+				T_Damage (self, world, world, max(self.dmg, 1));
 				self.deathtype = string_null;
 				self.pain_finished = time + 1;
 				
