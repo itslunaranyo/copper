@@ -67,7 +67,7 @@ void() f_walk18 =[	$swim18, f_walk1 ] {ai_walk(6);}
 void() f_run1 =[	$swim1, f_run2 ] {nmfast(); ai_run(12);
 	float r = 0.5;
 	if (skill == 3) r = 0.25;	// lots of fast fish on nightmare makes a racket
-	if (random() < 0.5)
+	if (random() < r)
 		sound (self, CHAN_VOICE, "fish/idle.wav", 1, ATTN_NORM);
 	fish_check_attack();	// calling this after ai_run is such a hack
 							// but i don't want to load down calls to visible()
@@ -102,9 +102,9 @@ void() fish_melee =
 	ldmg = 6 + random() * 6;
 	T_DamageMelee (self.enemy, self, ldmg);
 	
-	// nightmare: rob the player of a little air
-	if (skill == 3 && !has_biosuit(self.enemy))
-		self.enemy.air_finished -= 1;
+	// rob the player of air
+	//if (skill == 3 && !has_biosuit(self.enemy))
+	//	self.enemy.air_finished = min(self.enemy.air_finished, time);
 }
 
 /*
@@ -325,7 +325,7 @@ void() monster_fish_spawn =
 			self.deathtype = "was fed to the Rotfish";
 	}
 
-	nmspeed(0.055); // look at 'em go
+	nmspeed(0.04); // look at 'em go
 
 	swimmonster_start ();
 }
