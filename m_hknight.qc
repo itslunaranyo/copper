@@ -227,11 +227,21 @@ void()	hknight_magicb13 =[	$magicb13,	hknight_run1] {ai_face();}
 
 void(vector dir, vector org) hknight_bolt =
 {
+	entity spike;
 	if (skill == 3)
-		launch_knightspike (self.origin + org + dir * 20, dir * 525);
+	{
+		spike = launch_projectile(self.origin + org + dir * 20, dir * 525, "knightspike");	// FLYMISSILE
+		SUB_ChangeModel (spike, "progs/k_spike2.mdl");
+		spike.dmg = 16;
+	}
 	else
-		launch_knightspike (self.origin + org + dir * 20, dir * 400);
+	{
+		spike = launch_projectile(self.origin + org + dir * 20, dir * 525, "knightspike");	// FLYMISSILE
+		SUB_ChangeModel (spike, "progs/k_spike.mdl");
+		spike.dmg = 8;
+	}
 
+	spike.touch = spike_touch;
 	sound (self, CHAN_WEAPON, "hknight/attack1.wav", 1, ATTN_NORM);
 }
 
@@ -415,7 +425,7 @@ void(entity attacker, float damage)	hknight_pain =
 	if (self.pain_finished > time)
 		return;
 
-	if (time - self.pain_finished > 5)
+	if (skill < 3 && time - self.pain_finished > 5)
 	{	// always go into pain frame if it has been a while
 		hknight_pain_go();
 		return;
@@ -512,6 +522,7 @@ void() monster_hell_knight =
 	}
 	precache_model2 ("progs/hknight.mdl");
 	precache_model2 ("progs/k_spike.mdl");
+	precache_model2 ("progs/k_spike2.mdl");
 	precache_model2 ("progs/h_hellkn.mdl");
 
 	

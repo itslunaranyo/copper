@@ -427,28 +427,8 @@ entity(vector org, vector vel) launch_nail =
 
 /*
 ========
-launch_knightspike
-hellknight spreadfire
-========
-*/
-entity(vector org, vector vel) launch_knightspike =
-{
-	entity spike;
-	
-	spike = launch_projectile(org, vel, "knightspike");	// FLYMISSILE
-	spike.touch = spike_touch;
-	SUB_ChangeModel (spike, "progs/k_spike.mdl");
-	
-	spike.dmg = 8;
-	
-	return spike;
-}
-
-
-/*
-========
 launch_wizspike
-scrag spit, used by scrags and nouronihar
+scrag spit, used by scrags
 ========
 */
 entity(vector org, vector vel) launch_wizspike =
