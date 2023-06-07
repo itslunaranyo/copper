@@ -206,7 +206,9 @@ void() dev_remaining_monsters
 		mon = nextent(mon);
 		if (mon.flags & FL_MONSTER)
 		{
-			if (mon.health <= 0 || mon.deadflag) continue;
+			if (mon.health <= 0 || mon.deadflag || 
+				(mon.type == "zombie" && mon.customflags & CFL_RETURNED)) // no returned zombies on nightmare
+				continue;
 			bprint4(mon.classname, " at ", vtos(mon.origin), "\n");
 		}
 		else if (mon.customflags & CFL_SPAWNER)
