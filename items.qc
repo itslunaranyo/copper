@@ -77,6 +77,8 @@ void() ItemPiff =
 	particle(org, '8 -8 0', 8, 16);
 	particle(org, '-8 8 0', 8, 16);
 	particle(org, '-8 -8 0', 8, 16);
+	
+	sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
 }
 
 /*
@@ -90,15 +92,8 @@ void() ItemSpawn =
 	self.model = self.wad;		// restore original model
 	self.solid = SOLID_TRIGGER;	// allow it to be touched again
 	setorigin (self, self.origin);
-	//ItemFall();
 
-	
 	ItemPiff();
-	
-	if (self.targetname != string_null && self.use != SUB_regen)
-		sound (self, CHAN_VOICE, "misc/r_tele1.wav", 1, ATTN_NORM);
-	else
-		sound (self, CHAN_VOICE, "items/itembk2.wav", 1, ATTN_NORM);	// play respawn sound
 	
 	if (self.wait)
 		self.use = ItemUse;
