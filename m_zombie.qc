@@ -70,7 +70,7 @@ void() zombie_stand14	=[	$stand14,	zombie_stand15	] {ai_stand();}
 void() zombie_stand15	=[	$stand15,	zombie_stand1	] {ai_stand();}
 
 void() zombie_cruc1	=	[	$cruc_1,	zombie_cruc2	] {
-if (random() < 0.1)
+if (random() < 0.1 && !(self.customflags & CFL_RETURNED))
 	sound (self, CHAN_VOICE, "zombie/idle_w2.wav", 1, ATTN_STATIC);}
 void() zombie_cruc2	=	[	$cruc_2,	zombie_cruc3	] {self.nextthink = time + 0.1 + random()*0.1;}
 void() zombie_cruc3	=	[	$cruc_3,	zombie_cruc4	] {self.nextthink = time + 0.1 + random()*0.1;}
@@ -100,7 +100,7 @@ void() zombie_walk17	=[	$walk17,	zombie_walk18	] {ai_walk(0);}
 void() zombie_walk18	=[	$walk18,	zombie_walk19	] {ai_walk(0);}
 void() zombie_walk19	=[	$walk19,	zombie_walk1	] {
 ai_walk(0);
-if (random() < 0.2)
+if (random() < 0.2 && !(self.customflags & CFL_RETURNED))
 	sound (self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_IDLE);}
 
 void() zombie_run1		=[	$run1,	zombie_run2	] {
@@ -125,6 +125,7 @@ void() zombie_run16		=[	$run16,	zombie_run17] {ai_run(7);}
 void() zombie_run17		=[	$run17,	zombie_run18] {ai_run(3);}
 void() zombie_run18		=[	$run18,	zombie_run1	] {
 	ai_run(8);
+	if  (self.customflags & CFL_RETURNED) return;
 	if (random() < 0.2)
 		sound (self, CHAN_VOICE, "zombie/z_idle.wav", 1, ATTN_IDLE);
 	if (random() > 0.8)
