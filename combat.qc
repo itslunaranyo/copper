@@ -41,7 +41,6 @@ void(entity targ, entity attacker) Killed =
 	}
 
 	// ai_nav
-	//if (self.navtarget) remove(self.navtarget);
 	// clear floaty bullshit on scrags and fish
 	ai_floatmove_start();
 	
