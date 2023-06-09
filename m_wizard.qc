@@ -223,8 +223,7 @@ void()	wiz_stand6	=[	$hover6,		wiz_stand7	] {ai_stand();}
 void()	wiz_stand7	=[	$hover7,		wiz_stand8	] {ai_stand();}
 void()	wiz_stand8	=[	$hover8,		wiz_stand1	] {ai_stand();}
 
-void()	wiz_walk1	=[	$hover1,		wiz_walk2	] {ai_walk(8);
-Wiz_idlesound();}
+void()	wiz_walk1	=[	$hover1,		wiz_walk2	] {ai_walk(8);Wiz_idlesound();}
 void()	wiz_walk2	=[	$hover2,		wiz_walk3	] {ai_walk(8);}
 void()	wiz_walk3	=[	$hover3,		wiz_walk4	] {ai_walk(8);}
 void()	wiz_walk4	=[	$hover4,		wiz_walk5	] {ai_walk(8);}
@@ -233,8 +232,7 @@ void()	wiz_walk6	=[	$hover6,		wiz_walk7	] {ai_walk(8);}
 void()	wiz_walk7	=[	$hover7,		wiz_walk8	] {ai_walk(8);}
 void()	wiz_walk8	=[	$hover8,		wiz_walk1	] {ai_walk(8);}
 
-void()	wiz_side1	=[	$hover1,		wiz_side2	] {ai_run(8);
-Wiz_idlesound();}
+void()	wiz_side1	=[	$hover1,		wiz_side2	] {ai_run(8);Wiz_idlesound();}
 void()	wiz_side2	=[	$hover2,		wiz_side3	] {ai_run(8);}
 void()	wiz_side3	=[	$hover3,		wiz_side4	] {ai_run(8);}
 void()	wiz_side4	=[	$hover4,		wiz_side5	] {ai_run(8);}
@@ -243,9 +241,7 @@ void()	wiz_side6	=[	$hover6,		wiz_side7	] {ai_run(8);}
 void()	wiz_side7	=[	$hover7,		wiz_side8	] {ai_run(8);}
 void()	wiz_side8	=[	$hover8,		wiz_side1	] {ai_run(8);}
 
-void()	wiz_run1	=[	$fly1,		wiz_run2	] {ai_run(16);
-Wiz_idlesound();
-}
+void()	wiz_run1	=[	$fly1,		wiz_run2	] {ai_run(16);Wiz_idlesound();}
 void()	wiz_run2	=[	$fly2,		wiz_run3	] {ai_run(16);}
 void()	wiz_run3	=[	$fly3,		wiz_run4	] {ai_run(16);}
 void()	wiz_run4	=[	$fly4,		wiz_run5	] {ai_run(16);}
@@ -266,10 +262,10 @@ void()	wiz_fast3	=[	$magatt3,		wiz_fast4	] {ai_face();}
 void()	wiz_fast4	=[	$magatt4,		wiz_fast5	] {ai_face();}
 void()	wiz_fast5	=[	$magatt5,		wiz_fast6	] {ai_face();}
 void()	wiz_fast6	=[	$magatt6,		wiz_fast7	] {ai_face();}
-void()	wiz_fast7	=[	$magatt5,		wiz_fast8	] {ai_face();}
-void()	wiz_fast8	=[	$magatt4,		wiz_fast9	] {ai_face();}
-void()	wiz_fast9	=[	$magatt3,		wiz_fast10	] {ai_face();}
-void()	wiz_fast10	=[	$magatt2,		wiz_run1	] {ai_face(); ai_attack_finished(2); WizardAttackFinished();}
+void()	wiz_fast7	=[	$magatt7,		wiz_fast8	] {ai_face();}
+void()	wiz_fast8	=[	$magatt8,		wiz_fast9	] {ai_face();}
+void()	wiz_fast9	=[	$magatt10,		wiz_fast10	] {ai_face();}
+void()	wiz_fast10	=[	$magatt12,		wiz_run1	] {ai_face(); ai_attack_finished(2); WizardAttackFinished();}
 
 void()	wiz_pain1	=[	$pain1,		wiz_pain2	] {ai_nop();PainFinished(0.2);}
 void()	wiz_pain2	=[	$pain2,		wiz_pain3	] {ai_nop();}
@@ -277,17 +273,18 @@ void()	wiz_pain3	=[	$pain3,		wiz_pain4	] {ai_nop();}
 void()	wiz_pain4	=[	$pain4,		wiz_run1	] {ai_nop();}
 
 void()	wiz_death1	=[	$death1,		wiz_death2	] {
-
-self.velocity_x = -200 + 400*random();
-self.velocity_y = -200 + 400*random();
-self.velocity_z = 100 + 100*random();
-self.flags = not(self.flags, FL_ONGROUND);
-sound (self, CHAN_VOICE, "wizard/wdeath.wav", 1, ATTN_NORM);
+	self.velocity_x = -200 + 400*random();
+	self.velocity_y = -200 + 400*random();
+	self.velocity_z = 100 + 100*random();
+	self.flags = not(self.flags, FL_ONGROUND);
+	sound (self, CHAN_VOICE, "wizard/wdeath.wav", 1, ATTN_NORM);
 }
 void()	wiz_death2	=[	$death2,		wiz_death3	] {}
 void()	wiz_death3	=[	$death3,		wiz_death4	] {self.solid = SOLID_NOT; self.flags = not(self.flags, FL_ONGROUND);}
 void()	wiz_death4	=[	$death4,		wiz_death5	] {}
 void()	wiz_death5	=[	$death5,		wiz_death6	] {}
+// would be nice to hold on frame 6 until the plunk, but SOLID_NOT things don't generate touch events
+// if they did it would be a lot easier to remove dead scrags and heads in func_voids
 void()	wiz_death6	=[	$death6,		wiz_death7	] {}
 void()	wiz_death7	=[	$death7,		wiz_death8	] {}
 void()	wiz_death8	=[	$death8,		SUB_Null	] {}// deathvoidcheck(); }
@@ -338,7 +335,8 @@ void() monster_wizard_spawn =
 	if (self.deathtype == string_null)
 		self.deathtype = "was scragged by a Scrag";
 
-	flymonster_start ();
+	self.height = zeroconvertdefault(self.height, 40);
+	flymonster_start();
 }
 
 void() monster_wizard_spawner = {mon_spawner_use(monster_wizard_spawn);}
