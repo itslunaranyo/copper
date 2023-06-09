@@ -31,21 +31,19 @@ WizardCheckAttack
 */
 float()	WizardCheckAttack =
 {
-	local vector	spot1, spot2;	
-	local float		chance;
-
+	vector	spot1, spot2;	
+	float		chance;
+	
 	if (time < self.attack_finished)
 		return FALSE;
 	if (!enemy_vis)
 		return FALSE;
 
+	self.touch_time = time;	// keep track of last time we saw the player
+	
 	if (enemy_range >= RANGE_FAR)
 	{
-		if (self.attack_state != AS_STRAIGHT)
-		{
-			self.attack_state = AS_STRAIGHT;
-			wiz_run1 ();
-		}
+		self.attack_state = AS_STRAIGHT;
 		return FALSE;
 	}
 	
@@ -60,11 +58,7 @@ float()	WizardCheckAttack =
 
 		if (trace_ent != self.enemy)
 		{	// don't have a clear shot, so move to a side
-			if (self.attack_state != AS_STRAIGHT)
-			{
-				self.attack_state = AS_STRAIGHT;
-				wiz_run1 ();
-			}
+			self.attack_state = AS_STRAIGHT;
 			return FALSE;
 		}
 	}
@@ -85,28 +79,9 @@ float()	WizardCheckAttack =
 	}
 
 	if (enemy_range == RANGE_MID)
-	{
-		if (self.attack_state != AS_STRAIGHT)
-		{
-			self.attack_state = AS_STRAIGHT;
-			wiz_run1 ();
-		}
-	}
+		self.attack_state = AS_STRAIGHT;
 	else
-	{
-		// no circle strafing when we're really close ... because it's annoying
-		if (enemy_range == RANGE_MELEE)
-		{
-			self.attack_state = AS_STRAIGHT;
-			wiz_run1 ();
-			return TRUE;
-		}
-		if (self.attack_state != AS_SLIDING)
-		{
-			self.attack_state = AS_SLIDING;
-			wiz_side1 ();
-		}
-	}
+		self.attack_state = AS_SLIDING;
 	
 	return FALSE;
 }
@@ -118,19 +93,16 @@ WizardAttackFinished
 */
 void()	WizardAttackFinished =
 {
+	enemy_range = range(self.enemy);
+	enemy_vis = visible(self.enemy);
 	if (enemy_range >= RANGE_MID || !enemy_vis)
 	{
 		self.attack_state = AS_STRAIGHT;
 		self.think = wiz_run1;
+		return;
 	}
-	else
-	{
-		self.attack_state = AS_SLIDING;
-		if (skill == 3)
-			self.think = wiz_run1;
-		else
-			self.think = wiz_side1;
-	}
+	self.attack_state = AS_SLIDING;
+	self.think = wiz_side1;
 }
 
 /*
@@ -260,7 +232,13 @@ void()	wiz_side11	=[	$hover11,	wiz_side12	] {ai_run(8);}
 void()	wiz_side12	=[	$hover12,	wiz_side13	] {ai_run(8);}
 void()	wiz_side13	=[	$hover13,	wiz_side14	] {ai_run(8);}
 void()	wiz_side14	=[	$hover14,	wiz_side15	] {ai_run(8);}
-void()	wiz_side15	=[	$hover15,	wiz_side1	] {ai_run(8);}
+void()	wiz_side15	=[	$hover15,	wiz_side1	] {ai_run(8);
+	if (self.touch_time + 12 < time)
+	{
+		self.attack_state = AS_STRAIGHT;	// we're probably strafing back and forth in a closet
+		self.think = wiz_run1;
+	}
+}
 
 void()	wiz_run1	=[	$fly1,		wiz_run2	] {ai_run(16);Wiz_idlesound();}
 void()	wiz_run2	=[	$fly2,		wiz_run3	] {ai_run(16);}
