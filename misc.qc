@@ -162,12 +162,6 @@ void() misc_model =
 { 
 	if (!SUB_ShouldSpawn()) return;
 	
-	if (self.targetname == string_null && !self.pos1)
-	{
-		func_static_point(); 
-		return;
-	}
-	
 	precache_model_safe(self.model);
 	
 	if (self.mangle != '0 0 0')
@@ -188,6 +182,13 @@ void() misc_model =
 	
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_NONE;
+	
+	if (self.targetname == string_null && !self.pos1)
+	{
+		makestatic(self); 
+		return;
+	}
+	
 	if (!self.speed)
 		self.speed = 0.1;
 		

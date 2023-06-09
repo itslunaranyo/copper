@@ -221,7 +221,8 @@ void() func_wall =
 	if (self.noise) precache_sound_safe(self.noise);
 	precache_model_safe(self.model);
 	
-	self.angles = self.mangle;
+	if (self.mangle)
+		self.angles = self.mangle;
 	self.use = func_wall_use;
 	//self.angles = '0 0 0';
 
