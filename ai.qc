@@ -1064,8 +1064,8 @@ float() ai_fishmovecheck =
 
 void(float dist) ai_floatmove_finish =
 {
-	vector move;
-	float interv, spd, frac;
+	vector move, dst;
+	float interv, delta, frac;
 	
 	if (self.flags & (FL_FLY|FL_SWIM) == 0)
 		return;
@@ -1095,13 +1095,31 @@ void(float dist) ai_floatmove_finish =
 	// fudge the z velocity manually
 	if (self.goalentity.classname == "path_corner")
 	{
-		if (fabs(self.goalentity.origin_z - self.origin_z) > 16)
+		dst = self.goalentity.origin - self.origin;
+		if (fabs(dst_z) > 16)
 		{
-			spd = vlen(move);
-			frac = spd / vlen(self.goalentity.origin - self.origin);
-			move_z = frac * (self.goalentity.origin_z - self.origin_z);
+			delta = vlen(move);
+			frac = delta / vlen(dst);
+			move_z = frac * (dst_z);
 		}
 	}
+	// keep scrags a little above the player
+	else if (self.goalentity == self.enemy && self.height)
+	{
+		frac = self.enemy.origin_z + self.height;
+		dprint_float(delta);
+		dprint(" -> ");
+		if (self.origin_z < frac) // terminus is below where we want
+		{
+			if (self.oldorigin_z < frac)	// we're coming up from below
+				move_z = min(8, frac - self.oldorigin_z);
+			else	// we're coming down from above
+				move_z = max(-8, frac - self.oldorigin_z);
+		}
+		dprint_float(move_z);
+		dprint("\n");
+	}
+	
 	// FL_SWIM just invalidates any movement out of water, so simulate velocity 
 	// being clipped off at the surface instead
 	// TODO: support water volumes that end in other directions than up
