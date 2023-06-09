@@ -1107,8 +1107,6 @@ void(float dist) ai_floatmove_finish =
 	else if (self.goalentity == self.enemy && self.height)
 	{
 		frac = self.enemy.origin_z + self.height;
-		dprint_float(delta);
-		dprint(" -> ");
 		if (self.origin_z < frac) // terminus is below where we want
 		{
 			if (self.oldorigin_z < frac)	// we're coming up from below
@@ -1116,8 +1114,6 @@ void(float dist) ai_floatmove_finish =
 			else	// we're coming down from above
 				move_z = max(-8, frac - self.oldorigin_z);
 		}
-		dprint_float(move_z);
-		dprint("\n");
 	}
 	
 	// FL_SWIM just invalidates any movement out of water, so simulate velocity 
@@ -1588,17 +1584,21 @@ void(float dist) ai_run =
 	
 	if (enemy_vis && !(self.enemy.customflags & (CFL_PLUNGE|CFL_LIMBO)))
 	{
-		if (enemy_range == RANGE_MELEE)
-			self.attack_finished = 0;
-	
 		if (self.th_checkattack())
 		{
 			if (self.attack_state == AS_MISSILE)
-				ai_run_missile ();	
+			{
+				ai_run_missile ();
+			}
 			else if (self.attack_state == AS_MELEE)
+			{
+				self.attack_finished = 0;
 				ai_run_melee ();
+			}
 			else if (self.attack_state == AS_SLIDING)
+			{
 				ai_run_slide (dist);
+			}
 			return;
 		}
 	}
