@@ -195,7 +195,7 @@ void() sham_melee =
 	// gradually building chance that the shambler will lightning instead of 
 	// continuing to melee, so that attempting a shambler dance is an
 	// increasingly dangerous gamble and not a solidly predictable exploit
-	if (chance < floor(self.cnt) / 6.66)	// step up by 15% every other melee
+	if (chance < floor(self.lip) / 6.66)	// step up by 15% every other melee
 	{
 		sham_magic1();
 		return;
@@ -219,7 +219,7 @@ void() sham_melee =
 		else
 			sham_swingl1 ();
 	}
-	self.cnt += 0.5;
+	self.lip += 0.5;
 }
 
 
@@ -275,20 +275,19 @@ void() sham_spawn_effect =
 
 void() sham_magic1     =[      $magic1,       sham_magic2    ] {ai_face();
 	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
-	self.cnt = 0;
+	self.lip = 0;
 }
 void() sham_magic2     =[      $magic2,       sham_magic3    ] {ai_face();}
+void() sham_magic2nm     =[      $magic2,       sham_magic3    ]
+{
+	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
+	ai_face();
+}
 void() sham_magic3     =[      $magic3,       sham_magic4    ] {ai_face();
 	self.nextthink = self.nextthink + 0.2;
 	self.effects = self.effects | EF_MUZZLEFLASH;
 	ai_face();
 	sham_spawn_effect();
-}
-void() sham_magic2nm     =[      $magic2,       sham_magic3    ]
-{
-	sound (self, CHAN_WEAPON, "shambler/sattck1.wav", 1, ATTN_NORM);
-	ai_face();
-	self.cnt = -1;	// a little melee grace
 }
 void() sham_magic4     =[      $magic4,       sham_magic5    ]
 {
@@ -308,8 +307,9 @@ void() sham_magic6     =[      $magic6,       sham_magic9    ]
 }
 void() sham_magic9     =[      $magic9,       sham_magic10   ]{ CastLightning();}
 void() sham_magic10    =[      $magic10,      sham_magic11n   ]{ CastLightning();
+	if (vlen(self.origin - enemy_vispos()) < SHAM_LIGHTNING_RANGE)
+		ai_check_refire(sham_magic2nm);
 	ai_attack_finished (1 + 2*random());
-	ai_check_refire(sham_magic2nm);
 }
 void() sham_magic11n    =[      $magic11,      sham_magic12   ] {}
 void() sham_magic12    =[      $magic12,      sham_run1	   ] {}
