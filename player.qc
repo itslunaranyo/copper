@@ -364,7 +364,10 @@ void() DeathBubblesSpawn =
 {
 	entity	bubble;
 	if (self.owner.waterlevel < 3)
+	{
+		remove(self);	// remove bubble spawner
 		return;
+	}
 	bubble = bubble_spawn(self.owner.origin + '0 0 24');
 
 	self.nextthink = time + 0.1;
