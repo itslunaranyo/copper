@@ -84,8 +84,15 @@ void(vector start, vector limit, entity from, float damage) LightningBeam =
 	vector left, end;
 	entity targ;
 	// fix for wonky 'three beams' bug:
-	left = normalize(limit - start) * 12;
+	left = limit - start;
 	left = Vector(0 - left_y, left_x, 0);
+	if (left) {
+		left = normalize(left) * 12;
+	} else {
+		// if beam is straight up or down, take the orientation from the source entity
+		makevectors(from.angles);
+		left = v_right * -12;
+	}
 
 	traceline2(start, limit, from, 0);
 	end = trace_endpos;
