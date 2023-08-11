@@ -230,13 +230,13 @@ void(vector dir, vector org) hknight_bolt =
 	entity spike;
 	if (skill == 3)
 	{
-		spike = launch_projectile(self.origin + org + dir * 20, dir * 525, "knightspike");	// FLYMISSILE
+		spike = launch_projectile(self.origin + org + dir * 20, dir * 600, "knightspike");	// FLYMISSILE
 		SUB_ChangeModel (spike, "progs/k_spike2.mdl");
-		spike.dmg = 16;
+		spike.dmg = 24;
 	}
 	else
 	{
-		spike = launch_projectile(self.origin + org + dir * 20, dir * 525, "knightspike");	// FLYMISSILE
+		spike = launch_projectile(self.origin + org + dir * 20, dir * 400, "knightspike");	// FLYMISSILE
 		SUB_ChangeModel (spike, "progs/k_spike.mdl");
 		spike.dmg = 8;
 	}
@@ -306,7 +306,7 @@ void()	hknight_magicc1 =[	$magicc1,	hknight_magicc2	] {ai_face();}
 void()	hknight_magicc2 =[	$magicc2,	hknight_magicc3	] {ai_face();}
 void()	hknight_magicc3 =[	$magicc3,	hknight_magicc4	] {ai_face();}
 void()	hknight_magicc4 =[	$magicc4,	hknight_magicc5	] {ai_face();}
-void()	hknight_magicc5 =[	$magicc5,	hknight_magicc6	] {ai_face(); 
+void()	hknight_magicc5 =[	$magicc5,	hknight_magicc6	] {nmfast(); ai_face(); 
 	if (skill == 3)
 		self.think = hknight_magicc6nm;
 }
@@ -323,26 +323,26 @@ void()	hknight_magicc7nm =[	$magicc7,	hknight_magicc8nm	] {nmfast(); ai_face(); 
 void()	hknight_magicc8nm =[	$magicc8,	hknight_magicc9nm	] {nmfast(); ai_face(); hknight_shot(0, crandom()); }
 void()	hknight_magicc9nm =[	$magicc9,	hknight_magicc10nm	] {nmfast(); ai_face(); hknight_shot( 0.6, crandom() );}
 void()	hknight_magicc10nm =[	$magicc10,	hknight_magicc11nm	] {nmfast(); ai_face(); hknight_shot( 1.6, crandom() ); hknight_shot( 2.6, crandom() );}
-void()	hknight_magicc11nm =[	$magicc11,	hknight_run1]	  	  {}
+void()	hknight_magicc11nm =[	$magicc11,	hknight_run1]	  	  {nmfast(); }
 
 //===========================================================================
 
-void()	hknight_char_a1	=[	$char_a1,	hknight_char_a2	] {ai_rush(20);}
-void()	hknight_char_a2	=[	$char_a2,	hknight_char_a3	] {ai_rush(25);}
-void()	hknight_char_a3	=[	$char_a3,	hknight_char_a4	] {ai_rush(18);  }
-void()	hknight_char_a4	=[	$char_a4,	hknight_char_a5	] {ai_rush(16); ai_melee(); }
-void()	hknight_char_a5	=[	$char_a5,	hknight_char_a6	] {ai_rush(14); ai_melee(); }
-void()	hknight_char_a6	=[	$char_a6,	hknight_char_a7	] {ai_rush(20); ai_melee(); }
-void()	hknight_char_a7	=[	$char_a7,	hknight_char_a8	] {ai_rush(21);  }
-void()	hknight_char_a8	=[	$char_a8,	hknight_char_a9	] {ai_rush(13); }
-void()	hknight_char_a9	=[	$char_a9,	hknight_char_a10] {ai_rush(20);  }
-void()	hknight_char_a10=[	$char_a10,	hknight_char_a11] {ai_rush(20); ai_melee();}
-void()	hknight_char_a11=[	$char_a11,	hknight_char_a12] {ai_rush(18); ai_melee();}
-void()	hknight_char_a12=[	$char_a12,	hknight_char_a13] {ai_rush(16); ai_melee();}
-void()	hknight_char_a13=[	$char_a13,	hknight_char_a14] {ai_rush(14); ai_melee();}
-void()	hknight_char_a14=[	$char_a14,	hknight_char_a15] {ai_rush(25);  }
-void()	hknight_char_a15=[	$char_a15,	hknight_char_a16] {ai_rush(21);}
-void()	hknight_char_a16=[	$char_a16,	hknight_run1	] {ai_rush(13);}
+void()	hknight_char_a1	=[	$char_a1,	hknight_char_a2	] {nmfast();ai_rush(20);}
+void()	hknight_char_a2	=[	$char_a2,	hknight_char_a3	] {nmfast();ai_rush(25);}
+void()	hknight_char_a3	=[	$char_a3,	hknight_char_a4	] {nmfast();ai_rush(18);  }
+void()	hknight_char_a4	=[	$char_a4,	hknight_char_a5	] {nmfast();ai_rush(16); ai_melee(); }
+void()	hknight_char_a5	=[	$char_a5,	hknight_char_a6	] {nmfast();ai_rush(14); ai_melee(); }
+void()	hknight_char_a6	=[	$char_a6,	hknight_char_a7	] {nmfast();ai_rush(20); ai_melee(); }
+void()	hknight_char_a7	=[	$char_a7,	hknight_char_a8	] {nmfast();ai_rush(21);  }
+void()	hknight_char_a8	=[	$char_a8,	hknight_char_a9	] {nmfast();ai_rush(13); }
+void()	hknight_char_a9	=[	$char_a9,	hknight_char_a10] {nmfast();ai_rush(20);  }
+void()	hknight_char_a10=[	$char_a10,	hknight_char_a11] {nmfast();ai_rush(20); ai_melee();}
+void()	hknight_char_a11=[	$char_a11,	hknight_char_a12] {nmfast();ai_rush(18); ai_melee();}
+void()	hknight_char_a12=[	$char_a12,	hknight_char_a13] {nmfast();ai_rush(16); ai_melee();}
+void()	hknight_char_a13=[	$char_a13,	hknight_char_a14] {nmfast();ai_rush(14); ai_melee();}
+void()	hknight_char_a14=[	$char_a14,	hknight_char_a15] {nmfast();ai_rush(25);  }
+void()	hknight_char_a15=[	$char_a15,	hknight_char_a16] {nmfast();ai_rush(21);}
+void()	hknight_char_a16=[	$char_a16,	hknight_run1	] {nmfast();ai_rush(13);}
 
 //===========================================================================
 
