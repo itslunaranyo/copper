@@ -529,8 +529,11 @@ void() flytrain_think =
 	self.takedamage = self.buddy.takedamage;
 	
 	// if the ghost train hits a speed -1 teleport corner we have to teleport with it, not zoom to it
-	if (vlen(delta) > self.lip)
+	if (self.buddy.teleport_time)
+	{
+		self.buddy.teleport_time = 0;
 		setorigin(self, self.buddy.origin - self.movedir);
+	}
 	else
 		wishvel += delta;
 	
@@ -579,7 +582,6 @@ void() flytrain_setup =
 	
 	self.width = zeroconvertdefault(self.width, 8);
 	self.height = zeroconvertdefault(self.height, 8);
-	self.lip = zeroconvertdefault(self.lip, 64);
 	self.max_health = 0;
 
 	self.blocked = flytrain_blocked;
@@ -616,7 +618,6 @@ Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional rando
 @baseclass base(Train) = Flytrain [
 	width(string) : "Horizontal drift range" : "8"
 	height(string) : "Vertical drift range" : "8"
-	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
 ]
 @SolidClass base(Flytrain) = func_flytrain : 
 "Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners. Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
@@ -625,7 +626,6 @@ Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner ar
 [
 	width(string) : "Horizontal drift range" : "8"
 	height(string) : "Vertical drift range" : "8"
-	lip(integer) : "Length of 'leash' (increase if train jumps around at high speeds)" : 64
 ]
 */
 void() func_flytrain =
@@ -834,6 +834,7 @@ void() train_next =	// departure for next pathcorner
 	if (self.oldenemy.speed == -1)
 	{
 		setorigin(self, corner.origin - self.movedir);
+		self.teleport_time = time;
 		self.th_stand();
 		return;
 	}
