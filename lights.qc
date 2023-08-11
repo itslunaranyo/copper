@@ -219,7 +219,7 @@ void() light_message =
 		else if (self.style > 11)
 			lightstyle(self.style, self.message);
 		else
-			dprint5("WARNING: light at ", vtos(self.origin), " with message ", self.message, " but no style # set\n");
+			dprint5("\bwarning:\b light at ", vtos(self.origin), " with message ", self.message, " but no style # set\n");
 	}
 }
 

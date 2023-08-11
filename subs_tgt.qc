@@ -62,7 +62,7 @@ void(entity to, string tname) SUB_AddTarget =
 	else if (to.target4 == string_null)
 		to.target4 = tname;
 	else
-		dprint3("Warning: no room to add target to ", to.classname, "\n");
+		dprint3("\bwarning:\b no room to add target to ", to.classname, "\n");
 }
 
 /*
@@ -85,7 +85,7 @@ void(entity to) SUB_MergeTargets =
 	if (self.killtarget != string_null)
 	{
 		if (to.killtarget != string_null)
-			dprint3("Warning: no room to add killtarget to ", to.classname, "\n");
+			dprint3("\bwarning:\b no room to add killtarget to ", to.classname, "\n");
 		else
 			to.killtarget = self.killtarget;
 	}		
@@ -288,7 +288,7 @@ void(.string fld) SUB_UseTargetsByField =
 			}
 		} while ( 1 );
 	}
-	dprint3("WARNING: circular tname reference: ", curTgt, ", skipping\n");
+	dprint3("\bwarning:\b circular tname reference: ", curTgt, ", skipping\n");
 	curTgt = string_null;
 }
 
@@ -336,7 +336,7 @@ float(float hush) SUB_UseCheck =
 	{
 		//error("activator was null. globals are bad, kids.\n");
 		//return;
-		dprint3("  WARNING: Activator was null!\n  user (self): ", self.classname, ", using player 1\n");
+		dprint3("  \bwarning:\b  Activator was null!\n  user (self): ", self.classname, ", using player 1\n");
 		activator = nextent(world);
 	}
 	
@@ -363,12 +363,12 @@ void() SUB_UseTargetsGo =
 	if (self.killtarget != string_null)
 	{
 		if (self.killtarget == self.targetname)
-			dprint5("WARNING: ", self.classname, " killtargets itself! (", self.killtarget, ")\n");
+			dprint5("\bwarning:\b ", self.classname, " killtargets itself! (", self.killtarget, ")\n");
 		if (self.killtarget == self.target ||
 			self.killtarget == self.target2 ||
 			self.killtarget == self.target3 ||
 			self.killtarget == self.target4 )
-			dprint5("WARNING: ", self.classname, " targets and killtargets the same targetname (", self.killtarget, ")\n");
+			dprint5("\bwarning:\b ", self.classname, " targets and killtargets the same targetname (", self.killtarget, ")\n");
 	}
 	
 	// makes more logical sense to do killtarget after targets, but it was 

@@ -642,7 +642,7 @@ void() target_secret_check =
 	if (w)
 	{
 		if (w.type == "ammo" || w.type == "armor" || ( w.type == "health" && !(w.spawnflags & 2)) )
-			objerror("target_secret targeted by something the player might not be able to grab\n");
+			dprint("\bwarning:\b target_secret targeted by something the player might not be able to grab\n");
 	}
 }
 

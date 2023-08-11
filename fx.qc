@@ -654,7 +654,7 @@ void() target_screenshake =
 	if (!self.strength)
 	{
 		if (self.volume)
-			objerror("convert target_screenshake to .strength please");
+			dprint("\bwarning:\b convert target_screenshake to .strength please");
 		
 		self.strength = 1;
 	}
