@@ -6,9 +6,9 @@ SHAL-RATH
 ==============================================================================
 */
 
-float SHAL_BALL_TURN_RATE	= 256;
-float SHAL_BALL_THINK_RATE	= 0.1;
-float SHAL_BALL_VEL			= 272;
+const float SHAL_BALL_TURN_RATE		= 272;
+const float SHAL_BALL_THINK_RATE	= 0.1;
+const float SHAL_BALL_VEL			= 325;
 
 
 $cd id1/models/shalrath
@@ -151,6 +151,13 @@ vector(entity targ, float turnrate) ShalTurnToward =
 	vel = normalize(self.velocity);
 	
 	temp = CrossProduct(vel, aimdir);
+	
+	// try to flatten the rotation to the horizontal plane unless the difference is extreme
+	if (fabs(temp_z) > 0.92)
+	{
+		temp_z *= 4;
+		temp = normalize(temp);
+	}
 	out = rotateVectorAround(vel, temp, turnrate * SHAL_BALL_THINK_RATE);
 	
 	// don't turn past the desired direction
@@ -204,13 +211,9 @@ void() ShalHome =
 			
 			//|| !visible(self.enemy)		// if we lost LOS
 			// took ^^ this one out, because it made voreballs even more effective at going
-			// around corners, which meant that high skill players had a nice new dodge move
-			// but average players who tried to fight the vore the old cautious way were punished
-			
-			// || has_invis(self.enemy)			// if target is invis
-			// 1.1: took ^^ this one out too, because projectiles auto-miss the player when
-			// invisible now so they might as well always move the same
-			
+			// around corners, which meant that courageous players had a nice new dodge move
+			// but those who tried to fight the vore the old cautious way were punished			
+			|| has_invis(self.enemy)			// if target is invis
 			|| pointcontents(self.origin) < CONTENT_SOLID ) // if voreball is underwater
 		{
 			// voreballs headed straight at the player when he's hidden should maintain course, to
@@ -219,7 +222,7 @@ void() ShalHome =
 			{
 				rate *= max(1, 1.5 * (1 - dot));
 			}
-			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.5);
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.33);
 		}
 		else // good homing (full turn rate):
 		{
@@ -233,7 +236,7 @@ void() ShalHome =
 			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate);
 		}
 		
-		self.velocity *= 1 + dist;		
+		self.velocity *= 1 + dist;
 		self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
 	}
 	else
