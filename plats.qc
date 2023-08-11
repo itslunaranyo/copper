@@ -792,7 +792,7 @@ void() train_wait =	// arrival at a pathcorner
 void() train_next =	// departure for next pathcorner
 {
 	entity corner, ctrl;
-	float dspeed;
+	float dspeed, segs;
 	corner = findunlockedtarget(self.enemy, world);
 	if (!corner)
 	{
@@ -849,7 +849,14 @@ void() train_next =	// departure for next pathcorner
 			dspeed = corner.speed;
 		else
 			dspeed = self.speed;
-		SUB_CalcMoveCurve(corner.origin - self.movedir, ctrl.origin - self.movedir, ctrl.count, self.speed, dspeed, self.th_stand);
+		
+		if (ctrl.count)
+			segs = ctrl.count;
+		else
+			// chop the curve into roughly 200ms segments
+			segs = ceil(5 * bez_lenApprox(self.origin, ctrl.origin, corner.origin) / ((self.speed + dspeed) / 2));
+
+		SUB_CalcMoveCurve(corner.origin - self.movedir, ctrl.origin - self.movedir, segs, self.speed, dspeed, self.th_stand);
 		return;
 	}
 	
@@ -857,8 +864,8 @@ void() train_next =	// departure for next pathcorner
 	{
 		// 'curved' motion in a straight line, for the speed stepping
 		vector travel = (corner.origin - self.movedir) - self.origin;
-		dspeed = max( 2, floor( vlen(travel) / 64 ) );	// pick an intelligent segment count
-		SUB_CalcMoveCurve(corner.origin - self.movedir, self.origin + travel * 0.5, dspeed, self.speed, self.enemy.speed, self.th_stand);
+		segs = max( 2, floor( vlen(travel) / 64 ) );	// pick an intelligent segment count
+		SUB_CalcMoveCurve(corner.origin - self.movedir, self.origin + travel * 0.5, segs, self.speed, self.enemy.speed, self.th_stand);
 	}
 	else
 		SUB_CalcMove (corner.origin - self.movedir, self.speed, self.th_stand);

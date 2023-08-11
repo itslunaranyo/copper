@@ -828,7 +828,7 @@ Keys:
 
 Spawnflags:
 BEZIER	Act as a bilinear control point between the previous and next pathcorner in the chain (train only, no monster patrols)
-	"count"	change number of steps of interpolation along the curve the train will make (default 10)
+	"count"	override number of steps of interpolation along the curve the train will make
 */
 /*FGD
 @PointClass base(Appearflags, Targetname, Target, Angle) size(16 16 16) color(128 80 0) = 
@@ -842,7 +842,7 @@ Checking the Bezier spawnflag will make this pathcorner act as a bilinear contro
 	]
 	wait(string) : "Wait time (seconds)" : "0"
 	speed(string) : "A visiting func_train to change its speed to this. If 'speed' is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner." : "0"
-	count(integer) : "steps of interpolation along this bezier curve segment" : 10
+	count(integer) : "override steps of interpolation along this bezier curve segment"
 ]
 */
 void() path_corner =
@@ -863,9 +863,6 @@ void() path_corner =
 		//else if (!self.target)
 		//	self.wait = -1;
 	}
-	
-	if ((self.spawnflags & 16) && self.count <= 0)
-		self.count = 10;
 	
 	self.solid = SOLID_TRIGGER;
 	self.touch = path_corner_touch;

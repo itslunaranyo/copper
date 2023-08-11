@@ -169,6 +169,17 @@ vector(vector start, vector ctrl, vector end, float t) bez =
 	return t * b2 + (1-t) * b1;
 }
 
+// quick bezier length approximation (2/3 chord len + 1/3 perimeter)
+float(vector start, vector ctrl, vector end) bez_lenApprox =
+{
+	float chord, peri;
+	
+	chord = vlen(start - end);
+	peri = vlen(start - ctrl) + vlen(ctrl - end) + chord;
+	
+	return 2 * chord / 3 + peri / 3;
+}
+
 // rotates B around A
 vector(vector b, vector a, float r) rotateVectorAround =
 {
