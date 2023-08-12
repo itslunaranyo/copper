@@ -88,6 +88,7 @@ void(entity who, float amt, vector color) TintScreenFog
 		{
 			who.fog_density2 = -1;
 			who.fog_color = color;
+			who.fog_color2 = color;
 		}
 		else
 		{

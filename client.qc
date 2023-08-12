@@ -586,9 +586,15 @@ void() PutClientInServer =
 	
 	// yet another thing that doesn't work on the first frame
 	if (spot.fog_density || spot.fog_color || spot.fog_sky)
+	{
 		fog_save(self, spot.fog_density, spot.fog_color, spot.fog_sky);
+	}
 	else if (world.fog_density || world.fog_color || world.fog_sky)
+	{
 		fog_save(self, world.fog_density, world.fog_color, world.fog_sky);
+	}
+	if (!self.fog_sky)
+		self.fog_sky = cvar("r_skyfog");
 	cleanUpClientShit = 2;
 
 // oh, this is a hack!
