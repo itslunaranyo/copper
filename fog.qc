@@ -298,8 +298,6 @@ void() target_fogblend_use =
 	}
 	else
 		fog_blendTimeThink();
-	// don't allow retriggering before the blend is done or it looks super duper wacky
-	self.use = SUB_Null;
 }
 
 /*
@@ -319,10 +317,12 @@ void() fog_blendTimeThink =
 	}
 	else
 	{
+		// don't allow retriggering before the blend is done or it looks super duper wacky
+		self.use = SUB_Null;
 		self.nextthink = time + FOG_INTERVAL;//self.delay;//wtf
 		if (self.state && self.speed)
 			f = 1 - (self.pain_finished - time) / self.speed;
-		else if (self.speed2)
+		else if (!self.state && self.speed2)
 			f = 1 - (self.pain_finished - time) / self.speed2;
 		else
 			f = 1;
@@ -330,7 +330,7 @@ void() fog_blendTimeThink =
 
 	if (self.state == 0)
 		f = 1-f;
-
+	
 	if (f == 1)
 	{
 		ldensity = self.fog_density2;
@@ -420,8 +420,8 @@ void() target_fogblend =
 		self.state = 1 - self.state;
 	
 	if (!self.speed) self.speed = 1;
-	if (!self.speed2) self.speed2 = self.speed;
-	
 	if (self.speed == -1) self.speed = 0;
+	
+	if (!self.speed2) self.speed2 = self.speed;
 	if (self.speed2 == -1) self.speed2 = 0;
 }
