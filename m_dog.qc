@@ -369,7 +369,7 @@ void() monster_dog_spawn =
 	if (self.deathtype == string_null)
 		self.deathtype = "was mauled by a Rottweiler";
 
-	nmspeed(0.072);
+	nmspeed(0.05);
 
 	walkmonster_start();
 }
