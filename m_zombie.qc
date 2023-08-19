@@ -555,7 +555,7 @@ void() zombie_die =
 	self.nextthink = time + 
 		5 + // initial min
 		random() * 3 + // randomness on initial min
-		(1 + random()) * 30 * self.cnt;	// escalating buffer
+		(1 + random() + random()) * 15 * self.cnt;	// escalating buffer
 }
 
 void() zombie_return =
