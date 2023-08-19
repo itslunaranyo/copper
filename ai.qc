@@ -534,8 +534,13 @@ void() HuntTarget =
 	self.nextthink = time + 0.05;
 	
 	// wait a while before first attack
-	if (skill == 3 && self.classname == "monster_tarbaby")	// nightmare: react faster to waking up
-		ai_attack_finished(0.33);
+	if (skill == 3)
+	{	// nightmare: react faster to waking up
+		if (self.classname == "monster_tarbaby" || self.classname == "monster_grunt")
+			ai_attack_finished(0.3);
+		else
+			ai_attack_finished(0.7);
+	}
 	else ai_attack_finished (1);
 }
 
