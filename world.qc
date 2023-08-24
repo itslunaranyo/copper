@@ -223,6 +223,11 @@ void() worldspawn =
 		}
 	}
 	cvar_set("sv_gravity", ftos(self.gravity));
+	
+	// make sure these are set for spawnfuncs, which happen before the first startframe()
+	teamplay = cvar("teamplay");
+	skill = cvar("skill");
+	
 	self.light_lev = 0;	// shut up FTEQCC warning
 	
 	keyType = "Key";	// default if there are no keys placed in the map
