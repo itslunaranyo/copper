@@ -107,8 +107,19 @@ void() fish_melee =
 	//	self.enemy.air_finished = min(self.enemy.air_finished, time);
 }
 
-/*
-void() fish_checkdash =
+
+float() fish_checkdash =
+{
+	if (skill != 3)
+		return FALSE;
+	if (enemy_range != RANGE_NEAR || !infront(self.enemy))
+		return FALSE;
+	if (random() < 0.3)
+		return FALSE;
+	return TRUE;
+}
+
+void() fish_checkcontinuedash =
 {
 	if (vlen(self.origin - self.enemy.origin) < 60)
 	{
@@ -129,11 +140,7 @@ void() f_dash =
 {
 	ai_face();
 	ai_face();
-	if (!infront(self.enemy))
-	{
-		f_run1();
-		return;
-	}
+
 	self.velocity = normalize(enemy_vispos() - self.origin) * 300;
 	self.oldvelocity = self.velocity;
 	f_dash1();
@@ -144,13 +151,13 @@ void() f_dash1 =[	$swim1, f_dash2 ] {
 	if (random() < 0.1)
 		sound (self, CHAN_VOICE, "fish/idle.wav", 1, ATTN_NORM);
 }
-void() f_dash2 =[	$swim3, f_dash3 ] {fish_checkdash();}
-void() f_dash3 =[	$swim6, f_dash4 ] {fish_checkdash();}
-void() f_dash4 =[	$swim10, f_dash5 ] {fish_checkdash();}
-void() f_dash5 =[	$swim12, f_dash6 ] {fish_checkdash();}
-void() f_dash6 =[	$swim14, f_dash7 ] {fish_checkdash();}
-void() f_dash7 =[	$swim16, f_dash1 ] {fish_checkdash();}
-*/
+void() f_dash2 =[	$swim3, f_dash3 ] {fish_checkcontinuedash();}
+void() f_dash3 =[	$swim6, f_dash4 ] {fish_checkcontinuedash();}
+void() f_dash4 =[	$swim10, f_dash5 ] {fish_checkcontinuedash();}
+void() f_dash5 =[	$swim12, f_dash6 ] {fish_checkcontinuedash();}
+void() f_dash6 =[	$swim14, f_dash7 ] {fish_checkcontinuedash();}
+void() f_dash7 =[	$swim16, f_dash1 ] {fish_checkcontinuedash();}
+
 void() f_attack =
 {
 	float r;
@@ -271,14 +278,8 @@ void() fish_die =
 // can happen if the player is treading water with fish around his feet (thx 4LT)
 float() fish_check_attack =
 {
-	if (enemy_range > RANGE_MELEE) return FALSE;
 	if (self.enemy.customflags & (CFL_PLUNGE|CFL_LIMBO) || self.enemy.deadflag == DEAD_SPECTATING)
 		return FALSE;
-	
-	vector tgt = self.enemy.origin - self.origin;
-	tgt_z *= 0.75;	// fish can bite from above or below
-	
-	if (vlen((tgt)) > 60) return FALSE;
 	
 	if (pointcontents(self.origin) == CONTENT_EMPTY)	// airfish
 	{
@@ -288,6 +289,18 @@ float() fish_check_attack =
 	{
 		if (self.enemy.waterlevel <= WL_FEET) return FALSE;	// enemy is out of liquid
 	}
+	
+	//if (fish_checkdash())
+	//{
+	//	f_dash();
+	//	return TRUE;
+	//}
+	
+	if (enemy_range > RANGE_MELEE) return FALSE;
+	vector tgt = self.enemy.origin - self.origin;
+	tgt_z *= 0.75;	// fish can bite from above or below
+	
+	if (vlen((tgt)) > 60) return FALSE;
 	
 	// have to call melee directly because ai_run() won't catch AS_MELEE
 	self.th_melee();
@@ -325,7 +338,7 @@ void() monster_fish_spawn =
 			self.deathtype = "was fed to the Rotfish";
 	}
 
-	nmspeed(0.04); // look at 'em go
+	nmspeed(0.055); // look at 'em go
 
 	swimmonster_start ();
 }
