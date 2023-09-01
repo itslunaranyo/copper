@@ -363,9 +363,62 @@ void() target_heal =
 //============================================================================
 
 
+void() target_kill_rando =
+{
+	SUB_CountTargets();
+	self.cnt += self.frags;
+	
+	if (!self.cnt) return;
+
+	float randy;
+	entity t;
+
+	randy = ceil( random() * self.cnt );
+
+	t = world;
+	if (self.target != string_null) while ( randy > 0 )
+	{
+		t = find (t, targetname, self.target);
+		if (!t) break;
+		randy = randy - 1;
+	}
+	if (!t && self.target2 != string_null) while ( randy > 0 )
+	{
+		t = find (t, targetname, self.target2);
+		if (!t) break;
+		randy = randy - 1;
+	}
+	if (!t && self.target3 != string_null) while ( randy > 0 )
+	{
+		t = find (t, targetname, self.target3);
+		if (!t) break;
+		randy = randy - 1;
+	}
+	if (!t && self.target4 != string_null) while ( randy > 0 )
+	{
+		t = find (t, targetname, self.target4);
+		if (!t) break;
+		randy = randy - 1;
+	}
+	if (!t && self.killtarget != string_null) while ( randy > 0 )
+	{
+		t = find (t, targetname, self.killtarget);
+		if (!t) break;
+		randy = randy - 1;
+	}
+	
+	RemoveTarget(t);
+}
+
 void() target_kill_go =
 {
 	local entity t;
+
+	if (self.spawnflags & 2)
+	{
+		target_kill_rando();
+		return;
+	}
 
 	// kill targets
 	if (self.target != string_null) {
@@ -417,12 +470,21 @@ void() target_kill_use =
 	killer.nextthink = time + self.delay;
 }
 
-/*QUAKED target_kill (0.75 0.5 0) (-8 -8 -8) (8 8 8)
+/*QUAKED target_kill (0.75 0.5 0) (-8 -8 -8) (8 8 8) - RANDOM
 Kills ALL of its targets (1-4) as well as killtargets when triggered. for targets you really don't like.
+
+"delay" wait before killing
+
+RANDOM	randomly kill only one target out of all of them
 */
 /*FGD
 @Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_kill : 
-"Removes all targets when triggered. for targets you really don't like." []
+"Removes all targets when triggered. for targets you really don't like." [
+	spawnflags(flags) =	[
+		2 : "Kill one target at random" : 0
+	]	
+	delay(string) : "Delay before kill" : "0"
+]
 */
 void() target_kill =
 {
