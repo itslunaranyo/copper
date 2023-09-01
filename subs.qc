@@ -38,13 +38,20 @@ take an entity out of gameplay (independent of 'killing' it)
 */
 void(entity victim) RemoveTarget =
 {
-	
-	// iw -- don't change kill count when removing a dead monster
-	if (victim.flags & FL_MONSTER && victim.deadflag == DEAD_NO && !(victim.customflags & CFL_SPAWNER))
-		addmonster(-1);		// since the player won't get credit for the kill
-
+	// since the player won't get credit for the kill
+	if (victim.flags & FL_MONSTER && victim.deadflag == DEAD_NO)	// iw -- don't change kill count when removing a dead monster
+	{
+		addmonster(-1);
+	}
+	else if (victim.customflags & CFL_SPAWNER)
+	{
+		if (victim.count > 0)
+		{
+			addmonster(-1 * victim.count);
+		}
+	}
 	// clean up door triggers so they don't get lonely and crash
-	if (victim.trigger_field != world)
+	else if (victim.trigger_field != world)
 		remove(victim.trigger_field);
 
 	// silence movers
