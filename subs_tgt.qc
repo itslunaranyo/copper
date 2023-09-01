@@ -412,13 +412,10 @@ void() SUB_UseRandomTarget =
 		SUB_UseTargetsDelay(DelayThinkRandom);
 		return;
 	}
-
+	
 	// fire targets
-	if (self.target != string_null || 
-		self.target2 != string_null ||
-		self.target3 != string_null ||
-		self.target4 != string_null	
-	) {
+	if (self.cnt)	// set by SUB_CountTargets
+	{
 		randy = ceil( random() * self.cnt );
 		act = activator;
 		t = world;
@@ -460,7 +457,7 @@ void() SUB_UseRandomTarget =
 	}
 	
 	// kill the killtargets
-	if (self.killtarget != string_null)
+	if (self.frags)	// set by SUB_CountTargets
 	{
 		randy = ceil( random() * self.frags );
 		t = world;
