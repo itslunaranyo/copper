@@ -104,9 +104,6 @@ void() Tar_Forget =
 {
 	self.customflags |= CFL_OMNIVISION;	// gain 360 vision in case we fall asleep in a corner
 
-	// nightmare: no sleep timer to save you
-	if (skill == 3) return;
-	
 	if (!self.rad_time)	// time to be RAD
 	{
 		// we just woke up, don't forget right away, because if we were awoken
