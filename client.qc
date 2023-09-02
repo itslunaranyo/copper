@@ -208,10 +208,8 @@ float() TransferKeys =
 	float silver, gold, give;
 	entity recipient;	
 	
-	if (self.items & IT_KEY1)
-		silver = self.worldtype & 15;
-	if (self.items & IT_KEY2)
-		gold = (self.worldtype & 240) / 16;
+	silver = key_count_silver(self);
+	gold = key_count_gold(self);
 	
 	// no keys
 	if (!silver && !gold)
@@ -223,48 +221,76 @@ float() TransferKeys =
 	{
 		if (silver > 0)
 		{
-			give = 15 - (recipient.worldtype & 15);
+			give = 16 - key_count_silver(recipient);
 			give = min(give, silver);
 			if (give)
 			{
-				recipient.worldtype += give;
-				recipient.items |= IT_KEY1;
+				if (recipient.items & IT_KEY1)
+				{
+					recipient.worldtype += give;
+				}
+				else
+				{
+					recipient.items |= IT_KEY1;
+					recipient.worldtype += give - 1;
+				}
+			
+				silver -= give;
+				key_take_silvers(self, give);
+				
 				sprint(recipient, "You got ");
 				if (give > 1)
 				{
 					sprint(recipient, ftos(give));
-					sprint(recipient, " Silver Keys from ");
+					key_sprint_name(recipient, FALSE);
+					sprint(recipient, "s");
 				}
 				else
-					sprint(recipient, "the Silver Key from ");
+				{
+					sprint(recipient, "the");
+					key_sprint_name(recipient, FALSE);
+				}
+				sprint(recipient, " from ");
 				sprint(recipient, self.netname);
 				sprint(recipient, "\n");
-				silver -= give;
-				self.worldtype -= give;
 				stuffcmd(recipient, "bf\n");
 				sound (recipient, CHAN_ITEM, key_sound(), 1, ATTN_NORM);
 			}
 		}
 		if (gold > 0)
 		{
-			give = 15 - (recipient.worldtype & 240)/16;
+			give = 16 - key_count_gold(recipient);
 			give = min(give, gold);
 			if (give)
 			{
-				recipient.worldtype += give * 16;
-				recipient.items |= IT_KEY2;
+				if (recipient.items & IT_KEY2)
+				{
+					recipient.worldtype += give * 16;
+				}
+				else
+				{
+					recipient.items |= IT_KEY2;
+					recipient.worldtype += (give - 1) * 16;
+				}
+			
+				silver -= give;
+				key_take_golds(self, give);
+				
 				sprint(recipient, "You got ");
 				if (give > 1)
 				{
 					sprint(recipient, ftos(give));
-					sprint(recipient, " Gold Keys from ");
+					key_sprint_name(recipient, TRUE);
+					sprint(recipient, "s");
 				}
 				else
-					sprint(recipient, "the Gold Key from ");
+				{
+					sprint(recipient, "the");
+					key_sprint_name(recipient, TRUE);
+				}
+				sprint(recipient, " from ");
 				sprint(recipient, self.netname);
 				sprint(recipient, "\n");
-				gold -= give;
-				self.worldtype -= 16 * give;
 				stuffcmd(recipient, "bf\n");
 				sound (recipient, CHAN_ITEM, key_sound(), 1, ATTN_NORM);
 			}
