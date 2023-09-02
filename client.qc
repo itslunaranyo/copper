@@ -297,7 +297,7 @@ void() set_respawn_delay =
 {
 	self.lifetime_finished = time + 1;
 	
-	if (coop != 1 || gameover) return;
+	if (coop != 1 || gameover || mapname == "start") return;
 	
 	if (clientsAlive)
 	{
@@ -355,7 +355,7 @@ void() respawn =
 	}
 	if (coop)
 	{
-		if (coop == 1)
+		if (coop == 1 && mapname != "start")
 		{
 			// no restarting if someone else has already exited
 			if (gameover)
@@ -1667,7 +1667,7 @@ void() ClientObituary =
 	
 	entity attacker = self.enemy;
 
-	if (coop == 1)
+	if (coop == 1 && mapname != "start")
 	{
 		// centerprint before bprint if you want players to see both
 		entity e;
