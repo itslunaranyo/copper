@@ -218,11 +218,11 @@ void() shub_finale_4 =
 
 				r = random();
 				if (r < 0.3)				
-					ThrowGib ("progs/gib1.mdl", -300);
+					ThrowGib ("progs/gib1.mdl", -150 - random() * 180);
 				else if (r < 0.6)
-					ThrowGib ("progs/gib2.mdl", -300);
+					ThrowGib ("progs/gib2.mdl", -150 - random() * 180);
 				else
-					ThrowGib ("progs/gib3.mdl", -300);
+					ThrowGib ("progs/gib3.mdl", -150 - random() * 180);
 			}
 		}
 	}
