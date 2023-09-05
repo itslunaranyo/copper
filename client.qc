@@ -529,13 +529,28 @@ entity() SelectSpawnPoint =
 	// testinfo_player_start is only found in regioned levels
 	spot = find (world, classname, "info_player_start_test");
 	if (spot)
-	{
 		return spot;
-	}
 
-	if (serverflags & (SVFL_ALLEPISODES))
-	{	// return with a rune to start
-		spot = find (world, classname, "info_player_start2");
+	if (serverflags)	// return with a rune to start
+	{
+		spot = world;
+		dprint2(ftos(serverflags), "\n");
+		while (TRUE)
+		{
+			spot = find (spot, classname, "info_player_start2");
+			if (!spot) break;
+			dprint3("   ", ftos(spot.svflags), "\n");
+			
+			// all
+			if (spot.style == 1 && ((spot.svflags & serverflags) == spot.svflags))
+				break;
+			// none
+			else if (spot.style == 2 && ((spot.svflags & serverflags) == 0))
+				break;
+			// any
+			else if (spot.style == 0 && ((spot.svflags & serverflags) != 0))
+				break;
+		}
 		if (spot)
 			return spot;
 	}
@@ -1991,15 +2006,57 @@ Only used on start map for the return point from an episode. Will fire its targe
 
 "angle" viewing angle when spawning
 "fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
+"svflags" set the bits for a specific set of runes/serverflags you want to test
+"style" how to interpret svflags:
+	0: player will spawn here if they have any of the runes in svflags
+	1: player will only spawn here if they have all of them
+	2: player will NOT spawn here if they have any of them
 */
 /*FGD
-@PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" []
+@PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" [
+	svflags(Flags) =
+	[
+		1		: "Episode 1" : 1
+		2		: "Episode 2" : 1
+		4		: "Episode 3" : 1
+		8		: "Episode 4" : 1
+		16		: "Bit 5" :  0
+		32		: "Bit 6" :  0
+		64		: "Bit 7" :  0
+		128		: "Bit 8" :  0
+		256		: "Bit 9" :  0
+		512		: "Bit 10" : 0
+		1024	: "Bit 11" : 0
+		2048	: "Bit 12" : 0
+		4096	: "Bit 13" : 0
+		8192	: "Bit 14" : 0
+		16384	: "Bit 15" : 0
+		32768	: "Bit 16" : 0
+		65536	: "Bit 17" : 0
+		131072	: "Bit 18" : 0
+		262144	: "Bit 19" : 0
+		524288	: "Bit 20" : 0
+		1048576	: "Bit 21" : 0
+		2097152	: "Bit 22" : 0
+	]
+	style(Choices) : "Requirement" : 0 =
+	[
+		0 : "Have Any"
+		1 : "Must Have All"
+		2 : "Must Not Have Any"
+	]
+]
 */
 void() info_player_start2 =
 {
 	setsize(self,VEC_HULL_MIN,VEC_HULL_MAX);	// for telefrag testing
 	self.mangle = self.angles;
 	fog_fixKeys();
+	
+	if (!self.svflags)
+		self.svflags = SVFL_ALLEPISODES;
+	if (self.style < 0 || self.style > 2)
+		self.style = 0;
 }
 
 
