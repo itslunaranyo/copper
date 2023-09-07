@@ -757,7 +757,7 @@ trigger_setskill & target_setskill
 ==============================================================================
 */
 
-void(entity e, string sk) skill_set =
+void(string sk) skill_set =
 {
 	cvar_set ("skill", sk);
 	skill = cvar("skill");
@@ -765,7 +765,7 @@ void(entity e, string sk) skill_set =
 
 void() target_setskill_use
 {
-	skill_set(activator, self.message);
+	skill_set(self.message);
 }
 
 /*FGD
@@ -803,7 +803,7 @@ void() trigger_skill_touch =
 	if (!CheckValidTouch()) return;
 	if (self.customflags & CFL_LOCKED) return;
 	
-	skill_set(other, self.message);
+	skill_set(self.message);
 }
 
 /*QUAKED trigger_setskill (.5 .0 .5) ? ? ? TRIGGER_FIRST
