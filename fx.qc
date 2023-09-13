@@ -1046,6 +1046,10 @@ void() air_bubbles =
 	self.rand = zeroconvertdefault(self.rand, 1);
 	
 	self.think = air_bubbles_think;
+	if (self.targetname == string_null && (self.spawnflags & 1))
+	{
+		dprint3("\bwarning:\b air_bubbles at ", vtos(self.origin), " with start_off and no targetname\n");
+	}
 	if (self.targetname != string_null)
 	{
 		self.use = air_bubbles_use;
@@ -1053,6 +1057,9 @@ void() air_bubbles =
 		if (!self.state)
 			return;
 	}
+	else
+		self.state = 1;
+
 	if (self.spawnflags & 8)
 		return;
 	self.nextthink = time + self.wait;
