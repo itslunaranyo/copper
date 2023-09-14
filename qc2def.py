@@ -20,6 +20,8 @@ def addSkillFlags(deftxt):
 		while (len(initbits) < 14):
 			initbits.append("?")
 	initbits += ["NotEasy", "NotNormal", "NotHard", "NotDeathmatch", "CoopOnly", "NotCoop"]
+	if (cname.startswith("monster") or cname == "func_button" or cname == "func_door" or cname == "func_plat"):
+		initbits += ["AltTarget"]
 	
 	deflines[0] = " ".join(initbits)
 	deftxt = "\n".join(deflines)
