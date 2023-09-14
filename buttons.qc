@@ -23,6 +23,7 @@ void() button_done =	// hit bottom
 {
 	self.frame = 0;			// use normal textures
 	self.state = STATE_BOTTOM;
+	if (self.customflags & CFL_LOCKED) return;
 	SUB_UseTargetsAlt(target4);
 }
 
@@ -79,11 +80,17 @@ void() button_touch =
 	button_fire ();
 }
 
+// must preserve locked status until the end of the move so none of the four alt targets fire
+void() button_done_unlock =
+{
+	button_done();
+	self.customflags = not(self.customflags,CFL_LOCKED);	
+}
+
 void(float unlock) button_lock =
 {
 	if (unlock)
 	{
-		self.customflags = not(self.customflags,CFL_LOCKED);
 		if (self.max_health)
 		{
 			self.takedamage = DAMAGE_YES;
@@ -91,7 +98,7 @@ void(float unlock) button_lock =
 		}
 		self.frame = 0;			// use normal textures
 		self.state = STATE_DOWN;
-		SUB_CalcMove (self.pos1, self.speed, button_done);
+		SUB_CalcMove (self.pos1, self.speed, button_done_unlock);
 	}
 	else
 	{
