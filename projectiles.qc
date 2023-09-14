@@ -64,7 +64,7 @@ void(vector start, vector end, entity ignore, float traceflags) traceline2 =
 			if ( trace_ent.deadflag == DEAD_DYING || 	// don't let guys in death frames who aren't nonsolid yet act like solid walls to bullets
 				trace_ent == ignore || 					// always ignore the original ignore ent on future loops
 				trace_ent.movetype == MOVETYPE_NOCLIP || // don't shoot noclipping players
-				invis_miss_check(other,start,end-start) || 
+				invis_miss_check(trace_ent, start, end - start) || 
 				trace_ent.notrace)						// flag to make things game-functionally nonsolid (monsterclip/etc)
 			{
 				// if two entities that are both to be ignored are touching, the trace will
