@@ -231,6 +231,7 @@ void() plat_crush =
 
 void(entity p) plat_force = 
 {
+	if (p.customflags & CFL_LOCKED) return;
 	if (p.state == STATE_TOP || p.state == STATE_UP)
 		SUB_CallAsSelf(plat_go_down, p);
 	else
