@@ -1064,10 +1064,46 @@ float() ai_fishmovecheck =
 	return TRUE;
 }
 
+// feel around head and toes for blocking geo or monsters, and fudge our height value
+// to try to float over or under it
+float() ai_floatmove_vertical_nav =
+{
+	if (!(self.flags & FL_FLY)) return FALSE;
+		
+	float bl_high, bl_low;
+	vector dir, org;
+	
+	dir = self.enemy.origin + self.height * '0 0 1' - self.origin;
+	if (fabs(dir_z) > self.size_z) return FALSE;	// we're still approaching vertically
+	
+	dir = normalize(dir);
+	
+	org = self.origin + '0 0 1' * self.mins_z;
+	traceline(org, org + dir * 64, FALSE, self);
+	if (trace_ent == self.enemy) return FALSE;
+	if (trace_fraction < 1.0) bl_low = TRUE;
+	
+	org = self.origin + '0 0 1' * self.maxs_z;
+	traceline(org, org + dir * 64, FALSE, self);
+	if (trace_ent == self.enemy) return FALSE;
+	if (trace_fraction < 1.0) bl_high = TRUE;
+	
+	if (bl_low == bl_high) // either free to move, or totally blocked
+		return FALSE;
+
+	if (bl_low)
+		self.height += 32;
+	else if (bl_high)
+		self.height -= 24;
+	
+	return TRUE;
+}
+
+
 void(float dist) ai_floatmove_finish =
 {
 	vector move, dst;
-	float interv, delta, frac;
+	float interv, delta, amt;
 	
 	if (self.flags & (FL_FLY|FL_SWIM) == 0)
 		return;
@@ -1101,21 +1137,28 @@ void(float dist) ai_floatmove_finish =
 		if (fabs(dst_z) > 16)
 		{
 			delta = vlen(move);
-			frac = delta / vlen(dst);
-			move_z = frac * (dst_z);
+			amt = delta / vlen(dst);
+			move_z = amt * (dst_z);
 		}
 	}
 	// keep scrags a little above the player
-	else if (self.goalentity == self.enemy && self.height)
+	else if (self.goalentity == self.enemy)
 	{
-		frac = self.enemy.origin_z + self.height;
-		if (self.origin_z < frac) // terminus is below where we want
+		// feel around for blocking geo we can go over or under
+		if (!ai_floatmove_vertical_nav())
 		{
-			if (self.oldorigin_z < frac)	// we're coming up from below
-				move_z = min(8, frac - self.oldorigin_z);
-			else	// we're coming down from above
-				move_z = max(-8, frac - self.oldorigin_z);
-		}
+			// gradually shift back to baseline in the hopes that we've cleared the obstacle
+			if (self.height > self.jump_flag)
+				self.height -= min(4, self.height - self.jump_flag);
+			else
+				self.height += min(4, self.jump_flag - self.height);
+		}			
+		
+		amt = self.enemy.origin_z + self.height;
+		if (self.oldorigin_z < amt)	// we're coming up from below
+			move_z = min(8, amt - self.oldorigin_z);
+		else if (self.oldorigin_z > amt)	// we're coming down from above
+			move_z = max(-8, amt - self.oldorigin_z);
 	}
 	
 	// FL_SWIM just invalidates any movement out of water, so simulate velocity 
@@ -1129,6 +1172,7 @@ void(float dist) ai_floatmove_finish =
 	setorigin(self, self.oldorigin);
 	self.velocity = move / interv;
 }
+
 
 /*
 =============
@@ -1610,7 +1654,7 @@ void(float dist) ai_run =
 		ai_run_slide (dist);
 		return;
 	}
-	
+		
 	// head straight in
 	movetogoalplus(dist);	// wraps movetogoal()
 }

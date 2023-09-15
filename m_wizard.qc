@@ -95,14 +95,11 @@ void()	WizardAttackFinished =
 {
 	enemy_range = range(self.enemy);
 	enemy_vis = visible(self.enemy);
-	if (enemy_range >= RANGE_MID || !enemy_vis)
-	{
+	
+	if (enemy_range != RANGE_NEAR || !enemy_vis || random() < 0.5)
 		self.attack_state = AS_STRAIGHT;
-		self.think = wiz_run1;
-		return;
-	}
-	self.attack_state = AS_SLIDING;
-	self.think = wiz_side1;
+	else
+		self.attack_state = AS_SLIDING;
 }
 
 /*
@@ -218,7 +215,15 @@ void()	wiz_walk13	=[	$hover13,	wiz_walk14	] {ai_walk(8);}
 void()	wiz_walk14	=[	$hover14,	wiz_walk15	] {ai_walk(8);}
 void()	wiz_walk15	=[	$hover15,	wiz_walk1	] {ai_walk(8);}
 
-void()	wiz_side1	=[	$hover1,	wiz_side2	] {ai_run(8);Wiz_idlesound();}
+void()	wiz_side1	=[	$hover1,	wiz_side2	] {
+	if (self.attack_state == AS_STRAIGHT)
+	{
+		wiz_run1();
+		return;
+	}
+	ai_run(8);
+	Wiz_idlesound();
+}
 void()	wiz_side2	=[	$hover2,	wiz_side3	] {ai_run(8);}
 void()	wiz_side3	=[	$hover3,	wiz_side4	] {ai_run(8);}
 void()	wiz_side4	=[	$hover4,	wiz_side5	] {ai_run(8);}
@@ -233,14 +238,22 @@ void()	wiz_side12	=[	$hover12,	wiz_side13	] {ai_run(8);}
 void()	wiz_side13	=[	$hover13,	wiz_side14	] {ai_run(8);}
 void()	wiz_side14	=[	$hover14,	wiz_side15	] {ai_run(8);}
 void()	wiz_side15	=[	$hover15,	wiz_side1	] {ai_run(8);
-	if (self.touch_time + 12 < time)
+	if (self.touch_time + 8 < time)
 	{
 		self.attack_state = AS_STRAIGHT;	// we're probably strafing back and forth in a closet
 		self.think = wiz_run1;
 	}
 }
 
-void()	wiz_run1	=[	$fly1,		wiz_run2	] {ai_run(16);Wiz_idlesound();}
+void()	wiz_run1	=[	$fly1,		wiz_run2	] {
+	if (self.attack_state == AS_SLIDING)
+	{
+		wiz_side1();
+		return;
+	}
+	ai_run(16);
+	Wiz_idlesound();
+}
 void()	wiz_run2	=[	$fly2,		wiz_run3	] {ai_run(16);}
 void()	wiz_run3	=[	$fly3,		wiz_run4	] {ai_run(16);}
 void()	wiz_run4	=[	$fly4,		wiz_run5	] {ai_run(16);}
@@ -335,6 +348,7 @@ void() monster_wizard_spawn =
 		self.deathtype = "was scragged by a Scrag";
 
 	self.height = zeroconvertdefault(self.height, 40);
+	self.jump_flag = self.height;	// remember original value for short term nav tweaking
 	flymonster_start();
 }
 
