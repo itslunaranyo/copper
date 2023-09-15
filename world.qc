@@ -351,7 +351,21 @@ void() worldspawn =
 void() StartFrame =
 {
 	teamplay = cvar("teamplay");
-	skill = cvar("skill");
+	
+	float sk = cvar("skill");
+	entity skbtn;
+	if (sk != skill)
+	{
+		skill = sk;
+		skbtn = skill_head;
+		while (skbtn)
+		{
+			self = skbtn;
+			skillbutton_activate();
+			skbtn = skbtn.owner;
+		}
+		self = world;
+	}	
 	
 	if (cleanUpClientShit)
 		cleanUpClientShit -= 1;
