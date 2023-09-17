@@ -1068,23 +1068,25 @@ float() ai_fishmovecheck =
 // to try to float over or under it
 float() ai_floatmove_vertical_nav =
 {
-	if (!(self.flags & FL_FLY)) return FALSE;
-		
+	if (!(self.flags & FL_FLY))
+		return FALSE;
+
 	float bl_high, bl_low;
 	vector dir, org;
 	
-	dir = self.enemy.origin + self.height * '0 0 1' - self.origin;
+	dir_z = self.enemy.origin_z + self.height - self.origin_z;
 	if (fabs(dir_z) > self.size_z) return FALSE;	// we're still approaching vertically
 	
-	dir = normalize(dir);
+	makevectors('0 1 0' * self.ideal_yaw);
+	dir = v_forward * 80;
 	
 	org = self.origin + '0 0 1' * self.mins_z;
-	traceline(org, org + dir * 64, FALSE, self);
+	traceline(org, org + dir, FALSE, self);
 	if (trace_ent == self.enemy) return FALSE;
 	if (trace_fraction < 1.0) bl_low = TRUE;
 	
 	org = self.origin + '0 0 1' * self.maxs_z;
-	traceline(org, org + dir * 64, FALSE, self);
+	traceline(org, org + dir, FALSE, self);
 	if (trace_ent == self.enemy) return FALSE;
 	if (trace_fraction < 1.0) bl_high = TRUE;
 	
@@ -1092,9 +1094,9 @@ float() ai_floatmove_vertical_nav =
 		return FALSE;
 
 	if (bl_low)
-		self.height += 32;
+		self.height += 16;
 	else if (bl_high)
-		self.height -= 24;
+		self.height -= 16;
 	
 	return TRUE;
 }
@@ -1110,7 +1112,7 @@ void(float dist) ai_floatmove_finish =
 		
 	self.movetype = MOVETYPE_FLY;
 	move = self.origin - self.oldorigin;
-	
+
 	// fish have short bounding boxes, which in quake physics land means they can noclip through ceilings
 	if (pointcontents(self.origin) == CONTENT_SOLID)
 	{
@@ -1141,7 +1143,7 @@ void(float dist) ai_floatmove_finish =
 			move_z = amt * (dst_z);
 		}
 	}
-	// keep scrags a little above the player
+	// flymove navigates to self.enemy by default, not goalentity :/
 	else if (self.goalentity == self.enemy)
 	{
 		// feel around for blocking geo we can go over or under
@@ -1154,11 +1156,27 @@ void(float dist) ai_floatmove_finish =
 				self.height += min(4, self.jump_flag - self.height);
 		}			
 		
-		amt = self.enemy.origin_z + self.height;
-		if (self.oldorigin_z < amt)	// we're coming up from below
-			move_z = min(8, amt - self.oldorigin_z);
-		else if (self.oldorigin_z > amt)	// we're coming down from above
-			move_z = max(-8, amt - self.oldorigin_z);
+		// flymove velocity isn't clipped against surfaces, causing scrags to 
+		// 'stick' to floors and ceilings when we give them z velocity, so we 
+		// let SV_movestep()'s z-adjust do the work whenever possible.
+		// SV_movestep aims to match z between z+30 to z+40 of self.enemy, so
+		// only check for when we'd be fighting that behavior.
+		// TODO: better to use a fake goalentity so the height nav always works?
+
+		float engine_rise_to = self.enemy.origin_z + 30;
+		float engine_sink_to = self.enemy.origin_z + 40;
+		float desired_h = self.enemy.origin_z + self.height;
+		
+		if (self.height < 40 && self.origin_z < engine_sink_to && self.origin_z > desired_h)
+		{
+			// force descent
+			move_z = max(-8, desired_h - self.oldorigin_z);
+		}
+		else if (self.height > 30 && self.origin_z > engine_rise_to && self.origin_z < desired_h)
+		{
+			// force rise
+			move_z = min(8, desired_h - self.oldorigin_z);
+		}
 	}
 	
 	// FL_SWIM just invalidates any movement out of water, so simulate velocity 

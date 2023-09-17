@@ -347,7 +347,7 @@ void() monster_wizard_spawn =
 	if (self.deathtype == string_null)
 		self.deathtype = "was scragged by a Scrag";
 
-	self.height = zeroconvertdefault(self.height, 40);
+	self.height = zeroconvertdefault(self.height, 35);
 	self.jump_flag = self.height;	// remember original value for short term nav tweaking
 	flymonster_start();
 }
