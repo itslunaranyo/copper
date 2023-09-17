@@ -39,8 +39,6 @@ float()	WizardCheckAttack =
 	if (!enemy_vis)
 		return FALSE;
 
-	self.touch_time = time;	// keep track of last time we saw the player
-	
 	if (enemy_range >= RANGE_FAR)
 	{
 		self.attack_state = AS_STRAIGHT;
@@ -238,9 +236,9 @@ void()	wiz_side12	=[	$hover12,	wiz_side13	] {ai_run(8);}
 void()	wiz_side13	=[	$hover13,	wiz_side14	] {ai_run(8);}
 void()	wiz_side14	=[	$hover14,	wiz_side15	] {ai_run(8);}
 void()	wiz_side15	=[	$hover15,	wiz_side1	] {ai_run(8);
-	if (self.touch_time + 8 < time)
+	if (!enemy_vis)
 	{
-		self.attack_state = AS_STRAIGHT;	// we're probably strafing back and forth in a closet
+		self.attack_state = AS_STRAIGHT;	// we've casually strafed out of view like an idiot
 		self.think = wiz_run1;
 	}
 }
