@@ -566,7 +566,7 @@ void() zombie_return =
 	if (pc == CONTENT_SOLID || pc == CONTENT_LAVA || pc == CONTENT_SKY)
 		return;	// in something
 	
-	if (self.velocity != '0 0 0')
+	if (self.velocity != '0 0 0' || has_invis(self.enemy))
 	{
 		self.nextthink = time + 5;
 		return;
