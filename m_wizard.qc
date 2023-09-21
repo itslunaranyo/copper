@@ -108,6 +108,27 @@ FAST ATTACKS
 ==============================================================================
 */
 
+entity(vector org, vector vel) launch_wizspike =
+{
+	entity spike;
+	
+	if (skill == 3)
+	{
+		spike = launch_projectile(org, vel*720, "wizspike");	// FLYMISSILE
+		spike.dmg = 20;
+		SUB_ChangeModel (spike, "progs/w_spike2.mdl");
+	}
+	else
+	{
+		spike = launch_projectile(org, vel*600, "wizspike");	// FLYMISSILE
+		spike.dmg = 9;
+		SUB_ChangeModel (spike, "progs/w_spike.mdl");
+	}
+	spike.touch = spike_touch;
+	
+	return spike;	
+}
+
 void() Wiz_FastFire =
 {
 	vector vec;
@@ -122,7 +143,7 @@ void() Wiz_FastFire =
 	
 		vec = normalize(dst - self.origin);
 		sound (self, CHAN_WEAPON, "wizard/wattack.wav", 1, ATTN_NORM);
-		wsp = launch_wizspike (self.origin, vec*600);
+		wsp = launch_wizspike (self.origin, vec);
 		wsp.owner = wsp.trueowner = self.owner;
 	}
 
@@ -136,7 +157,7 @@ void(float when, float where) Wiz_Shot =
 	missile = spawn ();
 	missile.owner = self;
 	setsize (missile, '0 0 0', '0 0 0');		
-	setorigin (missile, self.origin + '0 0 30' + v_forward * 14 + v_right * where);
+	setorigin (missile, self.origin + '0 0 24' + v_forward * 14 + v_right * where);
 	missile.enemy = self.enemy;
 	missile.nextthink = time + when;
 	missile.think = Wiz_FastFire;
@@ -149,15 +170,6 @@ void() Wiz_StartFast =
 	self.v_angle = self.angles;
 	makevectors (self.angles);
 
-	// nightmare: three shots instead of two, with less anticipation
-	if (skill == 3)
-	{
-		Wiz_Shot(0.2, -15);
-		Wiz_Shot(0.6, 15);
-		Wiz_Shot(1, 0);
-		return;
-	}
-	
 	Wiz_Shot(0.3, -13);
 	Wiz_Shot(0.8, 13);
 }
@@ -275,7 +287,13 @@ void()	wiz_fast6	=[	$magatt6,		wiz_fast7	] {ai_face();}
 void()	wiz_fast7	=[	$magatt7,		wiz_fast8	] {ai_face();}
 void()	wiz_fast8	=[	$magatt8,		wiz_fast9	] {ai_face();}
 void()	wiz_fast9	=[	$magatt10,		wiz_fast10	] {ai_face();}
-void()	wiz_fast10	=[	$magatt12,		wiz_run1	] {ai_face(); ai_attack_finished(2); WizardAttackFinished();}
+void()	wiz_fast10	=[	$magatt12,		wiz_run1	] {ai_face();
+	if (skill == 3)
+		ai_attack_finished(3 * random()); 
+	else
+		ai_attack_finished(1.5 + random()); 
+	WizardAttackFinished();
+}
 
 void()	wiz_pain1	=[	$pain1,		wiz_pain2	] {ai_nop();PainFinished(0.2);}
 void()	wiz_pain2	=[	$pain2,		wiz_pain3	] {ai_nop();}
@@ -382,6 +400,7 @@ void() monster_wizard =
 	precache_model ("progs/wizard.mdl");
 	precache_model ("progs/h_wizard.mdl");
 	precache_model ("progs/w_spike.mdl");
+	precache_model ("progs/w_spike2.mdl");
 
 	precache_sound ("wizard/hit.wav");		// used by c code
 	precache_sound ("wizard/wattack.wav");

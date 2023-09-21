@@ -427,24 +427,6 @@ entity(vector org, vector vel) launch_nail =
 
 /*
 ========
-launch_wizspike
-scrag spit, used by scrags
-========
-*/
-entity(vector org, vector vel) launch_wizspike =
-{
-	entity spike;
-	
-	spike = launch_projectile(org, vel, "wizspike");	// FLYMISSILE
-	spike.touch = spike_touch;
-	spike.dmg = 9;
-	SUB_ChangeModel (spike, "progs/w_spike.mdl");
-	
-	return spike;	
-}
-
-/*
-========
 launch_laser
 used by trapshooter and enforcers
 ========
