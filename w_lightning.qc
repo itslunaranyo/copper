@@ -110,8 +110,8 @@ void(vector start, vector limit, entity from, float damage) LightningBeam =
 			if (self.classname == "player")
 			{
 				// have the arc pull into the target a little
-				if (targ.maxs_x <= 32)	// not for cthon/etc, he's too big
-					end = (trace_endpos + targ.origin) * 0.5;
+				//if (targ.maxs_x <= 32)	// not for cthon/etc, he's too big
+				//	end = (trace_endpos + targ.origin) * 0.5;
 				if (targ.classname == "player")
 					targ.velocity_z = targ.velocity_z + 400;
 				
