@@ -70,8 +70,16 @@ void() shal_attack3     =[      $attack3,       shal_attack4    ] {ai_face();}
 void() shal_attack4     =[      $attack4,       shal_attack5    ] {ai_face();}
 void() shal_attack5     =[      $attack5,       shal_attack6    ] {ai_face();}
 void() shal_attack6     =[      $attack6,       shal_attack7    ] {ai_face();}
-void() shal_attack7     =[      $attack7,       shal_attack8    ] {ai_face();}
-void() shal_attack8     =[      $attack8,       shal_attack9    ] {ai_face();}
+void() shal_attack7     =[      $attack7,       shal_attack8    ] {
+	ai_face(); 
+	if (skill == 3) 
+		self.dest = enemy_vispos();
+}
+void() shal_attack8     =[      $attack8,       shal_attack9    ] {
+	ai_face(); 
+	if (skill == 3 && visible(self.enemy)) 
+		self.dest = enemy_vispos();
+}
 void() shal_attack9     =[      $attack9,       shal_attack10   ] {ShalMissile();}
 void() shal_attack10    =[      $attack10,      shal_attack11   ] {ai_face();}
 void() shal_attack11    =[      $attack11,      shal_run1   ] {}
@@ -141,11 +149,11 @@ void() ShalMissileTouch =
 	ShalMissileExplode();
 }
 
-vector(entity targ, float turnrate) ShalTurnToward =
+vector(vector targ, float turnrate) ShalTurnToward =
 {
 	vector	vel, aimdir, temp, temp2, out;
 
-	temp = targ.origin + '0 0 10';
+	temp = targ + '0 0 10';
 	aimdir = temp - self.origin;
 	aimdir = normalize(aimdir);
 	vel = normalize(self.velocity);
@@ -222,7 +230,7 @@ void() ShalHome =
 			{
 				rate *= max(1, 1.5 * (1 - dot));
 			}
-			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.33);
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy.origin, rate * 0.33);
 		}
 		else // good homing (full turn rate):
 		{
@@ -232,8 +240,7 @@ void() ShalHome =
 			{
 				rate *= min(1.4, 1.4 + fabs(dot));
 			}
-			// FIXME: figure out how to stop them veering up or down when they don't have to
-			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate);
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy.origin, rate);
 		}
 		
 		self.velocity *= 1 + dist;
@@ -242,26 +249,30 @@ void() ShalHome =
 	else
 	{
 		// nightmare: vanilla-evil homing with corner following to force engagement rather than encourage it
-		if (visible(self.enemy))	// go straight to follow player around corners
+		enemy_vis = visible(self.enemy);
+		if (enemy_vis)	// go straight to follow player around corners
 		{
-			// poor homing
-			if ( self.owner.health <= 0	 || self.owner.customflags & CFL_PLUNGE
-				|| pointcontents(self.origin) < CONTENT_SOLID )
-			{
-				if (dot > 0)
-				{
-					rate *= max(1, 1.5 * (1 - dot));
-				}
-				self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 0.5);
-			}
-			else // evile homing
-			{
-				self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.enemy, rate * 5);
-			}
-			
-			self.velocity *= 1 + dist;
-			self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
+			// remember last seen position for corner hax
+			self.dest = self.enemy.origin;
 		}
+		
+		// poor homing
+		if ( self.owner.health <= 0	 || self.owner.customflags & CFL_PLUNGE
+			|| pointcontents(self.origin) < CONTENT_SOLID )
+		{
+			if (dot > 0)
+			{
+				rate *= max(1, 1.5 * (1 - dot));
+			}
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.dest, rate * 0.5);
+		}
+		else // evile homing
+		{
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.dest, rate * 5);
+		}
+		
+		self.velocity *= 1 + dist;
+		self.velocity += Vector(crandom(),crandom(),crandom()) * 16;
 	}
 
 	self.oldvelocity = self.velocity;	
@@ -298,6 +309,7 @@ void() ShalMissile =
 	missile.enemy = self.enemy;
 	missile.touch = ShalMissileTouch;
 	missile.lifetime_finished = time + 30;	 // blow up after a while
+	if (skill == 3) missile.dest = self.dest;
 }
 
 //=================================================================
