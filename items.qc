@@ -860,7 +860,6 @@ TEST: behaves like TAKE, but doesn't take anything
   - prints "message" if not
   - TEST with TAKE will reverse the test (fire if player doesn't have)
   - beware of how this interacts with triggers: it will only test the first client to touch a trigger in coop unless it has ALL_CLIENTS set
-HALFHEALTH_NM: divide the 'health' kv by 2 on skill 3 - can be necessary for testing if the player is fully healed accurately across skills
 
 Item Bitmask Reference:
 	SG	= 1		SSG	= 2
@@ -892,7 +891,6 @@ Spawnflag Usage:
   - TEST with TAKE will reverse the test (fire if player doesn't have)
   - beware of how this interacts with triggers: it will only test the first client to touch a trigger in coop!
 'Minimum': for numeric amounts, give the player enough to have a minimum of the amount specified
-'Half 'health' on NM': divide the 'health' kv by 2 on skill 3 - can be necessary for testing if the player is fully healed accurately across skills
 'Flash screen': flash the recipient's screen when triggered, defaults to being stealthy"
 [
 	length(integer) : "Override powerup duration" : 0
@@ -904,7 +902,6 @@ Spawnflag Usage:
 		4 : "Flash screen" : 0
 		8 : "Test only" : 0
 		16 : "Minimum" : 0
-		32 : "Halve 'health' on NM" : 0
 	]
 	weapon(choices) : "Force Select Weapon" = 
 	[
@@ -961,8 +958,6 @@ void() target_items =
 	
 	if (self.noise != string_null)
 		precache_sound_safe(self.noise);
-	if (self.spawnflags & 32)
-		self.health = floor(self.health / 2);
 }
 void() target_give = {target_items();}
 
