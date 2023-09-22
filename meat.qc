@@ -54,7 +54,6 @@ void(string gibname, float dm) ThrowHead =
 {
 	setmodel (self, gibname);
 	self.frame = 0;
-	self.nextthink = -1;
 	self.movetype = MOVETYPE_BOUNCE;
 	self.takedamage = DAMAGE_NO;
 	self.solid = SOLID_NOT;
@@ -89,7 +88,9 @@ void(string headmdl, float dm) GibSpray =
 
 void(string headmdl, float dm) Gib =
 {
-		sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+	sound (self, CHAN_VOICE, "player/udeath.wav", 1, ATTN_NORM);
+	self.think = SUB_Null;
+	self.nextthink = 0;
 	
 	GibSpray(headmdl, dm);
 }
