@@ -454,7 +454,8 @@ void(float rate) nmspeed =
 }
 void() nmfast =
 {
-	self.nextthink = time + self.walkframe;
+	if (self.health > 0 && self.nextthink > 0)
+		self.nextthink = time + self.walkframe;
 }
 
 /*
@@ -1585,11 +1586,6 @@ The monster has an enemy it is trying to kill
 */
 void(float dist) ai_run =
 {
-	if (self.health <= 0)	// defensive hack for sentient head gibs that attack you
-	{
-		self.nextthink = 0;
-		return;
-	}
 	if (!ai_check_liquid()) return;	// died in slime/lava already
 	
 	entity e;
