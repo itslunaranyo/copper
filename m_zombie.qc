@@ -592,7 +592,7 @@ void() zombie_return =
 		particle(org, '8 -8 0', 73, 16);
 		particle(org, '-8 8 0', 73, 16);
 		particle(org, '-8 -8 0', 73, 16);
-		sound (self, CHAN_BODY, "player/tornoff2.wav", 1, ATTN_IDLE);
+		sound (self, CHAN_BODY, "zombie/z_res.wav", 1, ATTN_IDLE);
 
 		monster_zombie_spawn();
 		self.skin = 1;
@@ -738,6 +738,7 @@ void() monster_zombie =
 	precache_sound ("zombie/z_fall.wav");
 	precache_sound ("zombie/z_miss.wav");
 	precache_sound ("zombie/z_hit.wav");
+	precache_sound3 ("zombie/z_res.wav");
 	precache_sound ("zombie/idle_w2.wav");
 
 	setsize (self, '-16 -16 -24', '16 16 40');
