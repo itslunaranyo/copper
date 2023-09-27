@@ -6,9 +6,9 @@ SHAL-RATH
 ==============================================================================
 */
 
-const float SHAL_BALL_TURN_RATE		= 272;
+const float SHAL_BALL_TURN_RATE		= 265;
 const float SHAL_BALL_THINK_RATE	= 0.1;
-const float SHAL_BALL_VEL			= 325;
+const float SHAL_BALL_VEL			= 300;
 
 
 $cd id1/models/shalrath
