@@ -232,7 +232,7 @@ void(vector dir, vector org) hknight_bolt =
 	{
 		spike = launch_projectile(self.origin + org + dir * 20, dir * 600, "knightspike");	// FLYMISSILE
 		SUB_ChangeModel (spike, "progs/k_spike2.mdl");
-		spike.dmg = 24;
+		spike.dmg = 16 + 8 * random();
 	}
 	else
 	{
