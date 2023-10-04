@@ -137,6 +137,8 @@ void() W_ResetWeaponState =
 
 float(float w) W_RankForWeapon =
 {
+	if (!w)
+		return 666;
 	if (w == IT_LIGHTNING)
 		return 1;
 	if (w == IT_ROCKET_LAUNCHER)
@@ -208,7 +210,9 @@ float() W_BestWeapon =
 		return IT_NAILGUN;
 	if(W_HasAmmo(IT_SHOTGUN))
 		return IT_SHOTGUN;
-	return IT_AXE;
+	if (self.items & IT_AXE)
+		return IT_AXE;
+	return 0;
 }
 
 void() W_SelectBestWeapon =
@@ -221,9 +225,10 @@ float() W_CheckNoAmmo =
 {
 	if (self.currentammo > 0)
 		return TRUE;
-
 	if (self.weapon == IT_AXE)
 		return TRUE;
+	if (!self.weapon)
+		return FALSE;
 	
 	W_SelectBestWeapon ();
 	return FALSE;
@@ -397,15 +402,15 @@ void() CycleWeaponCommand =
 {
 	float weap = self.weapon;
 	self.impulse = 0;
-	do {
+	if (!weap)
+		weap = W_BestWeapon();
+	else do {
 		weap = W_Next(weap);
 		if (self.items & weap && W_HasAmmo(weap))
-		{
-			self.weapon = weap;
-			W_ResetWeaponState ();
-			return;
-		}
+			break;
 	} while (weap != self.weapon);
+	self.weapon = weap;
+	W_ResetWeaponState ();
 }
 
 // cycle weapon down
@@ -413,15 +418,15 @@ void() CycleWeaponReverseCommand =
 {
 	float weap = self.weapon;
 	self.impulse = 0;
-	do {
+	if (!weap)
+		weap = W_BestWeapon();
+	else do {
 		weap = W_Prev(weap);
 		if (self.items & weap && W_HasAmmo(weap))
-		{
-			self.weapon = weap;
-			W_ResetWeaponState ();
-			return;
-		}
+			break;
 	} while (weap != self.weapon);
+	self.weapon = weap;
+	W_ResetWeaponState ();
 }
 
 /*

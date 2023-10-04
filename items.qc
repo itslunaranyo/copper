@@ -725,7 +725,7 @@ void(entity e) target_items_setinv =
 	{
 		float it = zeroconvert(self.items);
 
-		if (it & IT_WEAPONS)
+		if (it & IT_WEAPONS || self.items == -1)
 			e.items = not(e.items, IT_WEAPONS) + (it & IT_WEAPONS);
 			
 		// set artifact timers properly
@@ -831,7 +831,7 @@ void() target_items_use =
 	activator = act;
 }
 
-/*QUAKED target_items (0.75 0.25 0) (-8 -8 -8) (8 8 8) TAKE OVERRIDE FLASH TEST MINIMUM HALFHEALTH_NM
+/*QUAKED target_items (0.75 0.25 0) (-8 -8 -8) (8 8 8) TAKE OVERRIDE FLASH TEST MINIMUM
 Gives weapons, ammo, items, health, armor, and/or runes to the activating player when triggered. 
 
 Keyvalues:
@@ -854,7 +854,7 @@ TAKE: subtract specified inventory amounts instead of adding
   - will fire its targets if all items can be successfully taken
   - will print "message" and take nothing instead
   - TAKE with MINIMUM will skip the test and take whatever it can, firing no targets either way
-OVERRIDE: force the player's inventory to all specified amounts (mainly useful triggered from spawnpoints), specify -1 for any keyvalue to force a 0 (-1 does not work for items or health)
+OVERRIDE: force the player's inventory to all specified amounts (mainly useful triggered from spawnpoints), specify -1 for any keyvalue to force a 0 (-1 does not work for health)
 TEST: behaves like TAKE, but doesn't take anything 
   - fires targets if activator has the matching inventory
   - prints "message" if not
