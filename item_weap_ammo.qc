@@ -303,6 +303,28 @@ void() weapon_lightning =
 	StartWeapon();
 }
 
+/*QUAKED weapon_axe (0 0 1) (-16 -16 0) (16 16 56) ? ? SUSPENDED
+The axe, should you happen to make the player start without one.
+
+Keys:
+"target/2/3/4/k" - entity to trigger when picked up
+"targetname" - will not spawn until triggered
+"wait" - will respawn after 'wait' seconds. fires targets every time.
+"count" - limit number of times to respawn
+*/
+/*FGD
+@PointClass base(Weapon) model({ "path": ":progs/g_axe.mdl" }) = weapon_axe : "Axe." []
+*/
+void() weapon_axe =
+{
+	if (!SUB_ShouldSpawn()) return;
+	precache_model_safe ("progs/g_axe.mdl");
+	setmodel (self, "progs/g_axe.mdl");
+	self.items = IT_AXE;
+	self.netname = "Axe. Find some wood!";
+	StartWeapon();
+}
+
 
 // ===============================================================================
 
