@@ -362,6 +362,32 @@ void() target_heal =
 
 //============================================================================
 
+void(entity t) target_kill_remove =
+{
+	if ((self.spawnflags & 1) == 0)
+	{
+		RemoveTarget(t);
+		return;
+	}
+
+	// 'murder' spawnflag: actually kill monsters instead of removing them
+	if ((t.flags & FL_MONSTER) && (t.deadflag == DEAD_NO))
+	{
+		T_Damage(t, activator, self, t.health + 20);
+	}
+	else if (t.customflags & CFL_SPAWNER)
+	{
+		while (t.count > 0)
+		{
+			killed_monsters = killed_monsters + 1;
+			WriteByte (MSG_ALL, SVC_KILLEDMONSTER);
+			t.count -= 1;
+		}
+		remove(t);
+	}
+	else
+		RemoveTarget(t);
+}
 
 void() target_kill_rando =
 {
@@ -407,7 +433,7 @@ void() target_kill_rando =
 		randy = randy - 1;
 	}
 	
-	RemoveTarget(t);
+	target_kill_remove(t);
 }
 
 void() target_kill_go =
@@ -426,7 +452,7 @@ void() target_kill_go =
 		do	{
 			t = find(t, targetname, self.target);
 			if (!t) break;
-			RemoveTarget (t);
+			target_kill_remove (t);
 		} while ( 1 );
 	}
 	if (self.target2 != string_null) {
@@ -434,7 +460,7 @@ void() target_kill_go =
 		do	{
 			t = find(t, targetname, self.target2);
 			if (!t) break;
-			RemoveTarget (t);
+			target_kill_remove (t);
 		} while ( 1 );
 	}
 	if (self.target3 != string_null) {
@@ -442,7 +468,7 @@ void() target_kill_go =
 		do	{
 			t = find(t, targetname, self.target3);
 			if (!t) break;
-			RemoveTarget (t);
+			target_kill_remove (t);
 		} while ( 1 );
 	}
 	if (self.target4 != string_null) {
@@ -450,11 +476,17 @@ void() target_kill_go =
 		do	{
 			t = find(t, targetname, self.target4);
 			if (!t) break;
-			RemoveTarget (t);
+			target_kill_remove (t);
 		} while ( 1 );
 	}
-
-	SUB_KillTargets(self.killtarget);
+	if (self.killtarget != string_null) {
+		t = world;
+		do	{
+			t = find(t, targetname, self.killtarget);
+			if (!t) break;
+			target_kill_remove (t);
+		} while ( 1 );
+	}
 }
 
 void() target_kill_use =
@@ -470,17 +502,19 @@ void() target_kill_use =
 	killer.nextthink = time + self.delay;
 }
 
-/*QUAKED target_kill (0.75 0.5 0) (-8 -8 -8) (8 8 8) - RANDOM
+/*QUAKED target_kill (0.75 0.5 0) (-8 -8 -8) (8 8 8) MURDER RANDOM
 Kills ALL of its targets (1-4) as well as killtargets when triggered. for targets you really don't like.
 
 "delay" wait before killing
 
+MURDER	monsters are damaged to death, and spawners will credit unspawned kills
 RANDOM	randomly kill only one target out of all of them
 */
 /*FGD
 @Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_kill : 
 "Removes all targets when triggered. for targets you really don't like." [
 	spawnflags(flags) =	[
+		1 : "Murder monsters instead of removing" : 0
 		2 : "Kill one target at random" : 0
 	]	
 	delay(string) : "Delay before kill" : "0"
