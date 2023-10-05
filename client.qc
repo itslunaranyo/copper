@@ -1792,6 +1792,12 @@ void() ClientObituary =
 				else
 					bprint (" is no rocket surgeon\n");
 			}
+			else if (self.dmg_inflictor.deathtype != string_null)
+			{
+				bprint(" ");
+				bprint(self.dmg_inflictor.deathtype);
+				bprint("\n");
+			}				
 			else
 				bprint (" becomes bored with life\n");
 			return;
