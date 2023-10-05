@@ -683,6 +683,12 @@ void(entity e) target_items_setinv =
 {
 	if (self.health > 0)
 		e.health = self.health;
+	if (self.health < 0)
+	{
+		e.deathtype = "noarmor"; // terrible
+		T_Damage(e, self, activator, e.health);
+		e.deathtype = string_null;
+	}
 		
 	if (self.armorvalue)
 	{
