@@ -856,7 +856,6 @@ FLASH: flash the recipient's screen when triggered, defaults to being stealthy
 MINIMUM: for numeric amounts, give the player enough to have a minimum of the amount specified
 TAKE: subtract specified inventory amounts instead of adding
   - subtracting enough health WILL kill the player
-  - subtracting all weapons WILL break the game
   - will fire its targets if all items can be successfully taken
   - will print "message" and take nothing instead
   - TAKE with MINIMUM will skip the test and take whatever it can, firing no targets either way
@@ -887,7 +886,6 @@ Item Bitmask Reference:
 Spawnflag Usage:
 'Take': subtract specified inventory amounts instead of adding
   - subtracting enough health WILL kill the player
-  - subtracting all weapons WILL break the game
   - will fire its targets if all items are successfully taken
   - will print 'message' if fewer than all items are successfully taken
 'Override': force the player's inventory to all specified amounts (mainly useful triggered from spawnpoints), specify -1 for any keyvalue to force a 0 (-1 does not work for items or health)
