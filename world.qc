@@ -241,16 +241,18 @@ void() worldspawn =
 		}
 		else
 		{
+			/*
+			// globalstat is inconsistently implemented (ironwail) because the "EXT_CSQC" 
+			// extension is actually undefined and meaningless
 			if (checkextension("EXT_CSQC"))
 			{
-				globalstat(STAT_CLIENTS, 2, "clients");	// multiple keys on hud
-				globalstat(STAT_CLIENTSALIVEMASK, 2, "clientsAliveMask");	// cheap client death status monitor
+				globalstat(STAT_CLIENTS, 2, "clients");
+				globalstat(STAT_CLIENTDATA, 2, "clientsAliveMask");	// client death status monitor
 			}
 			else
-			{
-				clientstat(STAT_CLIENTSALIVEMASK, 2, length);	// cheap and shitty client death status monitor
-			}
+			*/
 			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
+			clientstat(STAT_CLIENTDATA, 2, length);	// shitty client death status monitor
 		}
 	}
 
@@ -396,26 +398,32 @@ void() StartFrame =
 	framecount++;
 	//cvar_set("registered",ftos(framecount));
 	
-	if (coop)
+	// assemble two bytes out of client count and a bitmask of who's dead to send to 
+	// players for display on the hud and scoreboard	
+	if (coop || deathmatch)
 	{
 		entity e = nextent(world);
-		float p = 1;
-		clientsAliveMask = 0;
+		float p = 16;
+		float clientDataMask;
+		clientDataMask = clients & 15;
+
 		while (e.flags & FL_CLIENT)
 		{
 			if (e.health > 0 && e.deadflag != DEAD_DEAD)
-			clientsAliveMask |= p;
+			clientDataMask |= p;
 			p *= 2;
 			e = nextent(e);
 		}
-		if (!globalStatSupported)
+		
+		// globalstat() isn't reliable in quake ports that implement completely random 
+		// assortments of csqc extensions, but somehow clientstat() is implemented in
+		// every engine that implements any csqc, so we have to copy the number to every 
+		// player and send it as a client stat instead. so it goes.
+		e = nextent(world);
+		while (e.flags & FL_CLIENT)
 		{
-			e = nextent(world);
-			while (e.flags & FL_CLIENT)
-			{
-				e.length = clientsAliveMask;
-				e = nextent(e);
-			}
+			e.length = clientDataMask;
+			e = nextent(e);
 		}
 	}
 	

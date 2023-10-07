@@ -21,11 +21,11 @@ float paintime, lookseed;
 float itemtimes[30];
 float baralpha;
 float hudstyle;
-float globalStatSupported;
+float clientdata;
 
-const float HUD_FACELEFT = 0;
-const float HUD_FACEFWD = 1;
-const float HUD_FACERIGHT = 2;
+const float MP_NARROW = 0;
+const float MP_MEDIUM = 1;
+const float MP_WIDE = 2;
 
 float(float a, float m) clampf =
 {
@@ -36,11 +36,7 @@ float(float a, float m) clampf =
 string(float f, float chars, string lead) FormatFloat
 {
 	string s = ftos(f);
-	if (f < 10 && chars >= 3)
-		s = strcat(lead, lead, s);
-	else if (f < 10 && chars == 2)
-		s = strcat(lead, s);
-	else if (f < 100 && chars >= 3)
+	while (strlen(s) < chars)
 		s = strcat(lead, s);
 	return s;
 };
@@ -112,13 +108,13 @@ void(vector pos) Hud_DrawLevelInfoBar =
 
 // STATUS BAR
 
-void(vector pos, float value, float threshhold, float left = FALSE) Hud_DrawLargeValue =
+void(vector pos, float value, float threshhold, float left = FALSE, float zeropad = 0) Hud_DrawLargeValue =
 {
 	float c;
 	float len;
 	string s;
 
-	s = ftos(floor(value));
+	s = FormatFloat(floor(value), zeropad, "0");
 	len = strlen(s);
 	if (!left)
 		pos_x -= 24 * len;
@@ -381,46 +377,49 @@ void Hud_DrawSigils(vector pos)
 	}
 }
 
-void Hud_DrawMultiplayer(vector pos, vector offset, float w)
+void Hud_DrawMultiplayerSwatch(vector pos, float p)
 {
-	float p, numclients, clientmask;
-	string cname, lbl;
-	float lblw, isdead, pb;
+	drawsubpic(pos, '8 8', "sb_teams", [0, stof(getplayerkeyvalue(p, "topcolor"))/16], [0.5,1/16], '1 1 1', 1);
+	drawsubpic(pos, '8 8', "sb_teams", [0.5, stof(getplayerkeyvalue(p, "bottomcolor"))/16], [0.5,1/16], '1 1 1', 1);
+}
+
+void Hud_DrawMultiplayer(vector pos, vector offset, float width)
+{
+	float cnum, p, numclients;
+	string cname, frags, lbl, ping;
+	float lblw, isdead, clientbit;
 	vector ofs;
 	
-	clientmask = getstatf(STAT_CLIENTSALIVEMASK);
-	if (globalStatSupported)
+	numclients = clientdata & 15;
+	clientbit = 16;
+	
+	for (cnum = 0; cnum < numclients; cnum++)
 	{
-		numclients = getstatf(STAT_CLIENTS);
-		if (numclients > 8) numclients = 8;
-	}
-	else
-		numclients = 8;
-	pb = 1;
-	for (p = 0; p < numclients; p++)
-	{
+		if (width == MP_WIDE)
+			p = -1 - cnum;	// sort by frags with the weird negative index
+		else
+			p = cnum;
 		cname = getplayerkeyvalue(p, "name");
-		// dumb hack: just assume the first player with an empty name is the end of the 
-		// client list. it isn't necessarily, but globalstat() support is unreliable
-		if (!globalStatSupported && cname == string_null)
-			break;
-			
-		drawsubpic(pos, '8 8', "sb_teams", [0, stof(getplayerkeyvalue(p, "topcolor"))/16], [0.5,1/16], '1 1 1', 1);
-		drawsubpic(pos, '8 8', "sb_teams", [0.5, stof(getplayerkeyvalue(p, "bottomcolor"))/16], [0.5,1/16], '1 1 1', 1);
-
+		frags = getplayerkeyvalue(p, "frags");
+		ping = getplayerkeyvalue(p, "ping");
+		
 		if (coop)
 		{
 			lbl = cname;
-			isdead = !(pb & clientmask);
+			isdead = (clientbit & clientdata) == 0;
 		}
 		else // dm
-			lbl = getplayerkeyvalue(p, "frags");
+			lbl = frags;
 		
-		lbl = substring(lbl, 0, w);
-		lblw = stringwidth(lbl, TRUE);
-		if (w < 4)	// try to cram three letters onto the classic hud
+		if (width == MP_NARROW)	// try to cram three letters onto the classic hud
+			lbl = substring(lbl, 0, 3);
+		else
+			lbl = substring(lbl, 0, 8);
+		
+		lblw = min(64, stringwidth(lbl, TRUE));
+		if (width == MP_NARROW)
 		{
-			if (lblw < w * 8)
+			if (lblw < 24)
 				ofs = '12 0';
 			else
 				ofs = '8 0';
@@ -429,14 +428,23 @@ void Hud_DrawMultiplayer(vector pos, vector offset, float w)
 		{
 			ofs = '12 0';
 		}
-		drawstring(pos + ofs, lbl, '8 8', '1 1 1', 1, 0);
 		
-		if (isdead)	// cross out the names of the dead
+		Hud_DrawMultiplayerSwatch(pos, p);
+		if (width == MP_WIDE)
+		{
+			drawstring(pos + '16 0', frags, '8 8', '1 1 1', 1, 0);
+			drawstring(pos + '48 0', cname, '8 8', '1 1 1', 1, 0);
+			drawstring(pos + '128 0', ping, '8 8', '1 1 1', 1, 0);
+		}
+		else
+			drawstring(pos + ofs, lbl, '8 8', '1 1 1', 1, 0);
+
+		if (isdead)	// cross out the names of the dead in coop
 		{
 			drawfill(pos + ofs + '0 3', [lblw, 1], '0.8 0 0', 1);
 			drawfill(pos + ofs + '0 4', [lblw, 1], '0.6 0 0', 1);
 		}
-		
+		clientbit *= 2;
 		pos += offset;
 	}
 }
@@ -489,10 +497,10 @@ void Hud_DrawIBar(vector pos)
 	Hud_DrawIBarPowerups(pos + '224 8');
 	Hud_DrawSigils(pos + '288 8');
 		
-	if (!cvar("coop") && !cvar("deathmatch"))
+	if (!coop && !deathmatch)
 		return;
 
-	Hud_DrawMultiplayer(pos + '192 0', '32 0', 3);
+	Hud_DrawMultiplayer(pos + '192 0', '32 0', MP_NARROW);
 };
 
 // ================================================================
@@ -629,6 +637,15 @@ void Hud_DrawModernCenter(vector pos, float expanded)
 
 // ================================================================
 
+void Hud_DrawRankings(vector pos)
+{
+	drawpic(pos + '78 0', "gfx/ranking.lmp", '164 24', '1 1 1', 1);
+	
+	Hud_DrawMultiplayer(pos + '72 32', '0 12', MP_WIDE);
+}
+
+// ================================================================
+
 void() HUD_UpdateStats =
 {
 	float olditems, olditems2, i, f;
@@ -638,6 +655,8 @@ void() HUD_UpdateStats =
 	stat_items = getstatbits(STAT_ITEMS, 0, 23);
 	stat_items2 = getstatbits(STAT_ITEMS, 23, 9);
 	keytype = getstatbits(STAT_KEYCOUNTS, 8, 8);
+	clientdata = getstatf(STAT_CLIENTDATA);
+		
 	skill = cvar("skill");
 	
 	f = 1;
@@ -696,7 +715,11 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 		if (scoreboard || stat_health <= 0)
 		{
 			Hud_DrawLevelInfoBar([screensize_x / 2, screensize_y] - '160 24');
-			if (screensize_x >= 500)
+			if (deathmatch)
+			{
+				Hud_DrawRankings([screensize_x / 2 - 160, screensize_y / 2 - 120]);
+			}
+			else if (screensize_x >= 500 && stat_health > 0)
 			{
 				Hud_DrawModernLeft([margin, screensize_y - margin], exp);
 				Hud_DrawModernRight([screensize_x - margin, screensize_y - margin], exp);
@@ -710,8 +733,8 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 		}
 		if (exp)
 		{
-			if (coop || deathmatch)
-				Hud_DrawMultiplayer([margin, floor(screensize_y * 0.3)], '0 12', 8);
+			if ((deathmatch && !(scoreboard || stat_health <= 0)) || coop)
+				Hud_DrawMultiplayer([margin, floor(screensize_y * 0.3)], '0 12', MP_MEDIUM);
 			Hud_DrawModernWeapons([screensize_x, floor(screensize_y * 0.4)]);
 		}		
 	}
@@ -720,61 +743,79 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 		pos = screensize;
 		pos_x = screensize_x / 2;
 		if (scoreboard || stat_health <= 0)
+		{
 			Hud_DrawLevelInfoBar(pos - '160 24');
+			if (coop || deathmatch)
+				Hud_DrawRankings([screensize_x / 2 - 160, screensize_y / 2 - 120]);
+		}
 		else
 			Hud_DrawSBar(pos - '160 24');
+		
 		if (exp)
 			Hud_DrawIBar(pos - '160 48');
 	}
+	
 };
 
 // ================================================================
 
 // INTERMISSION
 
-void(vector screensize, float showscores) CSQC_DrawScores =
+void(vector screensize, float scoreboard) CSQC_DrawScores =
 {
 	if (!intermission) return;
 	vector pos, div;
 	float value, mins, secs;
 	string s;
-	HUD_UpdateStats();
 	
+	HUD_UpdateStats();
 	pos = [screensize_x / 2 - 160, screensize_y / 2 - 120];
+	
+	if (deathmatch)
+	{
+		Hud_DrawRankings(pos);
+		return;
+	}
+	
 	drawpic(pos + '64 0', "gfx/complete.lmp", '196 24', '1 1 1', 1);
 
 	s = strcat(world.message, " (", mapname, ")");
-	Hud_ScrollTextBox(pos + '2 28', 0, 0, 320, 8, 8, s);
+	Hud_ScrollTextBox(pos + '2 26', 0, 0, 320, 8, 8, s);
 	if (skill == 0)
-		drawstring(pos + '144 40', "Easy", '8 8', '1 1 1', 1, 0);
+		drawstring(pos + '144 36', "Easy", '8 8', '1 1 1', 1, 0);
 	if (skill == 1)
-		drawstring(pos + '136 40', "Normal", '8 8', '1 1 1', 1, 0);
+		drawstring(pos + '136 36', "Normal", '8 8', '1 1 1', 1, 0);
 	if (skill == 2)
-		drawstring(pos + '144 40', "Hard", '8 8', '1 1 1', 1, 0);
+		drawstring(pos + '144 36', "Hard", '8 8', '1 1 1', 1, 0);
 	if (skill == 3)
-		drawstring(pos + '126 40', "\bNightmare\b", '8 8', '1 1 1', 1, 0);
+		drawstring(pos + '126 36', "\bNightmare\b", '8 8', '1 1 1', 1, 0);
 
 	mins = floor(intermission_time / 60);
 	secs = floor(intermission_time - mins * 60);
 
-	pos += '16 0';
+	pos += '12 0';
 	div = '200 0';
 	value = max(clampf(getstatf(STAT_MONSTERS), 9999), clampf(getstatf(STAT_SECRETS), 9999));
 	value = max(value, mins);
 	
+	if (value > 9)
+	{
+		pos -= '12 0';
+		div += '24 0';
+	}
 	if (value > 99)
 	{
-		pos -= '24 0';
+		pos -= '12 0';
 		div += '24 0';
 	}
 	if (value > 999)
 	{
-		pos -= '24 0';
+		pos -= '12 0';
 		div += '24 0';
 	}
 	
 	// kills
-	pos += '0 64';
+	pos += '0 56';
 	drawsubpic(pos + '51 2', '96 24', "gfx/inter.lmp", [8/160, 88/144], [96/160, 24/144], '1 1 1', 1);
 	
 	value = clampf(getstatf(STAT_MONSTERS), 9999);
@@ -784,7 +825,7 @@ void(vector screensize, float showscores) CSQC_DrawScores =
 	Hud_DrawLargeValue(pos+div + '16 0', value, -1, TRUE);
 	
 	// secrets
-	pos += '0 32';
+	pos += '0 36';
 	drawsubpic(pos + '8 2', '136 24', "gfx/inter.lmp", [8/160, 48/144], [136/160, 24/144], '1 1 1', 1);
 	
 	value = clampf(getstatf(STAT_SECRETS), 9999);
@@ -794,13 +835,16 @@ void(vector screensize, float showscores) CSQC_DrawScores =
 	Hud_DrawLargeValue(pos+div + '16 0', value, -1, TRUE);
 	
 	// time
-	pos += '0 32';
+	pos += '0 36';
 	drawsubpic(pos + '67 2', '80 24', "gfx/inter.lmp", [8/160, 8/144], [80/160, 24/144], '1 1 1', 1);
 	
 	mins = clampf(mins, 999);
 	Hud_DrawLargeValue(pos+div, mins, -1);
 	drawpic(pos+div, "num_colon", '16 24', '1 1 1', 1);
-	Hud_DrawLargeValue(pos+div + '16 0', secs, -1, TRUE);
+	Hud_DrawLargeValue(pos+div + '16 0', secs, -1, TRUE, 2);
+	
+	if (coop)
+		Hud_DrawMultiplayer(pos + '72 40', '0 12', MP_WIDE);
 }
 
 // ================================================================
@@ -866,9 +910,9 @@ void() Hud_Init
 	paintime = -1;
 	lookseed = floor(random() * 100);
 
-	if (cvar("pr_checkextension"))
-		if (checkextension("EXT_CSQC"))
-			globalStatSupported = TRUE;
+	//if (cvar("pr_checkextension"))
+	//	if (checkextension("EXT_CSQC"))
+	//		globalStatSupported = TRUE;
 };
 
 void(float apilevel, string enginename, float engineversion) CSQC_Init = {Hud_Init();}
