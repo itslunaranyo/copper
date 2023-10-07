@@ -507,8 +507,10 @@ void(entity e) setspawnparms		= #78;		// set parm1... to the
 												// for coop respawn
 
 float(string s) checkextension		= #99;		// check cvar("pr_checkextension") before calling
+#ifndef NO_CSQC
 void(float num, float type, .__variant fld) clientstat = #232;
 void(float num, float type, string name) globalstat = #233;
+#endif
 //================================================
 
 /*FGD

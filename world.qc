@@ -239,6 +239,7 @@ void() worldspawn =
 			// do absolutely nothing in the rerelease
 			isKex = TRUE;
 		}
+#ifndef NO_CSQC
 		else
 		{
 			/*
@@ -254,6 +255,7 @@ void() worldspawn =
 			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
 			clientstat(STAT_CLIENTDATA, 2, length);	// shitty client death status monitor
 		}
+#endif
 	}
 
 // the area based ambient sounds MUST be the first precache_sounds
@@ -398,6 +400,7 @@ void() StartFrame =
 	framecount++;
 	//cvar_set("registered",ftos(framecount));
 	
+#ifndef NO_CSQC
 	// assemble two bytes out of client count and a bitmask of who's dead to send to 
 	// players for display on the hud and scoreboard	
 	if (coop || deathmatch)
@@ -426,7 +429,7 @@ void() StartFrame =
 			e = nextent(e);
 		}
 	}
-	
+#endif
 	/*
 	'activator' should be a parameter of *_use(), but it's a global. so it goes.
 
