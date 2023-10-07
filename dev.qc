@@ -116,7 +116,9 @@ void() dev_invoke =
 	{
 		activator = self;
 		
-		if (trace_ent.flags & FL_MONSTER)
+		if (trace_ent.flags & FL_CLIENT)
+			sound (trace_ent, CHAN_VOICE, "player/plyrjmp8.wav", 1, ATTN_NORM);	
+		else if (trace_ent.flags & FL_MONSTER)
 			monster_kill(trace_ent);
 		else if (trace_ent.classname == "func_door")
 			door_force(trace_ent);
