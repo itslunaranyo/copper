@@ -26,7 +26,7 @@ void() explobox_respawn =
 
 	self.solid = SOLID_BSP;
 	self.movetype = MOVETYPE_PUSH;
-	self.use = explobox_explode_go;
+	self.use = explobox_use;
 	self.health = self.max_health;
 	if (self.health != -1)
 		self.takedamage = DAMAGE_AIM;
@@ -71,7 +71,8 @@ void() explobox_explode_go =
 	
 	entity boom = spawn();
 	setorigin(boom, BoundsCenter(self));
-	if (self.dmg > 0) T_RadiusMultiDamage (boom, self, self.dmg, boom, FALSE);
+	boom.deathtype = self.deathtype;
+	if (self.dmg > 0) T_RadiusMultiDamage (boom, self.enemy, self.dmg, boom, FALSE);
 	boom.nextthink = time;
 	if (self.spawnflags & 1)
 	{
@@ -120,9 +121,15 @@ void() explobox_explode =
 {
 	if (self.think == explobox_explode_go)
 		return;	// already exploding
-	self.enemy = activator;
+	self.enemy = damage_attacker;
 	self.think = explobox_explode_go;
 	self.nextthink = self.ltime + 0.05;	// infini-barrel crash fixed
+}
+
+void() explobox_use =
+{
+	self.enemy = activator;
+	explobox_explode_go();
 }
 
 // ye olde barrel explode function preserved for maphacks
@@ -144,7 +151,7 @@ void() explobox_appear =
 	setmodel (self, self.model);
 	bmodel_lightstyle(self,"a");
 	
-	self.use = explobox_explode_go;
+	self.use = explobox_use;
 }
 
 void() explobox_start_invis =
@@ -163,12 +170,13 @@ void() explobox_setup =
 	if (self.spawnflags & 1)
 		precache_sound_safe("blob/death1.wav");
 	self.th_die = explobox_explode;
-	self.use = explobox_explode_go;
+	self.use = explobox_use;
 	if (!self.health)
 		self.health = 18;
 	if (self.health != -1)
 		self.takedamage = DAMAGE_AIM;
 	self.type = "explobox";
+	self.deathtype = "detonated";
 	self.max_health = self.health;
 	
 	if (self.spawnflags & 128)
