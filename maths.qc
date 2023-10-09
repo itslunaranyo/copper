@@ -211,6 +211,11 @@ vector(vector a, vector b) vec_scale =
 	return Vector(a_x * b_x, a_y * b_y, a_z * b_z);
 }
 
+float(vector ang) is_angular =
+{
+	return (fabs(ang_x) > 1 || fabs(ang_y) > 1 || fabs(ang_z) > 1);
+}
+
 float(float a, float b) min = { if (a <= b) return a; return b; }
 float(float a, float b) max = { if (a >= b) return a; return b; }
 float(float a, float mn, float mx) clamp = { if (a >= mx) return mx; if (a <= mn) return mn; return a; }

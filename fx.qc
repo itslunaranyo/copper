@@ -1065,3 +1065,132 @@ void() air_bubbles =
 	self.nextthink = time + self.wait;
 }
 
+
+// ==============================================================
+
+void() target_debris_use =
+{
+	float i, tries, spd;
+	entity chunk;
+	vector org, dir;
+	
+	if (self.noise != string_null)
+		sound (self, CHAN_VOICE, self.noise, self.volume, self.distance);
+
+	for (i = 0; i < self.count; i++)
+	{
+		// keep debris out of the void
+		while (tries < 32)
+		{
+			org_x = (random()-0.5) * self.size_x + self.origin_x;
+			org_y = (random()-0.5) * self.size_y + self.origin_y;
+			org_z = (random()-0.5) * self.size_z + self.origin_z;
+			
+			if (pointcontents(org) == CONTENT_SOLID)
+			{
+				tries += 1;
+				if (tries == 32) return;
+				continue;
+			}
+			break;
+		}
+
+		dir_x = crandom() + self.mangle_x * 2;
+		dir_y = crandom() + self.mangle_y * 2;
+		dir_z = crandom() + self.mangle_z * 2;
+		
+		spd = self.speed * (0.8 + 0.4 * random());
+		
+		chunk = toss_projectile(org, normalize(dir) * spd, "debris");
+		chunk.type = "debris";
+		
+		if (self.model != string_null)
+		{
+			setmodel(chunk, self.model);
+		}
+		else
+		{
+			if (i%3 == 0)
+				setmodel(chunk, "progs/debris1.mdl");
+			else if (i%3 == 1)
+				setmodel(chunk, "progs/debris2.mdl");
+			else if (i%3 == 2)
+				setmodel(chunk, "progs/debris3.mdl");
+		}
+		setsize(chunk, VEC_ORIGIN, VEC_ORIGIN);
+		
+		chunk.frame = self.frame;
+		chunk.alpha = self.alpha;
+		chunk.skin = self.skin;
+		chunk.avelocity = Vector(random(),random(),random()) * 400;
+		chunk.angles = Vector(random(),random(),random()) * 120;
+
+		chunk.lifetime_finished = time + 6 + random() * 6;
+	}
+}
+
+/*QUAKED target_debris (0.5 0.5 0.5) (-8 -8 -8) (8 8 8)
+emitter of chunks of debris
+
+Keys
+"count" number of chunks to emit, default 3
+"delay" time to wait before first emit
+"speed" speed of chunks
+"mangle" override chunk direction, defaults to omni
+"size" random location of chunks within bounds of this size
+
+"model"	specify a different model for debris
+"frame"	will be copied to spawned chunks
+"skin"	will be copied to spawned chunks
+"alpha"	will be copied to spawned chunks
+*/
+/*FGD
+@PointClass base(Appearflags, Targetname) size(16 16 16) color(180 180 180) = target_debris : "Emits debris chunks"
+[
+	count(integer) : "Number of chunks" : 3
+	delay(string) : "Delay before first emit" : "0"
+	size(string) : "Random location within bounds" : "0 0 0"
+	speed(integer) : "Speed of chunks" : 128
+	mangle(string) : "Specify chunk direction" : "0 0 0"
+	frame(integer) : "Set frame on debris" : 0
+	skin(integer) : "Set skin on debris" : 0
+	alpha(string) : "Set alpha on debris" : "1"
+	model(string) : "Override model on debris" : ""
+	noise(string) : "Play a sound when triggered" : ""
+]
+*/
+void() target_debris =
+{
+	if (!SUB_ShouldSpawn()) return;
+	self.speed = zeroconvertdefault(self.speed, 128);
+	self.count = zeroconvertdefault(self.count, 3);
+	self.use = target_debris_use;
+	
+	if (!self.volume)
+		self.volume = 1;
+	if (!self.distance)
+		self.distance = 1;
+		
+	if (self.mangle != VEC_ORIGIN)
+	{
+		if (is_angular(self.mangle))
+		{
+			makevectors(self.mangle);
+			self.mangle = v_forward;
+		}
+		else
+			self.mangle = normalize(self.mangle);
+	}
+	
+	if (self.noise != string_null)
+		precache_sound(self.noise);
+
+	if (self.model != string_null)
+		precache_model(self.model);
+	else
+	{
+		precache_model("progs/debris1.mdl");
+		precache_model("progs/debris2.mdl");
+		precache_model("progs/debris3.mdl");
+	}
+}
