@@ -67,7 +67,7 @@ void() door_hit_bottom =
 
 void() door_go_down =
 {
-	dprint("door_go_down\n");
+	//dprint("door_go_down\n");
 	sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	if (self.max_health)
 	{
@@ -83,7 +83,7 @@ void() door_go_down =
 
 void() door_go_up =
 {
-	dprint("door_go_up\n");
+	//dprint("door_go_up\n");
 	if (self.state == STATE_UP)
 		return;		// already going up
 
@@ -117,7 +117,7 @@ void() door_fire =
 	local entity 	oself;
 	local entity	starte;
 		
-	dprint("door_fire\n");
+	//dprint("door_fire\n");
 	if (self.owner != self)
 		objerror ("door_fire: self.owner != self");
 
@@ -163,7 +163,7 @@ void() door_fire =
 
 void() door_use =
 {
-	dprint("door_use\n");
+	//dprint("door_use\n");
 	if (self.customflags & CFL_LOCKED) return;
 	if (!( self.spawnflags & DOOR_TOGGLE ) ) 
 	{
@@ -278,7 +278,7 @@ void(float unlock) door_lock =
 {
 	entity c;
 	
-	dprint("door_lock\n");
+	//dprint("door_lock\n");
 	if (unlock) door_unlock_do(self);
 	else door_lock_do(self);
 	// inner loop checks for doors that are linked by touch and not targetname
@@ -293,7 +293,7 @@ void(float unlock) door_lock =
 
 void(entity d) door_lock_do =
 {
-	dprint("door_lock_do\n");
+	//dprint("door_lock_do\n");
 	entity e;
 	if (d.customflags & CFL_LOCKED)
 		return;
@@ -325,7 +325,7 @@ void(entity d) door_lock_do =
 
 void(entity d) door_unlock_do =
 {
-	dprint("door_unlock_do\n");
+	//dprint("door_unlock_do\n");
 	if (!(d.customflags & CFL_LOCKED))
 		return;
 		
@@ -446,7 +446,7 @@ entity(vector fmins, vector fmaxs) door_spawn_field =
 {
 	local entity	trigger;
 	local	vector	t1, t2;
-	dprint("spawning door field\n");
+	//dprint("spawning door field\n");
 	trigger = spawn();
 	trigger.movetype = MOVETYPE_NONE;
 	trigger.solid = SOLID_TRIGGER;
