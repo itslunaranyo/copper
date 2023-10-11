@@ -1153,7 +1153,17 @@ Keys
 	speed(integer) : "Speed of chunks" : 128
 	mangle(string) : "Specify chunk direction" : "0 0 0"
 	frame(integer) : "Set frame on debris" : 0
-	skin(integer) : "Set skin on debris" : 0
+	skin(choices) : "Set skin on debris" =
+	[
+		0 : "Wizbrick brown"
+		1 : "Plaster brown"
+		2 : "Runic grey"
+		3 : "Rusty metal"
+		4 : "Gloom red"
+		5 : "Swampy green"
+		6 : "Elder blue"
+		7 : "Hottt"
+	]
 	alpha(string) : "Set alpha on debris" : "1"
 	model(string) : "Override model on debris" : ""
 	noise(string) : "Play a sound when triggered" : ""
