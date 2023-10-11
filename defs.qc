@@ -320,7 +320,7 @@ string	keyType;
 // fog
 .vector		fog_color, fog_color2;
 .float		fog_density, fog_density2;
-
+.float		fog_sky, fog_sky2;
 
 // object stuff
 //.string		mdl;			// only used by items to hide until respawn time
@@ -386,8 +386,6 @@ string	keyType;
 .float light_lev = bubble_count;	// shuts up a stupid stupid warning
 .vector rmovedir = finaldest;
 .float version = worldtype;
-.float fog_sky = length;
-.float fog_sky2 = width;
 
 
 //===========================================================================
