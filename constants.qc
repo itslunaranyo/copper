@@ -211,13 +211,13 @@ const float	ATTN_NORM		= 1;
 const float	ATTN_IDLE		= 2;
 const float	ATTN_STATIC		= 3;
 
-const // entity effects
+// entity effects
 const float	EF_BRIGHTFIELD	= 1;
 const float	EF_MUZZLEFLASH 	= 2;
 const float	EF_BRIGHTLIGHT 	= 4;
 const float	EF_DIMLIGHT 	= 8;
 
-const // attack states
+// attack states
 const float	AS_STRAIGHT		= 1;
 const float	AS_SLIDING		= 2;
 const float	AS_MELEE		= 3;
