@@ -218,8 +218,8 @@ void() plat_trigger_use =
 void() plat_crush =
 {
 //dprint ("plat_crush\n");
-
-	T_Damage (other, self, self, 1, DMGTYPE_CRUSH);
+	if (self.dmg)
+		T_Damage (other, self, self, self.dmg, DMGTYPE_CRUSH);
 	
 	if (self.state == STATE_UP)
 		plat_go_down ();
@@ -319,6 +319,7 @@ Alt Target Pattern: 'target' upon rising, 'target2' upon reaching top, 'target3'
 	speed(integer) : "Speed" : 150
 	height(integer) : "Travel altitude (can be negative)" : 0
 	lip(integer) : "Lip remaining at bottom of move" : 8
+	dmg(integer) : "Punishment for banging your head" : 1
 	wait(string) : "Apex pause time" : "3"
 	pos1(string) : "Override top position (x y z)"
 	pos2(string) : "Override bottom position (x y z)"
@@ -379,6 +380,7 @@ void() func_plat =
 		self.speed = 150;
 	if (!self.wait)
 		self.wait = 3;
+	self.dmg = zeroconvertdefault(self.dmg, 1);
 	
 	if (!self.height)
 	{
