@@ -303,7 +303,7 @@ void() shub_gibnearby =
 	{
 		if (head.flags & FL_MONSTER)
 		{
-			T_Damage(head, self, self, head.health + 100);
+			monster_kill(head);
 		}
 		head = head.chain;
 	}

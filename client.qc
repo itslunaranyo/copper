@@ -1158,9 +1158,7 @@ void() WaterMove =
 		{	// drown!
 			if (self.pain_finished < time)
 			{
-				self.deathtype = "drowning";
-				T_Damage (self, world, world, max(self.dmg, 1));
-				self.deathtype = string_null;
+				T_Damage (self, world, world, max(self.dmg, 1), DMGTYPE_DROWNING | DMGTYPE_NOARMOR);
 				self.pain_finished = time + 1;
 				
 				if (!has_invuln(self))	// don't advance the drowning timer with pent, or we
@@ -1191,11 +1189,9 @@ void() WaterMove =
 
 			if (self.waterlevel)
 			{
-				self.deathtype = "lava";
 				// biosuit protects from lava if it's 16u deep or less
 				if (!(has_biosuit(self) && pointcontents(self.origin - '0 0 7') != CONTENT_LAVA))
-					T_Damage (self, world, world, 10 * self.waterlevel);
-				self.deathtype = string_null;
+					T_Damage (self, world, world, 10 * self.waterlevel, DMGTYPE_LAVA);
 			}
 		}
 	}
@@ -1204,9 +1200,7 @@ void() WaterMove =
 		if (self.dmgtime < time && self.radsuit_finished < time)
 		{
 			self.dmgtime = time + 1;
-			self.deathtype = "slime";
-			T_Damage (self, world, world, 4 * self.waterlevel);
-			self.deathtype = string_null;
+			T_Damage (self, world, world, 4 * self.waterlevel, DMGTYPE_SLIME);
 		}
 	}
 	
@@ -1571,9 +1565,7 @@ void() PlayerPostThink =
 	{
 		if (self.jump_flag < -650 && !(self.customflags & CFL_PLUNGE) && !self.waterlevel)
 		{
-			self.deathtype = "falling";
-			T_Damage (self, world, world, 5); 
-			self.deathtype = string_null;
+			T_Damage (self, world, world, 5, DMGTYPE_FALLING); 
 			sound (self, CHAN_VOICE, "player/land2.wav", 1, ATTN_NORM);
 		}
 		else if (self.waterlevel < WL_EYES)
@@ -1619,7 +1611,7 @@ void() ClientKill =
 {
 	// don't kill the player through a special mechanism or too much stuff gets skipped
 	self.invincible_finished = 0;
-	T_Damage(self,self,self,ArmorSave(self, A_SHITLOAD) + self.health);
+	T_Damage(self,self,self,self.health, DMGTYPE_SCRIPT | DMGTYPE_NOARMOR);
 	
 	/*
 	bprint (self.netname);
@@ -1700,7 +1692,7 @@ ClientObituary
 called when a player dies
 ============
 */
-void() ClientObituary =
+void(float dmgtype) ClientObituary =
 {
 	local	float rnum;
 	local	string deathstring, deathstring2;
@@ -1725,8 +1717,6 @@ void() ClientObituary =
 			}
 			e = nextent(e);
 		}
-		/*
-		*/
 	}
 	
 	if (attacker.deathtype != string_null && attacker.classname != "player" )
@@ -1907,7 +1897,7 @@ void() ClientObituary =
 			bprint (" blew up\n");
 			return;
 		}
-		if (attacker.solid == SOLID_BSP && attacker != world)
+		if (attacker.solid == SOLID_BSP && attacker != world || (dmgtype & DMGTYPE_CRUSH) )
 		{	
 			bprint (" was squished\n");
 			return;
@@ -1929,7 +1919,7 @@ void() ClientObituary =
 		}
 
 		// liquid deaths
-		if (self.deathtype == "drowning")
+		if (dmgtype & DMGTYPE_DROWNING)
 		{
 			if (random() < 0.5)
 				bprint (" sleeps with the fishes\n");
@@ -1937,7 +1927,7 @@ void() ClientObituary =
 				bprint (" sucks it down\n");
 			return;
 		}
-		else if (self.deathtype == "slime")
+		else if (dmgtype & DMGTYPE_SLIME)
 		{
 			if (random() < 0.5)
 				bprint (" gulped a load of slime\n");
@@ -1945,7 +1935,7 @@ void() ClientObituary =
 				bprint (" can't exist on slime alone\n");
 			return;
 		}
-		else if (self.deathtype == "lava")
+		else if (dmgtype & DMGTYPE_LAVA)
 		{
 			if (self.waterlevel < WL_EYES)
 			{
@@ -1958,11 +1948,9 @@ void() ClientObituary =
 				bprint (" visits the Volcano God\n");
 			return;
 		}
-
 		// fell to their death?
-		if (self.deathtype == "falling")
+		else if (dmgtype & DMGTYPE_FALLING)
 		{
-			self.deathtype = string_null;
 			if (random() < 0.5)
 				bprint (" cratered\n");
 			else

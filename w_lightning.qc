@@ -309,7 +309,7 @@ void() W_FireLightning =
 		cells = self.ammo_cells;
 		self.ammo_cells = 0;
 		W_SetCurrentAmmo ();
-		T_RadiusDamage (self, self, 35*cells, world);
+		T_RadiusDamage (self, self, 35*cells, world, DMGTYPE_EXPLOSION);
 		return;
 	}
 
@@ -327,7 +327,7 @@ void() W_FireLightning =
 
 	ClearMultiDamage();
 	LightningBeam(org, trace_endpos + v_forward * 8, self, 30);
-	ApplyMultiDamage();
+	ApplyMultiDamage(DMGTYPE_LIGHTNING);
 	
 /*	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_LIGHTNING2);	// kabewm

@@ -100,7 +100,7 @@ void() fish_melee =
 		
 	sound (self, CHAN_VOICE, "fish/bite.wav", 1, ATTN_NORM);
 	ldmg = 6 + random() * 6;
-	T_DamageMelee (self.enemy, self, ldmg);
+	T_Damage (self.enemy, self, self, ldmg, DMGTYPE_MELEE);
 	
 	// rob the player of air
 	//if (skill == 3 && !has_biosuit(self.enemy))

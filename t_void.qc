@@ -172,7 +172,7 @@ float(entity me, entity o) void_salvation =
 	// might get put in teleport limbo and be TAKEDAMAGE_NO until reappearing
 	if (me.dmg > 0)
 	{
-		T_Damage(o, me, me, me.dmg);
+		T_Damage(o, me, me, me.dmg, DMGTYPE_FALLING);
 		teleport(o, spot, TRUE, TRUE);	
 		sound (o, CHAN_VOICE, "player/land2.wav", 1, ATTN_NORM);
 	}
@@ -214,7 +214,7 @@ void() void_func_touch =
 			// was made only as wide as the bottom
 			other.armorvalue = 0;
 			if (!void_salvation(self, other))		// maybe save him anyway?
-				T_Damage(other, self, self, 5000);	// or just blast him now and forget about it
+				T_Damage(other, self, self, 5000, DMGTYPE_FALLING);	// or just blast him now and forget about it
 			return;
 		}
 		
@@ -228,9 +228,9 @@ void() void_func_touch =
 			other.customflags |= CFL_PLUNGE;	// set this so Killed() doesn't throw gibs
 			//T_Damage(other, self, other.enemy, other.health + 10);
 			if (other.enemy.classname == "player")
-				Killed(other,other.enemy);
+				Killed(other,other.enemy, DMGTYPE_FALLING);
 			else if (other.oldenemy.classname == "player")
-				Killed(other,other.oldenemy);
+				Killed(other,other.oldenemy, DMGTYPE_FALLING);
 			// attacker must be the monster's enemy, so that players still count as the 
 			// killer if they boosh monsters into a pit
 			return;
@@ -264,7 +264,7 @@ void() void_fall_hitbottom =
 	}
 	
 	self.enemy.armorvalue = 0;
-	T_Damage(self.enemy, self, self, 5000);
+	T_Damage(self.enemy, self, self, 5000, DMGTYPE_FALLING);
 	
 	SUB_RemoveSoon();
 }

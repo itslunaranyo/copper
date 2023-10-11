@@ -476,7 +476,6 @@ void() PlayerDie =
 
 	clientsAlive -= 1;
 
-	ClientObituary();	// moved from Killed() so it doesn't get called when non-players die
 	set_respawn_delay();	// coop 1 respawn lockout
 	
 	if ((deathmatch || coop) && mapname != "start")

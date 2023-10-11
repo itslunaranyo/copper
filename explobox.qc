@@ -72,7 +72,7 @@ void() explobox_explode_go =
 	entity boom = spawn();
 	setorigin(boom, BoundsCenter(self));
 	boom.deathtype = self.deathtype;
-	if (self.dmg > 0) T_RadiusMultiDamage (boom, self.enemy, self.dmg, boom, FALSE);
+	if (self.dmg > 0) T_RadiusDamage (boom, self.enemy, self.dmg, boom, DMGTYPE_EXPLOSION);
 	boom.nextthink = time;
 	if (self.spawnflags & 1)
 	{

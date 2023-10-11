@@ -53,7 +53,7 @@ void() dog_bite =
 	if (vlen(delta) > 100)
 		return;
 		
-	T_DamageMelee (self.enemy, self, 8 + random() * 8);
+	T_Damage(self.enemy, self, self, 8 + random() * 8, DMGTYPE_MELEE);
 }
 
 void()	Dog_JumpTouchGround =
@@ -90,7 +90,7 @@ void()	Dog_JumpTouch =
 				{
 					self.touch_time = time + 0.2;
 				}
-				T_DamageMelee (other, self, 10 + 10*random());	
+				T_Damage(other, self, self, 10 + 10*random(), DMGTYPE_MELEE);	
 			}
 		}
 	}

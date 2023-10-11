@@ -84,7 +84,7 @@ void() Cheat_Genocide =
 			if (t.think == mon_spawner_tryspawn || t.modelindex == 0 || t.classname == string_null )
 				remove(t);
 			else
-				T_Damage(t, self, self, t.health);		// waurgh
+				T_Damage(t, self, self, t.health, DMGTYPE_SCRIPT);		// waurgh
 		}
 		t = nextent(t);
 	}

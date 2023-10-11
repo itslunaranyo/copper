@@ -670,9 +670,7 @@ float(entity e) target_items_takeinv =
 	
 	if (self.health > 0)
 	{
-		e.deathtype = "noarmor"; // terrible
-		T_Damage(e, self, activator, min(e.health, self.health));
-		e.deathtype = string_null;
+		T_Damage(e, self, activator, min(e.health, self.health), DMGTYPE_SCRIPT | DMGTYPE_NOARMOR);
 	}
 		
 	return TRUE;
@@ -683,12 +681,6 @@ void(entity e) target_items_setinv =
 {
 	if (self.health > 0)
 		e.health = self.health;
-	if (self.health < 0)
-	{
-		e.deathtype = "noarmor"; // terrible
-		T_Damage(e, self, activator, e.health);
-		e.deathtype = string_null;
-	}
 		
 	if (self.armorvalue)
 	{
@@ -714,12 +706,10 @@ void(entity e) target_items_setinv =
 		armor_set_type(e);
 	}
 
-
 	if (self.svflags)
 	{
 		serverflags = zeroconvert(self.svflags);		
 	}
-	
 
 	if (self.ammo_shells) e.ammo_shells = zeroconvert(self.ammo_shells);
 	if (self.ammo_nails) e.ammo_nails = zeroconvert(self.ammo_nails);
@@ -784,6 +774,10 @@ void(entity e) target_items_setinv =
 		target_items_setweapon(e);
 	}
 	SUB_CallAsSelf(W_ResetWeaponState, e);
+	
+	// after resetweaponstate or else deadthink will be overwritten
+	if (self.health < 0)
+		T_Damage(e, self, activator, e.health, DMGTYPE_SCRIPT | DMGTYPE_NOARMOR);
 }
 
 

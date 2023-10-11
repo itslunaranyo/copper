@@ -93,7 +93,7 @@ void() W_FireAxe =
 	{
 		trace_ent.customflags = trace_ent.customflags | CFL_AXEHITME;
 		SpawnBlood (org, '0 0 0', 20);
-		T_Damage (trace_ent, self, self, 24);
+		T_Damage (trace_ent, self, self, 24, DMGTYPE_MELEE);
 		
 		if (trace_ent.flags & FL_MONSTER)
 		{

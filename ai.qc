@@ -970,20 +970,10 @@ float() ai_check_liquid =
 	if (self.customflags & CFL_LIQUID_IMMUNE)
 		return TRUE;
 		
-	if (self.type == "zombie")
-	{
-		// zombies immune to slime (or else they just keep falling and getting up)
-		if (wt == CONTENT_LAVA)	// but always gib if touching lava
-			T_Damage(self, world, world, self.health + 10);
-	}
-	else
-	{
-		if (wt == CONTENT_LAVA)
-			T_Damage(self, world, world, wl * 10);
-		if (wt == CONTENT_SLIME && self.classname != "monster_wizard")
-			// scrags will happily fly down into slime, and they do spit green shit anyway
-			T_Damage(self, world, world, wl * 5);
-	}
+	if (wt == CONTENT_LAVA)
+		T_Damage(self, world, world, wl * 10, DMGTYPE_LAVA);
+	else if (wt == CONTENT_SLIME)
+		T_Damage(self, world, world, wl * 5, DMGTYPE_SLIME);
 	
 	return self.health > 0;
 }
@@ -1366,7 +1356,7 @@ void() ai_melee =
 	else
 		ldmg = 3 + random() * 2; //(random() + random() + random()) * 3;
 		
-	T_DamageMelee (self.enemy, self, ldmg);
+	T_Damage(self.enemy, self, self, ldmg, DMGTYPE_MELEE);
 }
 
 
@@ -1387,7 +1377,7 @@ void() ai_melee_side =
 	if (!CanDamage (self.enemy, self.origin))
 		return;
 	ldmg = (random() + random() + random()) * 3;
-	T_DamageMelee (self.enemy, self, ldmg);
+	T_Damage(self.enemy, self, self, ldmg, DMGTYPE_MELEE);
 }
 
 //============================================================================

@@ -260,7 +260,7 @@ void() trap_lightning_fire =
 		tgt = trace_endpos;
 		if (trace_ent.takedamage)
 		{
-			T_Damage(trace_ent, self, self, 10);
+			T_Damage(trace_ent, self, self, 10, DMGTYPE_LIGHTNING);
 			particle (trace_endpos + nudge, nudge * -8, 225, 40);
 			sound (trace_ent, CHAN_BODY, "weapons/lhit.wav", 1, ATTN_NORM);
 		}
@@ -295,7 +295,7 @@ void() trap_lightning_fire =
 					last = trace_ent;
 					if (self.strength == 2)
 					{
-						T_Damage(trace_ent, self, self, 30);
+						T_Damage(trace_ent, self, self, 30, DMGTYPE_LIGHTNING);
 						particle (org, nudge * -8, 225, 120);
 					}
 					else
@@ -307,18 +307,18 @@ void() trap_lightning_fire =
 							{
 								if (trace_ent.classname == "monster_boss")
 								{
-									T_Damage (trace_ent, self, self, 1000);
+									T_Damage (trace_ent, self, self, 1000, DMGTYPE_LIGHTNING);
 								}
 								else if (trace_ent.classname == "monster_oldone")
 								{
 									dprint4(ftos(self.count)," ", ftos(self.strength), " zapping shub with a thing\n");
-									T_Damage (trace_ent, self, self, 10001);	// auto-trigger one pain warble
+									T_Damage (trace_ent, self, self, 10001, DMGTYPE_LIGHTNING);	// auto-trigger one pain warble
 								}
 							}
 						}
 						else
 						{
-							T_Damage (trace_ent, self, self, trace_ent.health + min(trace_ent.armorvalue, trace_ent.health / trace_ent.armortype) + 50);
+							T_Damage (trace_ent, self, self, trace_ent.health + min(trace_ent.armorvalue, trace_ent.health / trace_ent.armortype) + 50, DMGTYPE_LIGHTNING);
 						}
 					}
 					sound (trace_ent, CHAN_BODY, "weapons/lhit.wav", 1, ATTN_NORM);

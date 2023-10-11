@@ -390,13 +390,13 @@ void() tdeath_touch =
 			self.classname = "teledeath2";
 		if (self.owner.classname != "player")
 		{	// other monsters explode themselves
-			T_Damage (self.owner, self, self, 50000);
+			T_Damage (self.owner, self, self, 50000, DMGTYPE_TELEFRAG);
 			return;
 		}
 	}
 
 	if (other.health)
-		T_Damage (other, self, self, 50000);
+		T_Damage (other, self, self, 50000, DMGTYPE_TELEFRAG);
 }
 
 entity(vector org, entity death_owner) spawn_tdeath =

@@ -163,7 +163,7 @@ local float 	ldmg;
 		return;
 		
 	ldmg = (random() + random() + random()) * 4;
-	T_DamageMelee (self.enemy, self, ldmg);
+	T_Damage (self.enemy, self, self, ldmg, DMGTYPE_MELEE);
 	
 	if (side)
 	{

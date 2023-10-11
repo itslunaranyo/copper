@@ -87,6 +87,20 @@ const float	DAMAGE_NO				= 0;
 const float	DAMAGE_YES				= 1;
 const float	DAMAGE_AIM				= 2;
 
+// type parameters for damage functions
+const float DMGTYPE_EXPLOSION		= 1;	// half to shamblers
+const float DMGTYPE_ZKILL			= 2;	// death to zombies (direct EXPLOSION always kills zombies but splash doesn't)
+const float DMGTYPE_NOARMOR			= 4;	// bypass armor
+const float DMGTYPE_MELEE			= 8;	// inflictor == attacker
+const float DMGTYPE_TELEFRAG		= 16;
+const float DMGTYPE_LIGHTNING		= 32;
+const float DMGTYPE_DROWNING		= 64;
+const float DMGTYPE_FALLING			= 128;	// everyone's favorite
+const float DMGTYPE_LAVA			= 256;
+const float DMGTYPE_SLIME			= 512;
+const float DMGTYPE_CRUSH			= 1024;
+const float DMGTYPE_SCRIPT			= 2048;	// target_items, invoke, etc
+
 const float	TRACE_NOMONSTERS		= 1;
 const float	TRACE_WATER				= 2;
 

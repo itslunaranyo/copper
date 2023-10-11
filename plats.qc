@@ -219,7 +219,7 @@ void() plat_crush =
 {
 //dprint ("plat_crush\n");
 
-	T_Damage (other, self, self, 1);
+	T_Damage (other, self, self, 1, DMGTYPE_CRUSH);
 	
 	if (self.state == STATE_UP)
 		plat_go_down ();
@@ -499,7 +499,7 @@ void() flytrain_blocked =
 	if (time < self.attack_finished)
 		return;
 	self.attack_finished = time + self.dmgtime;
-	T_Damage (other, self, self, self.dmg);
+	T_Damage (other, self, self, self.dmg, DMGTYPE_CRUSH);
 }
 
 void() flytrain_killed =
@@ -681,7 +681,7 @@ void() train_blocked =
 	if (time < self.attack_finished)
 		return;
 	self.attack_finished = time + self.dmgtime;
-	T_Damage (other, self, self, self.dmg);
+	T_Damage (other, self, self, self.dmg, DMGTYPE_CRUSH);
 }
 
 void() train_killed =
@@ -1075,7 +1075,7 @@ const float SFLAG_BOB_STOP = 4+8+16;
 
 void() func_bobbing_blocked = 
 {
-	T_Damage (other, self, self, self.dmg);
+	T_Damage (other, self, self, self.dmg, DMGTYPE_CRUSH);
 	
 	if (self.spawnflags & SFLAG_BOB_CRUSHER)	// don't reverse
 		return;
