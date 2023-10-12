@@ -386,6 +386,8 @@ string	keyType;
 .float light_lev = bubble_count;	// shuts up a stupid stupid warning
 .vector rmovedir = finaldest;
 .float version = worldtype;
+.string	model2 = wad;		// for debris emitter
+.string model3 = map;
 
 
 //===========================================================================

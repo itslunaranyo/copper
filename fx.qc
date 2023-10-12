@@ -1104,19 +1104,15 @@ void() target_debris_use =
 		chunk = toss_projectile(org, normalize(dir) * spd, "debris");
 		chunk.type = "debris";
 		
-		if (self.model != string_null)
-		{
+		// loop through 3 models if we have 3, alternate 2 if we 
+		// have 2, or always use the only one if we have 1
+		if (self.cnt == 3 && i % self.cnt == 2)
+			setmodel(chunk, self.model3);
+		else if (self.cnt >= 2 && i % self.cnt == 1)
+			setmodel(chunk, self.model2);
+		else if (i % self.cnt == 0)
 			setmodel(chunk, self.model);
-		}
-		else
-		{
-			if (i%3 == 0)
-				setmodel(chunk, "progs/debris1.mdl");
-			else if (i%3 == 1)
-				setmodel(chunk, "progs/debris2.mdl");
-			else if (i%3 == 2)
-				setmodel(chunk, "progs/debris3.mdl");
-		}
+		
 		setsize(chunk, VEC_ORIGIN, VEC_ORIGIN);
 		
 		chunk.frame = self.frame;
@@ -1139,7 +1135,7 @@ Keys
 "mangle" override chunk direction, defaults to omni
 "size" random location of chunks within bounds of this size
 
-"model"	specify a different model for debris
+"model"	specify a different model for debris (use "model2" and "model3" for variety)
 "frame"	will be copied to spawned chunks
 "skin"	will be copied to spawned chunks
 "alpha"	will be copied to spawned chunks
@@ -1152,8 +1148,8 @@ Keys
 	size(string) : "Random location within bounds" : "0 0 0"
 	speed(integer) : "Speed of chunks" : 128
 	mangle(string) : "Specify chunk direction" : "0 0 0"
-	frame(integer) : "Set frame on debris" : 0
-	skin(choices) : "Set skin on debris" =
+	frame(integer) : "Set frame on all debris" : 0
+	skin(choices) : "Set skin on all debris" =
 	[
 		0 : "Wizbrick brown"
 		1 : "Plaster brown"
@@ -1164,8 +1160,10 @@ Keys
 		6 : "Elder blue"
 		7 : "Hottt"
 	]
-	alpha(string) : "Set alpha on debris" : "1"
-	model(string) : "Override model on debris" : ""
+	alpha(string) : "Set alpha on all debris" : "1"
+	model(string) : "Choose a model for debris" : ""
+	model2(string) : "Choose a second model for debris" : ""
+	model3(string) : "Choose a third model for debris" : ""
 	noise(string) : "Play a sound when triggered" : ""
 ]
 */
@@ -1196,9 +1194,27 @@ void() target_debris =
 		precache_sound(self.noise);
 
 	if (self.model != string_null)
+	{
 		precache_model(self.model);
+		self.cnt = 1;
+		if (self.model2 != string_null)
+		{
+			precache_model(self.model2);
+			self.cnt = 2;
+			if (self.model3 != string_null)
+			{
+				precache_model(self.model3);
+				self.cnt = 3;
+			}
+		}
+	}
 	else
 	{
+		self.cnt = 3;
+		self.model = "progs/debris1.mdl";
+		self.model2 = "progs/debris2.mdl";
+		self.model3 = "progs/debris3.mdl";
+		
 		precache_model("progs/debris1.mdl");
 		precache_model("progs/debris2.mdl");
 		precache_model("progs/debris3.mdl");
