@@ -181,9 +181,17 @@ void() target_meat_fireworks_go =
 		SpawnMeatSpray(self.origin + self.pos1, spray * self.speed);
 	}
 	
-	target_meat_fireworks_do("progs/gib1.mdl");
-	target_meat_fireworks_do("progs/gib2.mdl");
-	target_meat_fireworks_do("progs/gib3.mdl");
+	target_meat_fireworks_do(self.model);
+	
+	if (self.cnt == 2)
+		target_meat_fireworks_do(self.model2);
+	else
+		target_meat_fireworks_do(self.model);
+		
+	if (self.cnt == 3)
+		target_meat_fireworks_do(self.model3);
+	else
+		target_meat_fireworks_do(self.model);
 }
 
 void() target_meat_fireworks_use =
@@ -252,6 +260,29 @@ void() target_meat_fireworks =
 	else
 	{
 		self.mangle = normalize(self.mangle);
+	}
+	
+	if (self.model != string_null)
+	{
+		precache_model(self.model);
+		self.cnt = 1;
+		if (self.model2 != string_null)
+		{
+			precache_model(self.model2);
+			self.cnt = 2;
+			if (self.model3 != string_null)
+			{
+				precache_model(self.model3);
+				self.cnt = 3;
+			}
+		}
+	}
+	else
+	{
+		self.cnt = 3;
+		self.model = "progs/gib1.mdl";
+		self.model2 = "progs/gib2.mdl";
+		self.model3 = "progs/gib3.mdl";
 	}
 }
 
