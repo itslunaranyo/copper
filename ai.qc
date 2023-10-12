@@ -705,14 +705,12 @@ float() FindTarget =
 	// - bumping into a dog
 	if (has_invis(client))
 	{
-		if (self.classname == "monster_dog" && client.classname == "player")
+		if (!(r == RANGE_MELEE && self.classname == "monster_dog" && client.classname == "player"))
 		{
-			if (r != RANGE_MELEE)
+			if (client.show_hostile < time)
 				return FALSE;
-		} 
-		else if (client.show_hostile < time)
-		{
-			return FALSE;
+			if (r == RANGE_FAR)
+				return FALSE;
 		}
 	}
 
