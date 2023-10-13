@@ -21,7 +21,10 @@ float paintime, lookseed;
 float itemtimes[30];
 float baralpha;
 float hudstyle;
-float clientdata;
+float coopdata;
+float scr_tint;
+vector scr_tintcolor;
+float noTint;
 
 const float MP_NARROW = 0;
 const float MP_MEDIUM = 1;
@@ -197,14 +200,14 @@ void Hud_DrawHead(vector pos)
 		headpic = "face_allpups";
 		break;
 	default:
-		if (time < paintime)
+		if (time < paintime + 0.2)
 		{
 			headpic = strcat("face_p", ftos(h));
 		}
 		else
 		{
 			headpic = strcat("face", ftos(h));
-			if (time > paintime + 1)
+			if (time > paintime + 1.2)
 			{	// peer left and right
 				f = floor(time * 2 + lookseed);
 				if (f % 23 == 0 || f % 17 == 0)
@@ -390,7 +393,7 @@ void Hud_DrawMultiplayer(vector pos, vector offset, float width)
 	float lblw, isdead, clientbit;
 	vector ofs;
 	
-	numclients = clientdata & 15;
+	numclients = coopdata & 15;
 	clientbit = 16;
 	
 	for (cnum = 0; cnum < numclients; cnum++)
@@ -406,7 +409,7 @@ void Hud_DrawMultiplayer(vector pos, vector offset, float width)
 		if (coop)
 		{
 			lbl = cname;
-			isdead = (clientbit & clientdata) == 0;
+			isdead = (clientbit & coopdata) == 0;
 		}
 		else // dm
 			lbl = frags;
@@ -655,12 +658,20 @@ void() HUD_UpdateStats =
 	stat_items = getstatbits(STAT_ITEMS, 0, 23);
 	stat_items2 = getstatbits(STAT_ITEMS, 23, 9);
 	keytype = getstatbits(STAT_KEYCOUNTS, 8, 8);
-	clientdata = getstatf(STAT_CLIENTDATA);
+	coopdata = getstatf(STAT_CLIENTDATA);
+	scr_tint = getstatf(STAT_TINTAMOUNT);
+	scr_tintcolor_x = getstatf(STAT_TINTCOLOR_R);
+	scr_tintcolor_y = getstatf(STAT_TINTCOLOR_G);
+	scr_tintcolor_z = getstatf(STAT_TINTCOLOR_B);
 		
 	skill = cvar("skill");
+	// gl_cshiftpercent isn't native to OG quake, so the cvar call fails and returns 0 
+	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
+	// at the same time to determine if that 0 is valid
+	noTint = (cvar("gl_cshiftpercent") < 90) && cvar("gl_farclip");
 	
 	f = 1;
-	for (i=0;i<23;i++)
+	for (i = 0; i < 23; i++)
 	{
 		if ((stat_items & f) != (olditems & f))
 		{
@@ -687,25 +698,61 @@ void() HUD_UpdateStats =
 	// update health and check for sudden reductions
 	f = getstatf(STAT_HEALTH);
 	if (stat_health - f > 1)
-	{
-		paintime = time + 0.2;	// flinch
-	}
+		paintime = time;	// flinch
 	stat_health = f;
+	
+	// void tint covers the red pain flash when we die so replicate it here
+	f = 1 + paintime - time;
+	if (f < 0) f = 0;
+	f *= f;
+	scr_tintcolor_x = 160 * f + (1-f) * scr_tintcolor_x;
+	scr_tintcolor_y = 0 + (1-f) * scr_tintcolor_y;
+	scr_tintcolor_z = 0 + (1-f) * scr_tintcolor_z;
+}
+
+void(vector screensize) Hud_DrawTint =
+{
+	vector hpanel, vpanel, color;
+	float f;
+	// cover the screen with a full color quad for hud-based fades
+	
+	f = scr_tint / 255;
+	color = scr_tintcolor / 255;
+	if (noTint)
+	{
+		hpanel_x = screensize_x;
+		hpanel_y = screensize_y * 0.55 * f;
+		vpanel_x = screensize_x * 0.55 * f;
+		vpanel_y = screensize_y;
+		
+		drawfill('0 0', hpanel, color, 1, 0);
+		drawfill(screensize - hpanel, hpanel, color, 1, 0);
+		hpanel_x = 0;
+		drawfill(hpanel, vpanel, color, 1, 0);
+		hpanel_x = screensize_x - vpanel_x;
+		drawfill(hpanel, vpanel, color, 1, 0);
+		
+		return;
+	}
+	
+	drawfill('0 0', screensize, scr_tintcolor / 255, scr_tint / 255, 0);
 }
 
 void(vector screensize, float scoreboard) CSQC_DrawHud =
 {
+	if (intermission) return;
 	float viewsize = cvar("viewsize");
+	HUD_UpdateStats();
+	Hud_DrawTint(screensize);
+	
 	if (viewsize > 110)
 		return;
-	if (intermission) return;
 
 	vector pos;
 	baralpha = cvar("scr_sbaralpha");
 	hudstyle = max(cvar("saved1"), cvar("hudstyle"));	// catch ironwail hud cvar
 	float margin, exp;
 
-	HUD_UpdateStats();
 	exp = (viewsize <= 100);
 
 	if (hudstyle)

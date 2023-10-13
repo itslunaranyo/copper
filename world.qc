@@ -207,7 +207,7 @@ void() worldspawn =
 {
 	lastspawn = world;
 	startingserverflags = serverflags;
-	
+
 	InitBodyQueue ();
 	InitLightStyles();	// moved to lights.qc
 
@@ -242,6 +242,7 @@ void() worldspawn =
 #ifndef NO_CSQC
 		else
 		{
+			isCSQC = TRUE;
 			/*
 			// globalstat is inconsistently implemented (ironwail) because the "EXT_CSQC" 
 			// extension is actually undefined and meaningless
@@ -253,7 +254,11 @@ void() worldspawn =
 			else
 			*/
 			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
-			clientstat(STAT_CLIENTDATA, 2, length);	// shitty client death status monitor
+			clientstat(STAT_CLIENTDATA, 2, clientdata);	// shitty client death status monitor
+			clientstat(STAT_TINTAMOUNT, 2, tint);		// backdoor v_cshift
+			clientstat(STAT_TINTCOLOR_R, 2, tint_color_x);
+			clientstat(STAT_TINTCOLOR_G, 2, tint_color_y);
+			clientstat(STAT_TINTCOLOR_B, 2, tint_color_z);
 		}
 #endif
 	}
@@ -425,7 +430,7 @@ void() StartFrame =
 		e = nextent(world);
 		while (e.flags & FL_CLIENT)
 		{
-			e.length = clientDataMask;
+			e.clientdata = clientDataMask;
 			e = nextent(e);
 		}
 	}

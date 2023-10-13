@@ -24,7 +24,7 @@ it really is (often not that deep).
 */
 
 const float CSHIFT_CUTOFF = 90;
-float noTint;
+nosave float noTint;
 
 /*
 ============
@@ -34,9 +34,17 @@ TintScreen
 void(entity who, float amt) TintScreen
 {
 //	bprint(ftos(amt)); bprint("\n");
-	stuffcmd(who, "\nv_cshift 0 0 0 ");
-	stuffcmd(who, ftos(amt));
-	stuffcmd(who, "\n");
+	if (isCSQC)
+	{
+		who.tint = amt;
+		who.tint_color = '0 0 0';
+	}
+	else
+	{
+		stuffcmd(who, "\nv_cshift 0 0 0 ");
+		stuffcmd(who, ftos(amt));
+		stuffcmd(who, "\n");
+	}
 }
 
 
@@ -54,16 +62,24 @@ void(entity who, float amt, vector color) TintScreenColor
 	color_y = ceil(color_y);
 	color_z = ceil(color_z);
 	
-	// ugh:
-	stuffcmd(who, "\nv_cshift ");
-	stuffcmd(who, ftos(color_x));
-	stuffcmd(who, " ");
-	stuffcmd(who, ftos(color_y));
-	stuffcmd(who, " ");
-	stuffcmd(who, ftos(color_z));
-	stuffcmd(who, " ");
-	stuffcmd(who, ftos(amt));
-	stuffcmd(who, "\n");
+	if (isCSQC)
+	{
+		who.tint = amt;
+		who.tint_color = color;
+	}
+	else
+	{
+		// ugh:
+		stuffcmd(who, "\nv_cshift ");
+		stuffcmd(who, ftos(color_x));
+		stuffcmd(who, " ");
+		stuffcmd(who, ftos(color_y));
+		stuffcmd(who, " ");
+		stuffcmd(who, ftos(color_z));
+		stuffcmd(who, " ");
+		stuffcmd(who, ftos(amt));
+		stuffcmd(who, "\n");
+	}
 }
 
 /*
@@ -415,6 +431,10 @@ void() void_trigger_touch =
 	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
 	// at the same time to determine if that 0 is valid
 	noTint = (cvar("gl_cshiftpercent") < CSHIFT_CUTOFF) && cvar("gl_farclip") && !coop;
+#ifndef NO_CSQC
+	if (isCSQC)
+		noTint = FALSE;	// rely on the hud for this instead
+#endif
 	// doesn't work in coop bc the server's values will be used to determine tint/fog for clients
 }
 

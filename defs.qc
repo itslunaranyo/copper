@@ -233,7 +233,6 @@ nosave float	gamestarted;
 nosave float	cleanUpClientShit;
 nosave float	clients;
 nosave float	clientsAlive;
-//nosave float	clientsAliveMask;
 
 float	skill;
 float	coop_time;
@@ -263,7 +262,9 @@ float	intermission, intermission_exittime;
 float	modelindex_eyes, modelindex_player;
 
 float	icantsee;
-float	isKex;	// running the quake rerelease
+// these are set in worldspawn() and thus reset every game start
+nosave float	isKex;	// running the quake rerelease
+nosave float	isCSQC;	// running something with passable csqc support
 
 string	keyType;
 
@@ -317,6 +318,13 @@ string	keyType;
 .float		bubble_count;	// keeps track of the number of bubbles
 .float		healthtime;
 .string		deathtype;		// keeps track of how the player died
+
+#ifndef NO_CSQC
+// fields for csqc HUD stats
+.float		clientdata;
+.float		tint;
+.vector		tint_color;
+#endif
 
 // fog
 .vector		fog_color, fog_color2;

@@ -272,6 +272,10 @@ const float STAT_PUNCHANGLE_Z	= 28;
 const float STAT_USER			= 32; // Custom user stats start here (lower values are reserved for engine use)
 const float STAT_KEYCOUNTS		= 32;
 const float STAT_CLIENTDATA		= 33;
+const float STAT_TINTAMOUNT		= 34;
+const float STAT_TINTCOLOR_R	= 35;	// you can send a vector as a stat but there's no accompanying getstatv
+const float STAT_TINTCOLOR_G	= 36;	// so we have to send the three components separately and getstatf them
+const float STAT_TINTCOLOR_B	= 37;
 
 
 // temporary entities

@@ -1471,7 +1471,7 @@ void() PlayerPreThink =
 		fog_setFromEnt( self, self );
 		if ( !( self.customflags & (CFL_PLUNGE|CFL_LIMBO) ) )
 		{
-			stuffcmd(self,"\nv_cshift\n");
+			TintScreen(self, 0);
 		}
 		else if ( self.customflags & CFL_LIMBO )
 		{
