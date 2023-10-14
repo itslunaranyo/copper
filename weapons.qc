@@ -221,19 +221,6 @@ void() W_SelectBestWeapon =
 	W_ResetWeaponState();
 }
 
-float() W_CheckNoAmmo =
-{
-	if (self.currentammo > 0)
-		return TRUE;
-	if (self.weapon == IT_AXE)
-		return TRUE;
-	if (!self.weapon)
-		return FALSE;
-	
-	W_SelectBestWeapon ();
-	return FALSE;
-}
-
 void() W_SelectBestShotgun =
 {
 	if (self.items & (IT_SHOTGUN|IT_SUPER_SHOTGUN))
@@ -287,8 +274,11 @@ An attack impulse can be triggered now
 */
 void() W_Attack =
 {
-	if (!W_CheckNoAmmo ())
+	if (!W_HasAmmo(self.weapon))
+	{
+		W_SelectBestWeapon();
 		return;
+	)
 	if (self.customflags & (CFL_PLUNGE|CFL_LIMBO))
 		return;
 //	if (self.movetype == MOVETYPE_NOCLIP)
