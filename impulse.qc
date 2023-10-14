@@ -194,6 +194,15 @@ void() ImpulseCommands =
 	case 11:
 		ServerflagsCommand();
 		break;
+	case 13:
+		W_SelectBestShotgun();
+		break;
+	case 14:
+		W_SelectBestNailgun();
+		break;
+	case 15:
+		W_SelectBestWeapon();
+		break;
 /*
 	// ai_nav
 	case 80:

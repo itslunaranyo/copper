@@ -234,6 +234,50 @@ float() W_CheckNoAmmo =
 	return FALSE;
 }
 
+void() W_SelectBestShotgun =
+{
+	if (self.items & (IT_SHOTGUN|IT_SUPER_SHOTGUN))
+	{
+		if (W_HasAmmo(IT_SUPER_SHOTGUN))
+		{
+			self.weapon = IT_SUPER_SHOTGUN;
+			W_ResetWeaponState();
+		}
+		else if (W_HasAmmo(IT_SHOTGUN))
+		{
+			self.weapon = IT_SHOTGUN;
+			W_ResetWeaponState();
+		}
+		else sprint (self, "not enough ammo.\n");
+	}
+	else
+	{
+		sprint(self, "no weapon.\n");
+	}
+}
+
+void() W_SelectBestNailgun =
+{
+	if (self.items & (IT_NAILGUN|IT_SUPER_NAILGUN))
+	{
+		if (W_HasAmmo(IT_SUPER_NAILGUN))
+		{
+			self.weapon = IT_SUPER_NAILGUN;
+			W_ResetWeaponState();
+		}
+		else if (W_HasAmmo(IT_NAILGUN))
+		{
+			self.weapon = IT_NAILGUN;
+			W_ResetWeaponState();
+		}
+		else sprint (self, "not enough ammo.\n");
+	}
+	else
+	{
+		sprint(self, "no weapon.\n");
+	}
+}
+
 /*
 ============
 W_Attack
