@@ -278,7 +278,7 @@ void() W_Attack =
 	{
 		W_SelectBestWeapon();
 		return;
-	)
+	}
 	if (self.customflags & (CFL_PLUNGE|CFL_LIMBO))
 		return;
 //	if (self.movetype == MOVETYPE_NOCLIP)
