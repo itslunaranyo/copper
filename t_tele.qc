@@ -291,12 +291,17 @@ void(entity traveler, entity dst, float tfog, float nofwd) teleport =
 		fog_setFromEnt(traveler, dst);
 		traveler.fixangle = 1;		// turn this way immediately
 		makevectors (vdir);
-		t = self;
-		self = dst;
-		activator = traveler;
-		SUB_UseTargets();
-		self = t;
-		
+		if (dst.classname == "info_teleport_destination" ||
+			dst.classname == "info_teleport_target" ||
+			dst.classname == "misc_teleporttrain" ||
+			dst.classname == "info_notnull")
+		{
+			t = self;
+			self = dst;
+			activator = traveler;
+			SUB_UseTargets();
+			self = t;
+		}
 		if (nofwd)
 		{
 			traveler.velocity = VEC_ORIGIN;
