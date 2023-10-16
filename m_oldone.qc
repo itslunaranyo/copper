@@ -272,7 +272,7 @@ void() shub_finale_4 =
 		
 		// start the end text
 		WriteByte (MSG_ALL, SVC_FINALE);
-		WriteString (MSG_ALL, self.message);
+		WriteString (MSG_ALL, self.noise4);
 
 	// switch cd track
 		WriteByte (MSG_ALL, SVC_CDTRACK);
@@ -418,8 +418,13 @@ void() monster_oldone =
 	self.th_die = shub_die;
 	self.use = shub_use;
 	
-	if (self.message == string_null)
-		self.message = "Congratulations, and well done! You have\nbeaten the hideous Shub-Niggurath and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now.\n\nId Software is currently out of the\noffice, but if you leave a message,\nthey will be happy to salute you in\na couple of months.";
+	if (self.message != string_null)
+	{
+		self.noise4 = self.message;
+		self.message = string_null;
+	}
+	else
+		self.noise4 = "Congratulations, and well done! You have\nbeaten the hideous Shub-Niggurath and\nher hundreds of ugly changelings and\nmonsters. You have proven that your\nskill and your cunning are greater than\nall the powers of Quake. You are the\nmaster now.\n\nId Software is currently out of the\noffice, but if you leave a message,\nthey will be happy to salute you in\na couple of months.";
 	
 	total_monsters = total_monsters + 1;
 }
