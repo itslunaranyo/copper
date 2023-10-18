@@ -536,7 +536,10 @@ void(entity attacker, float take) zombie_pain =
 void() zombie_die =
 {
 	sound (self, CHAN_VOICE, "zombie/z_gib.wav", 1, ATTN_NORM);
-	GibSpray ("progs/h_zombie.mdl", self.health);
+	if (self.customflags & CFL_RETURNED)
+		GibSpray ("progs/h_zombnm.mdl", self.health);
+	else
+		GibSpray ("progs/h_zombie.mdl", self.health);
 	
 	if (skill != 3) return;
 	
@@ -595,7 +598,8 @@ void() zombie_return =
 		sound (self, CHAN_BODY, "zombie/z_res.wav", 1, ATTN_IDLE);
 
 		monster_zombie_spawn();
-		self.skin = 1;
+		setmodel (self, "progs/zombienm.mdl");
+		setsize (self, '-16 -16 -24', '16 16 40');
 		
 		return;
 	}
@@ -726,7 +730,9 @@ void() monster_zombie =
 	}
 	
 	precache_model ("progs/zombie.mdl");
+	precache_model ("progs/zombienm.mdl");
 	precache_model ("progs/h_zombie.mdl");
+	precache_model ("progs/h_zombnm.mdl");
 	precache_model ("progs/zom_gib.mdl");
 
 	precache_sound ("zombie/z_idle.wav");
