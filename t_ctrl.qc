@@ -96,9 +96,9 @@ void() trigger_relay =
 	if (self.targetname == string_null)
 	{
 		// IW fix - no longer objerror, which is a game-ender in old engines
-		dprint3("\bwarning:\b  trigger_relay at ", vtos(self.origin), "not targeted by anything");
-		remove(self);
-		return;
+		dprint3("\bwarning:\b  trigger_relay at ", vtos(self.origin), "not targeted by anything\n");
+		//remove(self);
+		//return;
 	}
 		
 	self.use = trigger_relay_use;
