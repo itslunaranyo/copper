@@ -175,6 +175,39 @@ void() dev_trigger =
 	} while ( 1 );
 }
 
+void(float i) dev_impulse =
+{
+	dprint3("dev impulse ", ftos(i), " triggering\n");
+	entity t;
+	activator = self;
+	t = world;
+	do	{
+		t = find(t, classname, "tg_imp");
+		if (t.impulse == i)
+			SUB_CallAsSelf(t.owner.use, t.owner);
+	} while ( t != world );
+}
+
+void() dev_impulse_list =
+{
+	if (!cvar("developer")) return;
+	dprint("dev impulses:\n");
+	entity t;
+	t = world;
+	do	{
+		t = find(t, classname, "tg_imp");
+		if (t)
+		{
+			dprint3(ftos(t.impulse), ": ", t.owner.classname);
+			if (t.owner.targetname != string_null)
+				dprint3(", tname: ", t.owner.targetname, "\n");
+			else
+				dprint("\n");
+		}
+	} while ( t != world );
+	dprint("end of list.\n");
+}
+
 void() dev_enemychain =
 {
 	local vector org;

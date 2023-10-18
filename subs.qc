@@ -132,6 +132,21 @@ float() SUB_ShouldSpawn =
 		remove(self);
 		return FALSE;
 	}
+	
+	// support impulse triggering on anything
+	// shouldn't really be here but it has to get called on every entity anyway
+	if (self.impulse)
+	{
+		if (self.impulse >= 20 && self.impulse < 40)
+		{
+			entity t = spawn();
+			t.owner = self;
+			t.impulse = self.impulse;
+			t.classname = "tg_imp";
+			self.impulse = 0;
+		}
+		else dprint5("\bwarning:\b ", self.classname," with impulse ", ftos(self.impulse), "not in the triggerable range (20-39)\n");
+	}
 	return TRUE;
 }
 

@@ -171,20 +171,18 @@ void() ServerflagsCommand =
 // --------------------------------
 void() ImpulseCommands =
 {
-	switch(self.impulse)
+	if (!self.impulse) return;
+	
+	if (self.impulse < 9)
 	{
-	case 0:
-		return;
-	case 1:
-	case 2:
-	case 3:
-	case 4:
-	case 5:
-	case 6:
-	case 7:
-	case 8:
 		W_ChangeWeapon();
-		break;
+	}
+	else if (self.impulse >= 20 && self.impulse <= 39)
+	{
+		dev_impulse(self.impulse);
+	}
+	else switch(self.impulse)
+	{
 	case 10:
 		CycleWeaponCommand();
 		break;
@@ -203,24 +201,10 @@ void() ImpulseCommands =
 	case 15:
 		W_SelectBestWeapon();
 		break;
-/*
-	// ai_nav
-	case 80:
-		nav_toggleEditor();
+
+	case 40:
+		dev_impulse_list();
 		break;
-	case 81:
-		nav_nodeSizeUp();
-		break;
-	case 82:
-		nav_nodeSizeDown();
-		break;
-	case 83:
-		nav_createNode();
-		break;
-	case 84:
-		nav_deleteNode();
-		break;
-	*/
 	case 64:
 		dev_i_cant_see();
 		break;

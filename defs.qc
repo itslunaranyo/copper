@@ -526,7 +526,10 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 	]
 ]
 
-@baseclass = Targetname [ targetname(target_source) : "Name" ]
+@baseclass = Targetname [ 
+	targetname(target_source) : "Name" 
+	impulse(integer) : "Can activate with this impulse" : 0
+]
 @baseclass = Target [ 
 	target(target_destination) : "Target: activate anything with a matching targetname" 
 	target2(target_destination) : "Target 2: activate anything with a matching targetname" 
