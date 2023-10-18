@@ -41,7 +41,7 @@ vector(float num) SinCos =
 	
 	angle = '0 1 0' * num;
 	makevectors(angle);
-	result = Vector(v_forward_y, v_forward_x, v_forward_x / v_forward_y);	// technically SinCosTan
+	result = Vector(v_forward_y, v_forward_x, 0);
 	
 	v_forward = vf;
 	v_up = vu;
@@ -68,6 +68,7 @@ float(float num) tan =
 {
 	vector temp;
 	temp = SinCos(num);
+	if (temp_y == 0) return A_SHITLOAD;	// to infinity and beyond
 	return temp_x / temp_y;
 }
  
