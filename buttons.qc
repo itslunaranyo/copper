@@ -520,15 +520,18 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 	}
 
 	if (self.spawnflags & 16)	// silent
-		self.message = "";
-	else if (self.spawnflags & 1)
-		self.message = "EASY skill selected";
-	else if (self.spawnflags & 4)
-		self.message = "HARD skill selected";
-	else if (self.spawnflags & 8)
-		self.message = "\bNIGHTMARE\b skill selected";
-	else	// 2 or default
-		self.message = "NORMAL skill selected";
+		self.message = string_null;
+	else if (self.message == string_null)
+	{
+		if (self.spawnflags & 1)
+			self.message = "EASY skill selected";
+		else if (self.spawnflags & 4)
+			self.message = "HARD skill selected";
+		else if (self.spawnflags & 8)
+			self.message = "\bNIGHTMARE\b skill selected";
+		else	// 2 or default
+			self.message = "NORMAL skill selected";
+	}
 
 	self.think = skillbutton_activate;	// assume correct position and set up any related target states
 	self.nextthink = 0.1;
