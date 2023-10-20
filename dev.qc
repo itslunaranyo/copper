@@ -190,7 +190,6 @@ void(float i) dev_impulse =
 
 void() dev_impulse_list =
 {
-	if (!cvar("developer")) return;
 	dprint("dev impulses:\n");
 	entity t;
 	t = world;
@@ -198,7 +197,7 @@ void() dev_impulse_list =
 		t = find(t, classname, "tg_imp");
 		if (t)
 		{
-			dprint3(ftos(t.impulse), ": ", t.owner.classname);
+			dprint4("  ", ftos(t.impulse), ": ", t.owner.classname);
 			if (t.owner.targetname != string_null)
 				dprint3(", tname: ", t.owner.targetname, "\n");
 			else
