@@ -213,7 +213,7 @@ If 'Inverse' spawnflag is set, will decrement when triggered instead of incremen
 void() target_state =
 {
 	if (!SUB_ShouldSpawn()) return;
-	if (self.targetname == string_null)
+	if (self.targetname == string_null && !self.impulse)
 		objerror("target_state not targeted by anything");
 	if (self.spawnflags & 1 && self.include == string_null)
 		objerror("target_state relay has no include");

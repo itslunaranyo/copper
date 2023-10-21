@@ -294,7 +294,7 @@ void() light =
 {
 	light_message();
 	
-	if (self.targetname == string_null)
+	if (self.targetname == string_null && !self.impulse)
 	{	// inert light
 		remove(self);
 		return;

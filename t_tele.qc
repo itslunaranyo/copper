@@ -636,7 +636,7 @@ void() info_teleport_target =
 {
 	if (!SUB_ShouldSpawn()) return;
 	
-	if (self.targetname == string_null)
+	if (self.targetname == string_null && !self.impulse)
 		objerror ("no targetname");
 		
 	if ((self.spawnflags & 8) && 

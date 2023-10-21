@@ -183,7 +183,7 @@ void() misc_model =
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_NONE;
 	
-	if (self.targetname == string_null && !self.pos1)
+	if (self.targetname == string_null && !self.impulse && !self.pos1)
 	{
 		makestatic(self); 
 		return;
