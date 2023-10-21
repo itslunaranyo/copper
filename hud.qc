@@ -207,6 +207,7 @@ void Hud_DrawHead(vector pos)
 		else
 		{
 			headpic = strcat("face", ftos(h));
+			/*
 			if (time > paintime + 1.2)
 			{	// peer left and right
 				f = floor(time * 2 + lookseed);
@@ -215,6 +216,7 @@ void Hud_DrawHead(vector pos)
 				else if (f % 29 == 0 || f % 11 == 0)
 					headpic = strcat(headpic,"_r");				
 			}
+			*/
 		}
 	}
 	drawpic(pos, headpic, '24 24', '1 1 1', 1, 0);
@@ -920,6 +922,8 @@ void() Hud_Init
 	precache_pic("gfx/sb_bkey2", TRUE);
 
 	precache_pic("sbar", TRUE);
+	/*
+	// looking left and right frames - art not complete yet
 	precache_pic("face1_l", TRUE);
 	precache_pic("face1_r", TRUE);
 	precache_pic("face2_l", TRUE);
@@ -930,7 +934,7 @@ void() Hud_Init
 	precache_pic("face4_r", TRUE);
 	precache_pic("face5_l", TRUE);
 	precache_pic("face5_r", TRUE);
-	
+	*/
 	precache_pic("face_invis", TRUE);
 	precache_pic("face_inv2", TRUE);
 	precache_pic("face_invul2", TRUE);
