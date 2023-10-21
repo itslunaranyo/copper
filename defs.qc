@@ -233,6 +233,8 @@ nosave float	gamestarted;
 nosave float	cleanUpClientShit;
 nosave float	clients;
 nosave float	clientsAlive;
+nosave float	clientsAliveMask;
+nosave float	globalStatSupported;
 
 float	skill;
 float	coop_time;

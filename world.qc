@@ -435,6 +435,7 @@ void() StartFrame =
 		}
 	}
 #endif
+
 	/*
 	'activator' should be a parameter of *_use(), but it's a global. so it goes.
 
