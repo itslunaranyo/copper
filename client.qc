@@ -2013,10 +2013,10 @@ Only used on start map for the return point from an episode. Will fire its targe
 @PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" [
 	svflags(Flags) =
 	[
-		1		: "Episode 1" : 1
-		2		: "Episode 2" : 1
-		4		: "Episode 3" : 1
-		8		: "Episode 4" : 1
+		1		: "Episode 1" : 0
+		2		: "Episode 2" : 0
+		4		: "Episode 3" : 0
+		8		: "Episode 4" : 0
 		16		: "Bit 5" :  0
 		32		: "Bit 6" :  0
 		64		: "Bit 7" :  0
@@ -2034,7 +2034,6 @@ Only used on start map for the return point from an episode. Will fire its targe
 		262144	: "Bit 19" : 0
 		524288	: "Bit 20" : 0
 		1048576	: "Bit 21" : 0
-		2097152	: "Bit 22" : 0
 	]
 	style(Choices) : "Requirement" : 0 =
 	[
@@ -2051,7 +2050,7 @@ void() info_player_start2 =
 	fog_fixKeys();
 	
 	if (!self.svflags)
-		self.svflags = SVFL_ALLEPISODES;
+		self.svflags = 2097151;	// all bits up to 21
 	if (self.style < 0 || self.style > 2)
 		self.style = 0;
 }
