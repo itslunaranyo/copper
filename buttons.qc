@@ -534,5 +534,5 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 	}
 
 	self.think = skillbutton_activate;	// assume correct position and set up any related target states
-	self.nextthink = 0.1;
+	self.nextthink = 0.2;
 }
