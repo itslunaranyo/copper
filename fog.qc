@@ -5,40 +5,68 @@ FOG
 
 adapted from similar things czg did in honey_fog.qc god bless him
 
-new skyfog stuff:
-the skyfog keys will all be 0 in all existing maps, and therefore the desired
-behavior when a skyfog key is 0 has to be "do not change the skyfog". -1 is
-the new "actually mark it zero" for mappers.
-
 ====================
 */
 
-float FOG_INTERVAL = 0.05; //1/20;
+float FOG_INTERVAL = 0.05;
+
 /*FGD
 @baseclass = Fog [ 
-	fog_density(string) : "Fog Density" 
+	fog_density(string) : "Fog Density (-1 for clear)" 
 	fog_color(string) : "Fog Color" 
 	fog_sky(string) : "Sky Fog Density (-1 for clear sky)" 
 ]
 @baseclass = FogShift [ 
-	fog_density(string) : "Start Fog Density" 
+	fog_density(string) : "Start Fog Density (-1 for clear)" 
 	fog_color(string) : "Start Fog Color" 
 	fog_sky(string) : "Start Sky Fog Density (-1 for clear sky)" 
-	fog_density2(string) : "End Fog Density" 
+	fog_density2(string) : "End Fog Density (-1 for clear)" 
 	fog_color2(string) : "End Fog Color" 
 	fog_sky2(string) : "End Sky Fog Density (-1 for clear sky)" 
 ]
 */
 
+/*
+for mappers, -1 means "force to zero" and 0 means "ignore" (density and sky)
+
+within this code, -1 means "ignore" and all values 0-1 are values to be set
+
+yes these are opposites, but the first was necessary for consistency with
+other behavior and for back compatibility (skyfog is 0 in all maps made before
+1.30 when skyfog control was added, for example) and the second just makes the
+code more sensible, so all entities are converted at spawn time
+
+for added complication, the old way to force zero density on fog was to set
+a non-black color but leave density at zero, which was a mistake to require,
+but it's done now and needs to stay supported
+*/
 void() fog_fixKeys =
 {
+	// if color is not set
+		// 0 density counts as ignore (-1)
+		// -1 density counts as set-to-0
+	// if color is set
+		// 0 density counts as set-to-0
+		// -1 density counts as set-to-0
+	if (self.fog_color == VEC_ORIGIN)
+		self.fog_density = zeroconvertdefault(self.fog_density, -1);
+	else
+		if (self.fog_density <= 0)
+			self.fog_density = 0;
+	
+	if (self.fog_color2 == VEC_ORIGIN)
+		self.fog_density2 = zeroconvertdefault(self.fog_density2, -1);
+	else
+		if (self.fog_density2 <= 0)
+			self.fog_density2 = 0;
+	
 	if (self.fog_color_x > 1 || self.fog_color_y > 1 || self.fog_color_z > 1)
 		self.fog_color /= 255;
 	if (self.fog_color2_x > 1 || self.fog_color2_y > 1 || self.fog_color2_z > 1)
 		self.fog_color2 /= 255;
 
-	self.fog_density = zeroconvert(self.fog_density);
-	self.fog_density2 = zeroconvert(self.fog_density2);
+	self.fog_sky = zeroconvertdefault(self.fog_sky, -1);
+	self.fog_sky2 = zeroconvertdefault(self.fog_sky2, -1);
 }
 
 float(entity e, float dens, vector col, float sky) fog_sigdif =
@@ -68,6 +96,20 @@ float(entity e, float dens, vector col, float sky) fog_sigdif =
 	return FALSE;
 }
 
+float(float a, float b, float f) fog_lerpf =
+{
+	// don't lerp the -1 values
+	if (a < 0 || f >= 1) return b;
+	if (b < 0 || f <= 0) return a;
+	return b * f + a * (1 - f);
+}
+float(float a, float b, float f) fog_lerpHermite =
+{
+	// don't lerp the -1 values
+	if (a < 0 || f >= 1) return b;
+	if (b < 0 || f <= 0) return a;
+	return lerpHermite(a, b, f);
+}
 
 /*
 ================
@@ -81,7 +123,7 @@ void( entity client, float density, vector color, float sky ) fog_save =
 	// save whatever we set the client's fog to in case of saves/loads
 	client.fog_density = density;
 	client.fog_color = color;
-	if (sky) client.fog_sky = sky;
+	client.fog_sky = sky;
 }
 
 /*
@@ -94,10 +136,8 @@ void( entity client, entity fogger ) fog_setFromEnt =
 	dprint("setting fog values\n");
 	// don't set the fog if the entity has no values, because it might be a custom map with
 	// _fog on the worldspawn instead
-	// to actually get an entity to clear the fog, set a color but leave density at 0
-	if (!fogger.fog_color)
-		if (!fogger.fog_density)
-			return;
+	if (fogger.fog_density == -1 && fogger.fog_sky == -1)
+		return;
 	
 	fog_set(client, fogger.fog_density, fogger.fog_color, fogger.fog_sky);
 }
@@ -126,17 +166,19 @@ void( entity client, float density, vector color, float sky ) fog_set =
 		return;
 	}
 	
-	stuffcmd(client, "\nfog ");
-	stuffcmd_float(client, density);
-	stuffcmd(client, " ");
-	stuffcmd_float(client, color_x * (icantsee + 1));
-	stuffcmd(client, " ");
-	stuffcmd_float(client, color_y * (icantsee + 1));
-	stuffcmd(client, " ");
-	stuffcmd_float(client, color_z * (icantsee + 1));
-	stuffcmd(client, "\n");
-
-	if (sky)
+	if (density != -1)
+	{
+		stuffcmd(client, "\nfog ");
+		stuffcmd_float(client, density);
+		stuffcmd(client, " ");
+		stuffcmd_float(client, color_x * (icantsee + 1));
+		stuffcmd(client, " ");
+		stuffcmd_float(client, color_y * (icantsee + 1));
+		stuffcmd(client, " ");
+		stuffcmd_float(client, color_z * (icantsee + 1));
+		stuffcmd(client, "\n");
+	}
+	if (sky != -1)
 	{
 		float skyz = zeroconvert(sky);
 		stuffcmd(client, "r_skyfog ");
@@ -156,7 +198,7 @@ void() fog_blendTouch =
 	if (!CheckValidTouch()) return;
 	
 	// fix for only first client getting a fog change when multiple coop clients are touching this at once
-	if (time != self.rad_time)	// because fog is rad
+	if (time != self.rad_time)	// because fog is rad?
 		if (time < self.attack_finished)
 			return;
 		
@@ -185,13 +227,13 @@ void() fog_blendTouch =
 		{
 			ldensity = self.fog_density2;
 			lcolor = self.fog_color2;
-			if (self.fog_sky2) lsky = zeroconvert(self.fog_sky2);
+			lsky = self.fog_sky2;
 		}
 		else
 		{
 			ldensity = self.fog_density;
 			lcolor = self.fog_color;
-			if (self.fog_sky) lsky = zeroconvert(self.fog_sky);
+			lsky = self.fog_sky;
 		}
 		force = TRUE;
 	}
@@ -204,24 +246,16 @@ void() fog_blendTouch =
 		f = dorg * self.movedir;
 		f = (f / self.distance) + 0.5;
 		
-		ldensity = lerp(self.fog_density, self.fog_density2, f);
+		ldensity = fog_lerpf(self.fog_density, self.fog_density2, f);
 		lcolor = lerpVector(self.fog_color, self.fog_color2, f);
-		if (self.fog_sky && self.fog_sky2)
-		{
-			lsky = lerp(zeroconvert(self.fog_sky), zeroconvert(self.fog_sky2), f);
-		}
+		lsky = fog_lerpf(self.fog_sky, self.fog_sky2, f);
 	}
-	
-	// fog_set does final interpretation of 0 = ignore, -1 = 0
-	if (self.fog_sky && self.fog_sky2 && !lsky)
-		lsky = -1;
 	
 	if (force || fog_sigdif(other,ldensity,lcolor,lsky))
 	{
 		self.invisible_time = time;
 		fog_set(other, ldensity, lcolor, lsky);
 	}
-	//fog_save(other, ldensity, lcolor);
 	
 	self.rad_time = time;
 	self.attack_finished = time + FOG_INTERVAL / 2;
@@ -335,28 +369,21 @@ void() fog_blendTimeThink =
 	{
 		ldensity = self.fog_density2;
 		lcolor = self.fog_color2;
-		if (self.fog_sky2) lsky = zeroconvert(self.fog_sky2);
+		lsky = self.fog_sky2;
 	}
 	else if (f == 0)
 	{
 		ldensity = self.fog_density;
 		lcolor = self.fog_color;
-		if (self.fog_sky) lsky = zeroconvert(self.fog_sky);
+		lsky = self.fog_sky;
 	}
 	else
 	{
 		// in transition, blend proportionally between the two fogs
-		ldensity = lerpHermite(self.fog_density, self.fog_density2, f);
+		ldensity = fog_lerpHermite(self.fog_density, self.fog_density2, f);
 		lcolor = lerpVectorHermite(self.fog_color, self.fog_color2, f);
-		if (self.fog_sky && self.fog_sky2)
-		{
-			lsky = lerpHermite(zeroconvert(self.fog_sky), zeroconvert(self.fog_sky2), f);
-		}
+		lsky = fog_lerpHermite(self.fog_sky, self.fog_sky2, f);
 	}
-	
-	// fog_set does final interpretation of 0 = ignore, -1 = 0
-	if (self.fog_sky && self.fog_sky2 && !lsky)
-		lsky = -1;
 	
 	if (self.spawnflags & 4)
 	{
