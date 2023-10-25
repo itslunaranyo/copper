@@ -523,10 +523,11 @@ void(float num, float type, string name) globalstat = #233;
 #endif
 //================================================
 
+//	angles(string) : "Direction, specifically (pitch yaw roll)"
+
 /*FGD
 @baseclass = Angle [ 
 	angle(integer) : "Direction (0-360 yaw, or -1 for up/-2 for down)"
-	angles(string) : "Direction, specifically (pitch yaw roll)"
 ]
 @baseclass = Appearflags [
 	spawnflags(Flags) =
