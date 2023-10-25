@@ -966,4 +966,8 @@ void() Hud_Init
 	//		globalStatSupported = TRUE;
 };
 
-void(float apilevel, string enginename, float engineversion) CSQC_Init = {Hud_Init();}
+void(float apilevel, string enginename, float engineversion) CSQC_Init = {
+	checkextension("FRIK_FILE");
+	checkextension("FTE_STRINGS");
+	Hud_Init();
+}

@@ -227,12 +227,11 @@ float(string cvarname, string defaultvalue) registercvar = #93; /*
 		Creates a new cvar on the fly. If it does not already exist, it will be given the specified value. If it does exist, this is a no-op.
 		This builtin has the limitation that it does not apply to configs or commandlines. Such configs will need to use the set or seta command causing this builtin to be a noop.
 		In engines that support it, you will generally find the autocvar feature easier and more efficient to use. */
-
-float(float a, float b, ...) min = #94; /*
-		Returns the lowest value of its arguments. */
-
-float(float a, float b, ...) max = #95; /*
-		Returns the highest value of its arguments. */
+		
+/*
+float(float a, float b, ...) min = #94; 
+float(float a, float b, ...) max = #95; 
+*/
 
 float(float minimum, float val, float maximum) bound = #96; /*
 		Returns val, unless minimum is higher, or maximum is less. */
