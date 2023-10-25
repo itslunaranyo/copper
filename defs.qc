@@ -509,10 +509,11 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 
 //================================================
 
+//	angles(string) : "Direction, specifically (pitch yaw roll)"
+
 /*FGD
 @baseclass = Angle [ 
 	angle(integer) : "Direction (0-360 yaw, or -1 for up/-2 for down)"
-	angles(string) : "Direction, specifically (pitch yaw roll)"
 ]
 @baseclass = Appearflags [
 	spawnflags(Flags) =
