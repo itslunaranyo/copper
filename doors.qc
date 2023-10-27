@@ -402,11 +402,8 @@ void() door_shadowmonitor_go =
 		frac = 0;
 	else
 		frac = vlen(o.origin - o.pos1) / vlen(o.pos2 - o.pos1);
-	
-	if (o.spawnflags & DOOR_START_OPEN)
-		frac = 1 - frac;
 
-	bmodel_lightstyle(o, light_str(frac));
+	bmodel_lightstyle(o, light_str(frac, o));
 	
 	// pay attention to owner state so we stop thinking when the door is done moving
 	if ((o.state == STATE_TOP) && (o.spawnflags & DOOR_TOGGLE) || o.state == STATE_BOTTOM)
@@ -428,10 +425,20 @@ void(entity d) door_shadowmonitor =
 	m.enemy = d.enemy;
 	d.enemy = m;
 
-	if (!(d.spawnflags & DOOR_START_OPEN))
+	if (d.style < 0)
 	{
-		bmodel_lightstyle(d, "a");
+		d.style *= -1;
+		d.customflags |= CFL_INVLIGHT;
 	}
+	if (d.spawnflags & DOOR_START_OPEN)
+	{
+		if (d.customflags & CFL_INVLIGHT)
+			d.customflags -= CFL_INVLIGHT;
+		else
+			d.customflags |= CFL_INVLIGHT;
+	}
+	
+	bmodel_lightstyle(d, light_str(0, d));
 }
 
 /*
@@ -966,7 +973,7 @@ void() secret_shadowmonitor_go =
 		frac = (p * normalize(mv)) / vlen(mv);
 	}
 
-	bmodel_lightstyle(o, light_str(frac));
+	bmodel_lightstyle(o, light_str(frac, o));
 
 	if ((frac == 0 || frac == 1) && o.wait == -1)
 	{
@@ -1283,7 +1290,12 @@ void () func_door_secret =
 	if (self.spawnflags & SECRET_OPEN_ONCE) self.wait = -1;
 	if (!self.wait) self.wait = 5;	// 5 seconds before closing
 	
-	bmodel_lightstyle(self, "a");
+	if (self.style < 0)
+	{
+		self.style *= -1;
+		self.customflags |= CFL_INVLIGHT;
+	}
+	bmodel_lightstyle(self, light_str(0, self));
 	
 	self.use = secretdoor_use;
 	if ( !self.targetname || self.spawnflags & SECRET_YES_SHOOT)
