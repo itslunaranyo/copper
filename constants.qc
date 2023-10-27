@@ -2,7 +2,7 @@
 // constants
 //================================================
 
-const string version_s = "Copper Quake 1.30\bA\b - 22 October 2023";
+const string version_s = "Copper Quake 1.30 - 31 October 2023";
 const float version_f = 1.30;
 
 const float	FALSE					= 0;
@@ -26,6 +26,7 @@ const float	FL_UNDERWATER			= 8192;	// for dive/surface water sounds
 // edict.customflags
 const float	CFL_LEFTY			= 1;	// used by slidemovers (scrags) to alternate strafe direction
 const float	CFL_RETURNED		= 1;	// zombie has already respawned in nightmare
+const float	CFL_INVLIGHT			= 1;	// for backwards bmover light fade behavior
 const float	CFL_ZAPPED			= 2;
 const float	CFL_AXEHITME		= 4;
 const float	CFL_LOCKED			= 16;	// special state-independent deactivation

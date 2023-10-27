@@ -355,7 +355,7 @@ void() skillbutton_shadowmonitor_go =
 	else
 		frac = vlen(o.origin - o.pos2) / vlen(o.pos2 - o.pos1);
 	
-	bmodel_lightstyle(o, light_str(frac));
+	bmodel_lightstyle(o, light_str(frac, o));
 	
 	// pay attention to owner state so we stop thinking when the door is done moving
 	if (o.state == STATE_BOTTOM)
@@ -474,6 +474,12 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 		m.enemy = self;
 		m.owner = skill_head;
 		self.owner = m;
+		if (self.style < 0)
+		{
+			self.style *= -1;
+			self.customflags |= CFL_INVLIGHT;
+		}
+		bmodel_lightstyle(self, light_str(1, self));
 	}
 	skill_head = self;
 

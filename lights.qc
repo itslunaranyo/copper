@@ -172,10 +172,11 @@ void(entity b, string l) bmodel_lightstyle =
 		lightstyle(b.switchshadstyle, l);
 }
 
-string(float f) light_str =
+string(float f, entity e) light_str =
 {
-	// you know what's cool?  arrays.
+	if (e.customflags & CFL_INVLIGHT) f = 1 - f;
 	float bright = floor(f * 12 + 0.5);
+	
 	if (bright <= 0 ) return "a";
 	if (bright >= 12) return "m";
 
@@ -207,7 +208,7 @@ void() light_inc_use =
 		self.cnt = self.cnt - 1;
 	}
 	
-	lightstyle(self.style, light_str(self.cnt / self.count));
+	lightstyle(self.style, light_str(self.cnt / self.count, self));
 }
 
 void() light_message =
