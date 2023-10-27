@@ -1220,3 +1220,232 @@ void() target_debris =
 		precache_model("progs/debris3.mdl");
 	}
 }
+
+// ==============================================================
+
+/*
+- target_fade
+	- sets alpha on entities, or style on lights
+	- over time or distance from activator
+	- min/max alpha, min/max distance
+	- exclude axes
+	- alt target: fade target, 2 on start, 3 on finish, 4 on return
+*/
+
+void(entity e) target_fade_add =
+{
+	dprint("target_fade_add\n");
+	entity fader;
+	if (self.enemy)
+	{
+		// if this fader targets more than one entity, we need to list them somehow.
+		// the quakeC way is a linked list, but multiple target_fades could affect the 
+		// same entity, and even with our own .entity field this would clash. we have
+		// to create a chain of dummy entities that just serve to keep the ref instead.
+		fader = spawn();
+		fader.classname = "fader";
+		fader.enemy = e;
+		fader.chain = self.chain;
+		self.chain = fader;
+	}
+	else
+	{
+		self.enemy = e;
+	}
+}
+
+// targetname scanning 20 times a frame is a little rude, so we check for
+// targets up front and remember them
+void() target_fade_find =
+{
+	if (self.enemy) return;
+	
+	entity tf = world;
+	if (self.target != string_null) do {
+		tf = find(tf, targetname, self.target);
+		if (!tf) break;
+		target_fade_add(tf);
+	} while (1);
+
+	if (!(self.spawnflags & SPAWN_ALT_TARG))
+	{
+		if (self.target2 != string_null) do {
+			tf = find(tf, targetname, self.target2);
+			if (!tf) break;
+			target_fade_add(tf);
+		} while (1);
+		if (self.target3 != string_null) do {
+			tf = find(tf, targetname, self.target3);
+			if (!tf) break;
+			target_fade_add(tf);
+		} while (1);
+		if (self.target4 != string_null) do {
+			tf = find(tf, targetname, self.target4);
+			if (!tf) break;
+			target_fade_add(tf);
+		} while (1);
+	}
+}
+
+void() target_fade_done =
+{
+	dprint("target_fade_done\n");
+	entity t = self.chain;
+	entity ot;
+	while (t)
+	{
+		ot = t;
+		t = t.chain;
+		remove(ot);
+	}
+	self.enemy = world;
+	self.chain = world;
+}
+
+void(float f) target_fade_set =
+{
+	if (f == 0) f = -1;
+	entity t = self;
+	while (t)
+	{
+		dprint("  setting alpha on something\n");
+		t.enemy.alpha = f;
+		t = t.chain;
+	}
+}
+
+void() target_fade_dist =
+{
+	target_fade_find();
+	float dist, f;
+	dist = vlen(self.origin - activator.origin);
+	f = saturate((dist - self.lip) / self.distance);
+	
+	target_fade_set(f);
+	
+	// clean up/refresh our target list if not being used
+	self.nextthink = time + 1;
+	self.think = target_fade_done;
+}
+
+
+void() target_fade_think =
+{
+	float f, a;
+	dprint("target_fade_think\n");
+	
+	if (time >= self.pain_finished)
+	{
+		f = 1;
+		self.use = target_fade_time;
+	}
+	else
+	{
+		// don't allow retriggering before the blend is done
+		self.use = SUB_Null;
+		self.nextthink = time + 0.05;
+		if (self.state && self.speed)
+			f = 1 - (self.pain_finished - time) / self.speed;
+		else if (!self.state && self.speed2)
+			f = 1 - (self.pain_finished - time) / self.speed2;
+		else
+			f = 1;
+	}
+
+	if (self.state == 0)
+		f = 1 - f;
+	
+	if (f == 1)
+		a = self.alpha2;
+	else if (f == 0)
+		a = self.alpha;
+	else
+		// in transition, blend proportionally
+		a = lerpHermite(self.alpha, self.alpha2, f);
+	
+	dprint3("  ", ftos(a), "\n");
+	target_fade_set(a);
+	if (self.use == target_fade_time)
+	{
+		//if (self.state)
+		//	SUB_UseTargetsAlt(target2);
+		//else
+		//	SUB_UseTargetsAlt(target4);
+		target_fade_done();
+	}
+}
+
+void() target_fade_time =
+{
+	if (activator.classname != "player") return;
+	dprint("target_fade_time\n");
+	if (!(self.spawnflags & 1))
+		self.state = 1 - self.state;
+	
+	if (self.state)
+		self.pain_finished = time + self.delay + self.speed;
+	else
+		self.pain_finished = time + self.delay + self.speed2;
+	
+	target_fade_find();
+	
+	if (self.delay > 0)
+		self.nextthink = time + self.delay;
+	else
+		target_fade_think();
+}
+
+/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE
+Changes the alpha of its targets over time from 'alpha' to 'alpha2'. Triggering again will fade it back, unless ONE_WAY is set.
+Set REVERSE to swap the values.
+
+"delay" - pause before beginning to blend
+"speed" - time to spend blending, -1 for instant.
+"speed2" - time to spend blending back, if different than "speed". -1 for instant.
+*/
+/*FGD
+@PointClass base(Appearflags, Targetname, Target) color(128 128 50) = target_fade : 
+"Target: Fade
+Changes the alpha of its targets over time from 'alpha' to 'alpha2'." 
+[
+	spawnflags(flags) = [
+		1 : "One-Way Only" : 0
+		2 : "Reverse Start/End" : 0
+	]
+	delay(string) : "Pause before starting blend"
+	alpha(string) : "Start alpha" : "1.0"
+	alpha2(string) : "End alpha" : "0.0"
+	speed(string) : "Time to blend (-1 for instant)"
+	speed2(string) : "Time to blend back, if different (-1 for instant)"
+]
+*/
+void() target_fade =
+{
+	if (!SUB_ShouldSpawn()) return;
+
+	if (self.spawnflags & 2)
+		self.state = 1;
+	else
+		self.state = 0;
+	if (self.spawnflags & 1)
+		self.state = 1 - self.state;
+	
+	if (!self.speed) self.speed = 1;
+	if (self.speed == -1) self.speed = 0;
+	
+	if (!self.speed2) self.speed2 = self.speed;
+	if (self.speed2 == -1) self.speed2 = 0;
+	
+	if (!self.alpha) self.alpha = 1;
+
+	if (self.distance > 0)
+	{
+		self.use = target_fade_dist;
+		self.distance -= self.lip;
+	}
+	else
+	{
+		self.use = target_fade_time;
+		self.think = target_fade_think;
+	}
+}
