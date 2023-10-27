@@ -298,6 +298,8 @@ If the plat targets a trigger once/multiple/multiple_box, it will override the p
 	1: base fast
 	2: chain slow (default if 0)
 	-1: silent
+
+Alt Target Pattern: 'target' upon rising, 'target2' upon reaching top, 'target3' upon descending, 'target4' upon reaching bottom.
 */
 /*FGD
 @SolidClass base(Appearflags, Targetname, Func, Target, AltTarget) = func_plat : "Elevator platform.
@@ -616,6 +618,8 @@ Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional rando
 0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
 1) ratchet metal
 2) base plat
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination
 */
 /*FGD
 @baseclass base(Train) = Flytrain [
@@ -654,6 +658,8 @@ Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional rando
 0) none, or, set your own with 'noise' (stop sound) and 'noise1' (move sound)
 1) ratchet metal
 2) base plat
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination
 */
 /*FGD
 @PointClass base(Flytrain) size(16 16 16) = func_flytrain_point : 
@@ -953,6 +959,8 @@ PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches the
 If a path_corner's speed is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner.
 TOGGLE: allow starting/stopping motion anywhere on its path (default is to ignore triggerings when in motion)
 SMOOTH_SPEED: if PATH_SPEED, train will smoothly blend to its destination's 'speed' as it travels to it
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination
 */
 /*FGD
 @SolidClass base(Train) = func_train : "Moving platform that players can ride. 
@@ -1007,6 +1015,8 @@ Keys:
 
 Spawnflags:
 PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches them
+
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination
 */
 /*FGD
 @PointClass base(Train) = func_train_point : "Moving platform that players can ride. 
