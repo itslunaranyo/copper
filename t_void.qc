@@ -481,8 +481,8 @@ void(float unlock) void_lock =
 		self.buddy.modelindex = self.modelindex;
 		
 		self.flags = not(self.flags, CFL_LOCKED);
-		self.enemy.flags = not(self.flags, CFL_LOCKED);
-		self.buddy.flags = not(self.flags, CFL_LOCKED);
+		self.enemy.flags = not(self.enemy.flags, CFL_LOCKED);
+		self.buddy.flags = not(self.buddy.flags, CFL_LOCKED);
 	}
 	else
 	{
