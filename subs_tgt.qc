@@ -541,6 +541,7 @@ float(entity tg) SUB_VerifyTrigger =
 		//tg.classname == "path_corner" ||	// trains do fire targets
 		tg.classname == "trap_shooter" ||
 		tg.classname == "target_drop" ||
+		tg.classname == "target_fade" ||
 		tg.classname == "trap_spikeshooter")
 		return FALSE;
 		

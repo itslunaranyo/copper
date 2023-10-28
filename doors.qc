@@ -758,6 +758,8 @@ Key doors are always wait -1.
 4) hissy metal
 5) winchy secret door
 6) base secret door
+
+Alt Target Pattern: 'target' when starting to open, 'target2' when opened, 'target3' when starting to close, 'target4' when closed.
 */
 /*FGD
 @SolidClass base(Angle, Appearflags, Targetname, Target, Func, FuncInvis, AltTarget) = func_door : 

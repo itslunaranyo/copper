@@ -197,6 +197,8 @@ Acts as if touched when triggered. Will depress itself when locked by a target_l
 2) metallic click
 3) in-out
 4) trigger noise (big light switch)
+
+Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'target3' when returning, 'target4' when fully out.
 */
 /*FGD
 @SolidClass base(Appearflags, Angle, Target, Targetname, Func, FuncInvis, AltTarget) = func_button : 
@@ -421,6 +423,8 @@ Special button for selecting skill level. Will always be pressed when the skill 
 2) metallic click
 3) in-out
 4) trigger noise (big light switch)
+
+Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'target3' when returning, 'target4' when fully out.
 */
 /*FGD
 @SolidClass base(Appearflags, Angle, Target, Func, AltTarget) = func_button_skill : 

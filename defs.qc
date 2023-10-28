@@ -399,6 +399,7 @@ string	keyType;
 .float version = worldtype;
 .string	model2 = wad;		// for debris emitter
 .string model3 = map;
+.float alpha2 = volume;
 
 
 //===========================================================================
