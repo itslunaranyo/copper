@@ -279,7 +279,7 @@ CAVEATS:
 - a bug in most quake engine ports will reset the eye position smoothing that happens when climbing stairs or riding a plat on every frame that a 'stuffcmd' is sent, so fog transitions during upwards motion will cause noticeable stuttering.
 */
 /*FGD
-@SolidClass color(128 128 0) base(Appearflags, Targetname, Target, FogShift) = trigger_fogblend : 
+@SolidClass color(128 128 0) base(Appearflags, Targetname, FogShift) = trigger_fogblend : 
 "Trigger: Fog Blend
 Acts as a smoothly blending portal between two zones of different fog. Sets the fog for any client passing through it, blending their global fog settings between start and end values proportional to their position within the trigger.
 fog_sky/fog_sky2 will affect r_skyfog at the same time if both are non-zero. Use -1 if you really want 0.

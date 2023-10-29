@@ -931,7 +931,7 @@ Setting style to -1 will override lightstyle 0, which is all static lights in th
 "delay" pause between trigger and activation
 */
 /*FGD
-@PointClass base(Appearflags, Targetname, Target) color(128 210 128) = target_lightstyle : 
+@PointClass base(Appearflags, Targetname) color(128 210 128) = target_lightstyle : 
 "Target : Lightstyle
 Changes a global lightstyle when triggered."
 [
@@ -939,6 +939,10 @@ Changes a global lightstyle when triggered."
 	style(integer) : "Lightstyle to change (0-63)" : 0
 	count(integer) : "Limit uses" : 0
 	delay(string) : "Delay before activation" : "0"
+	target(target_destination) : "Target: acts on all with matching targetname" 
+	target2(target_destination) : "Target 2: acts on all with matching targetname" 
+	target3(target_destination) : "Target 3: acts on all with matching targetname" 
+	target4(target_destination) : "Target 4: acts on all with matching targetname" 
 ]
 */
 void() target_lightstyle =

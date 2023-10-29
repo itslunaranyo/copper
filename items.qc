@@ -407,8 +407,14 @@ void() target_drop_use =
 Causes all targeted items which are SUSPENDED to drop when triggered.
 */
 /*FGD
-@PointClass base(Appearflags, Target, Targetname) size(32 32 32) color(192 64 0) = target_drop : 
-"Target Drop. Causes all targeted items which are suspended to drop when triggered." []
+@PointClass base(Appearflags, Targetname) size(32 32 32) color(192 64 0) = target_drop : 
+"Target Drop. Causes all targeted items which are suspended to drop when triggered."
+[
+	target(target_destination) : "Target: acts on all items with a matching targetname" 
+	target2(target_destination) : "Target 2: acts on all items with a matching targetname" 
+	target3(target_destination) : "Target 3: acts on all items with a matching targetname" 
+	target4(target_destination) : "Target 4: acts on all items with a matching targetname" 
+]
 */
 void() target_drop =
 {

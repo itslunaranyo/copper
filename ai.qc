@@ -835,7 +835,7 @@ BEZIER	Act as a bilinear control point between the previous and next pathcorner 
 	"count"	override number of steps of interpolation along the curve the train will make
 */
 /*FGD
-@PointClass base(Appearflags, Targetname, Target, Angle) size(16 16 16) color(128 80 0) = 
+@PointClass base(Appearflags, Targetname, Angle) size(16 16 16) color(128 80 0) = 
 	path_corner : 
 "Waypoint for platforms and monsters. Will stop here for good if no path_corner is targeted by this entity.
 Monsters who wait here will turn to face 'angle'.
@@ -844,6 +844,12 @@ Checking the Bezier spawnflag will make this pathcorner act as a bilinear contro
 	spawnflags(Flags) = [
 		16 : "Bezier point" : 0
 	]
+	target(target_destination) : "Target: next path_corner to move to" 
+	target2(target_destination) : "Target 2: trains will activate all matching on arrival" 
+	target3(target_destination) : "Target 3: trains will activate all matching on arrival" 
+	target4(target_destination) : "Target 4: trains will activate all matching on arrival" 
+	killtarget(target_destination) : "Killtarget: trains will remove all matching on arrival"
+	delay(string) : "Delay before activating targets" : "0"
 	wait(string) : "Wait time (seconds)" : "0"
 	speed(string) : "A visiting func_train to change its speed to this. If 'speed' is -1, the func_train's move when LEAVING that corner will be to snap instantly to the next corner." : "0"
 	count(integer) : "override steps of interpolation along this bezier curve segment"

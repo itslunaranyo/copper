@@ -1985,7 +1985,7 @@ The normal starting point for a level. Only one is allowed. Will fire its target
 "fog_color"/"fog_density"/"fog_sky" set the fog when spawning at this spot (fog_sky 0 = no change, -1 = clear to 0)
 */
 /*FGD
-@PointClass base(PlayerClass) = info_player_start : "Player 1 start" []
+@PointClass base(PlayerClass) = info_player_start : "Player 1 start. Fires targets when a player spawns here." []
 */
 void() info_player_start =
 {
@@ -2007,7 +2007,7 @@ Only used on start map for the return point from an episode. Will fire its targe
 	2: player will NOT spawn here if they have any of them
 */
 /*FGD
-@PointClass base(PlayerClass) = info_player_start2 : "Player episode return point" [
+@PointClass base(PlayerClass) = info_player_start2 : "Player episode return point. Fires targets when a player spawns here." [
 	svflags(Flags) =
 	[
 		1		: "Episode 1" : 1
