@@ -274,15 +274,17 @@ An attack impulse can be triggered now
 */
 void() W_Attack =
 {
-	if (!W_HasAmmo(self.weapon))
+	if (self.weapon && !W_HasAmmo(self.weapon))
 	{
 		W_SelectBestWeapon();
-		return;
+		if (!self.weapon || self.weapon == IT_AXE)
+		{
+			sprint (self, "not enough ammo.\n");
+			return;
+		}
 	}
 	if (self.customflags & (CFL_PLUNGE|CFL_LIMBO))
 		return;
-//	if (self.movetype == MOVETYPE_NOCLIP)
-//		return;
 
 	makevectors	(self.v_angle);			// calculate forward angle for velocity
 
