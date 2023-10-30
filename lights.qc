@@ -164,17 +164,40 @@ void() light_use =
 	}
 }
 
-void(entity b, string l) bmodel_lightstyle =
+void(entity b, float opacity) bmodel_lightstyle =
 {
+	float a = zeroconvertdefault(b.alpha, 1);
+	float f;
+
+	// 'alpha' could be set by mapper or target_fade, 0 is invisible
+	//		1 blocks all light, 0 admits all
+	// 'opacity' is like positional alpha: is the bmodel visible or hidden? how far open is the door? etc
+	//		1 blocks all light, 0 admits all
+	
+	// stash for future changes in alpha
+	if (opacity == 0) b.alpha2 = -1;
+	else b.alpha2 = opacity;
+	
+	//dprint3("for ", b.targetname, " -- ");
+	//dprint5("op: ", ftos(opacity), " a: ", ftos(a), " -- ");
+	
+	if (b.customflags & CFL_INVLIGHT)
+		opacity = 1 - opacity;
+	
+	// 0 for either will override the other and admit light, so we multiply
+	// finally, invert so 0 (brightest) becomes a high value
+	f = 1 - opacity * a;
+	//dprint3("brightness: ", ftos(f), "\n");
+	string l = light_str(f);
+
 	if (b.style)
 		lightstyle(b.style, l);
 	if (b.switchshadstyle)
 		lightstyle(b.switchshadstyle, l);
 }
 
-string(float f, entity e) light_str =
+string(float f) light_str =
 {
-	if (e.customflags & CFL_INVLIGHT) f = 1 - f;
 	float bright = floor(f * 12 + 0.5);
 	
 	if (bright <= 0 ) return "a";
@@ -208,7 +231,7 @@ void() light_inc_use =
 		self.cnt = self.cnt - 1;
 	}
 	
-	lightstyle(self.style, light_str(self.cnt / self.count, self));
+	lightstyle(self.style, light_str(self.cnt / self.count));
 }
 
 void() light_message =

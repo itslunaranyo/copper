@@ -37,7 +37,7 @@ void() bmodel_appear =
 	// NOT ANY OTHER ORDERS
 	// ***
 	
-	bmodel_lightstyle(self,light_str(0,self));
+	bmodel_lightstyle(self, 1);
 	self.state = STATE_BOTTOM;
 	//force_retouch = 2;
 }
@@ -129,7 +129,7 @@ void() bmodel_vanish_do =
 {
 	self.state = STATE_TOP;
 	self.modelindex = 0;
-	bmodel_lightstyle(self,light_str(1,self));
+	bmodel_lightstyle(self, 0);
 }
 
 // ==========================================
@@ -268,7 +268,7 @@ void() func_wall =
 	}
 	else
 	{
-		bmodel_lightstyle(self,light_str(0,self));
+		bmodel_lightstyle(self, 1);
 		self.state = STATE_BOTTOM;
 	}
 }
@@ -390,12 +390,12 @@ void() func_episodegate =
 	if (inhibit)
 	{
 		dprint3("inhibiting episodegate ", ftos(runes), "\n");
-		bmodel_lightstyle(self,light_str(1,self));
+		bmodel_lightstyle(self,0);
 //		remove(self);
 		return;			// can still enter episode
 	}
 	
-	bmodel_lightstyle(self,light_str(0,self));
+	bmodel_lightstyle(self,1);
 	self.style = 0;
 	self.switchshadstyle = 0;
 	self.spawnflags = 0;
@@ -421,10 +421,10 @@ void() func_bossgate =
 	if (!SUB_ShouldSpawn()) return;
 	if ( (serverflags & SVFL_ALLEPISODES) == SVFL_ALLEPISODES)
 	{
-		bmodel_lightstyle(self,light_str(1,self));
+		bmodel_lightstyle(self,0);
 		return;		// all episodes completed
 	}
-	bmodel_lightstyle(self,light_str(0,self));
+	bmodel_lightstyle(self,1);
 	self.style = 0;
 	self.switchshadstyle = 0;
 	self.spawnflags = 0;

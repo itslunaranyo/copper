@@ -1232,9 +1232,10 @@ void() target_debris =
 	- alt target: fade target, 2 on start, 3 on finish, 4 on return
 */
 
+// targetname scanning 20 times a frame is a little rude, so we check for
+// targets up front and remember them
 void(entity e) target_fade_add =
 {
-	dprint("target_fade_add\n");
 	entity fader;
 	if (self.enemy)
 	{
@@ -1254,8 +1255,6 @@ void(entity e) target_fade_add =
 	}
 }
 
-// targetname scanning 20 times a frame is a little rude, so we check for
-// targets up front and remember them
 void() target_fade_find =
 {
 	if (self.enemy) return;
@@ -1289,7 +1288,6 @@ void() target_fade_find =
 
 void() target_fade_done =
 {
-	dprint("target_fade_done\n");
 	entity t = self.chain;
 	entity ot;
 	while (t)
@@ -1306,10 +1304,20 @@ void(float f) target_fade_set =
 {
 	if (f == 0) f = -1;
 	entity t = self;
+	entity e;
 	while (t)
 	{
-		dprint("  setting alpha on something\n");
-		t.enemy.alpha = f;
+		e = t.enemy;
+		if (!e.modelindex)	// don't do this for hidden bmodels
+		{
+			t = t.chain;
+			continue;
+		}
+		
+		e.alpha = f;
+		if ((e.style || e.switchshadstyle) && e.alpha2)
+			bmodel_lightstyle(e, zeroconvert(e.alpha2));
+			
 		t = t.chain;
 	}
 }
@@ -1320,6 +1328,7 @@ void() target_fade_dist =
 	float dist, f;
 	dist = vlen(self.origin - activator.origin);
 	f = saturate((dist - self.lip) / self.distance);
+	f = lerp(self.alpha, self.alpha2, f);
 	
 	target_fade_set(f);
 	
@@ -1332,7 +1341,6 @@ void() target_fade_dist =
 void() target_fade_think =
 {
 	float f, a;
-	dprint("target_fade_think\n");
 	
 	if (time >= self.pain_finished)
 	{
@@ -1363,7 +1371,6 @@ void() target_fade_think =
 		// in transition, blend proportionally
 		a = lerpHermite(self.alpha, self.alpha2, f);
 	
-	dprint3("  ", ftos(a), "\n");
 	target_fade_set(a);
 	if (self.use == target_fade_time)
 	{
@@ -1378,9 +1385,8 @@ void() target_fade_think =
 void() target_fade_time =
 {
 	if (activator.classname != "player") return;
-	dprint("target_fade_time\n");
-	if (!(self.spawnflags & 1))
-		self.state = 1 - self.state;
+	
+	self.state = 1 - self.state;
 	
 	if (self.state)
 		self.pain_finished = time + self.delay + self.speed;
@@ -1409,7 +1415,6 @@ Set REVERSE to swap the values.
 Changes the alpha of its targets over time from 'alpha' to 'alpha2'." 
 [
 	spawnflags(flags) = [
-		1 : "One-Way Only" : 0
 		2 : "Reverse Start/End" : 0
 	]
 	delay(string) : "Pause before starting blend"
@@ -1423,12 +1428,7 @@ void() target_fade =
 {
 	if (!SUB_ShouldSpawn()) return;
 
-	if (self.spawnflags & 2)
-		self.state = 1;
-	else
-		self.state = 0;
-	if (self.spawnflags & 1)
-		self.state = 1 - self.state;
+	self.state = 0;
 	
 	if (!self.speed) self.speed = 1;
 	if (self.speed == -1) self.speed = 0;
@@ -1437,6 +1437,16 @@ void() target_fade =
 	if (self.speed2 == -1) self.speed2 = 0;
 	
 	if (!self.alpha) self.alpha = 1;
+	if (self.alpha == -1) self.alpha = 0;
+	if (self.alpha2 == -1) self.alpha2 = 0;
+	
+	float ta;
+	if (self.spawnflags & 2)
+	{
+		ta = self.alpha;
+		self.alpha = self.alpha2;
+		self.alpha2 = ta;
+	}
 
 	if (self.distance > 0)
 	{
