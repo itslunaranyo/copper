@@ -930,7 +930,7 @@ void() target_items =
 	if (self.length <= 0)
 		self.length = 30;
 	if (self.deathtype == string_null)
-		self.deathtype = "had his life removed";
+		self.deathtype = "had their life removed";
 	
 	if (self.items > 0)
 	{
