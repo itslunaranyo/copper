@@ -1307,19 +1307,20 @@ void(float f) target_fade_set =
 	entity e;
 	while (t)
 	{
-		e = t.enemy;
-		if (!e.modelindex)	// don't do this for hidden bmodels
-		{
-			t = t.chain;
-			continue;
-		}
-		
+		e = t.enemy;		
 		e.alpha = f;
-		if ((e.style || e.switchshadstyle) && e.alpha2)
-			bmodel_lightstyle(e, zeroconvert(e.alpha2));
-			
+		if ((e.style || e.switchshadstyle))
+		{
+			if (e.alpha2)
+				bmodel_lightstyle(e, zeroconvert(e.alpha2));
+			else if (e.style)
+				lightstyle(e.style, light_str(f));
+		}	
 		t = t.chain;
 	}
+	
+	if (self.style)
+		lightstyle(self.style, light_str(f));
 }
 
 void() target_fade_dist =
