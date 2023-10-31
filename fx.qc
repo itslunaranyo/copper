@@ -1326,8 +1326,23 @@ void(float f) target_fade_set =
 void() target_fade_dist =
 {
 	target_fade_find();
+	
 	float dist, f;
-	dist = vlen(self.origin - activator.origin);
+	vector dir;
+	
+	dir = vec_scale(activator.origin - self.origin, self.dest);
+
+	if (self.movedir)
+	{
+		dist = dir * self.movedir;
+		if (self.spawnflags & 1)
+			dist = max(0,dist);
+		else
+			dist = fabs(dist);
+	}
+	else
+		dist = vlen(dir);
+		
 	f = saturate((dist - self.lip) / self.distance);
 	f = lerp(self.alpha, self.alpha2, f);
 	
@@ -1387,7 +1402,8 @@ void() target_fade_time =
 {
 	if (activator.classname != "player") return;
 	
-	self.state = 1 - self.state;
+	if (!(self.spawnflags & 1))
+		self.state = 1 - self.state;
 	
 	if (self.state)
 		self.pain_finished = time + self.delay + self.speed;
@@ -1402,13 +1418,25 @@ void() target_fade_time =
 		target_fade_think();
 }
 
-/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE
+/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE BY_DISTANCE
 Changes the alpha of its targets over time from 'alpha' to 'alpha2'. Triggering again will fade it back, unless ONE_WAY is set.
 Set REVERSE to swap the values.
 
-"delay" - pause before beginning to blend
-"speed" - time to spend blending, -1 for instant.
-"speed2" - time to spend blending back, if different than "speed". -1 for instant.
+If this targets brushmodels with switchable shadows or lightstyles, the lighting will fade appropriately.
+
+"alpha"		starting translucency. -1 for clear
+"alpha2"	ending translucency. -1 for clear
+"delay"		pause before beginning to blend
+"speed"		time to spend blending, -1 for instant.
+"speed2"	time to spend blending back, if different than "speed". -1 for instant.
+"style"		fade this lightstyle directly
+
+If BY_DISTANCE is checked, it will set alpha immediately based on how far the activator is from its origin. 
+"distance"	max distance beyond which alpha will be set to 'alpha'
+"lip"		min distance within which alpha will be set to 'alpha2'
+"angle/angles"	constrain distance measurement to this axis (like a fogblend)
+ONE_WAY in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
+"dest"		alternate distance constraint (scale position by these three values)
 */
 /*FGD
 @PointClass base(Appearflags, Targetname, Target) color(128 128 50) = target_fade : 
@@ -1416,13 +1444,18 @@ Set REVERSE to swap the values.
 Changes the alpha of its targets over time from 'alpha' to 'alpha2'." 
 [
 	spawnflags(flags) = [
-		2 : "Reverse Start/End" : 0
+		1 : "One Way" : 0
+		2 : "Reverse alpha/alpha2" : 0
+		2 : "Blend By Distance Instead" : 0
 	]
 	delay(string) : "Pause before starting blend"
 	alpha(string) : "Start alpha" : "1.0"
 	alpha2(string) : "End alpha" : "0.0"
 	speed(string) : "Time to blend (-1 for instant)"
 	speed2(string) : "Time to blend back, if different (-1 for instant)"
+	distance(integer) : "Max distance for 'alpha'"
+	lip(integer) : "Min distance for 'alpha2'"
+	angle(integer) : "Constrain distance to this axis"
 ]
 */
 void() target_fade =
@@ -1431,15 +1464,8 @@ void() target_fade =
 
 	self.state = 0;
 	
-	if (!self.speed) self.speed = 1;
-	if (self.speed == -1) self.speed = 0;
-	
-	if (!self.speed2) self.speed2 = self.speed;
-	if (self.speed2 == -1) self.speed2 = 0;
-	
-	if (!self.alpha) self.alpha = 1;
-	if (self.alpha == -1) self.alpha = 0;
-	if (self.alpha2 == -1) self.alpha2 = 0;
+	self.alpha = zeroconvertdefault(self.alpha, 1);
+	self.alpha2 = zeroconvert(self.alpha2);
 	
 	float ta;
 	if (self.spawnflags & 2)
@@ -1447,15 +1473,22 @@ void() target_fade =
 		ta = self.alpha;
 		self.alpha = self.alpha2;
 		self.alpha2 = ta;
+		self.spawnflags -= 2;
 	}
 
-	if (self.distance > 0)
+	if ((self.spawnflags & 4) && self.distance > 0)
 	{
+		if (!self.dest) self.dest = '1 1 1';
 		self.use = target_fade_dist;
 		self.distance -= self.lip;
+		if (self.angles)
+			SetMovedir();
 	}
 	else
 	{
+		self.speed = zeroconvertdefault(self.speed, 1);
+		self.speed2 = zeroconvertdefault(self.speed2, self.speed);
+
 		self.use = target_fade_time;
 		self.think = target_fade_think;
 	}
