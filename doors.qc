@@ -396,14 +396,15 @@ void() door_shadowmonitor_go =
 {
 	float frac;
 	entity o = self.owner;
-	if (o.state == STATE_TOP)
-		frac = 1;
-	else if (o.state == STATE_BOTTOM)
+	if (o.state == STATE_TOP)	// at pos2 (open)
 		frac = 0;
+	else if (o.state == STATE_BOTTOM)	// at pos1 (closed)
+		frac = 1;
 	else
-		frac = vlen(o.origin - o.pos1) / vlen(o.pos2 - o.pos1);
+		frac = vlen(o.origin - o.pos2) / vlen(o.pos2 - o.pos1);	// distance FROM pos2
 
-	bmodel_lightstyle(o, light_str(frac, o));
+	// 1 blocks light, 0 admits light
+	bmodel_lightstyle(o, frac);
 	
 	// pay attention to owner state so we stop thinking when the door is done moving
 	if ((o.state == STATE_TOP) && (o.spawnflags & DOOR_TOGGLE) || o.state == STATE_BOTTOM)
@@ -438,7 +439,7 @@ void(entity d) door_shadowmonitor =
 			d.customflags |= CFL_INVLIGHT;
 	}
 	
-	bmodel_lightstyle(d, light_str(0, d));
+	bmodel_lightstyle(d, 1);
 }
 
 /*
@@ -960,30 +961,43 @@ void(entity attacker, float damage) secretdoor_pain =
 
 void() secret_shadowmonitor_go =
 {
-	float frac;
+	float opac, done;
 	vector mv, p;
 	entity o = self.owner;
 	
+	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
+	
 	if (o.think == secretdoor_move2 || o.think == secretdoor_move6)
-		frac = 0;
+	{
+		opac = 1;
+		done = TRUE;
+	}
+	else if (o.think == SUB_Null)
+	{
+		opac = 0;
+		if (o.wait == -1)
+			done = TRUE;
+	}
 	else if (o.think == secretdoor_move4)
-		frac = 1;
+	{
+		opac = 0;
+		self.nextthink += o.wait;
+	}
 	else
 	{
 		mv = o.dest2 - o.dest1;
-		p = o.origin - o.dest1;
-		frac = (p * normalize(mv)) / vlen(mv);
+		p = o.origin - o.dest2;
+		opac = vlen(p) / vlen(mv);
 	}
 
-	bmodel_lightstyle(o, light_str(frac, o));
+	bmodel_lightstyle(o, opac);
 
-	if ((frac == 0 || frac == 1) && o.wait == -1)
+	if (done)
 	{
 		remove(self);
 		return;
 	}
 	
-	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
 	self.think = secret_shadowmonitor_go;
 }
 
@@ -998,14 +1012,6 @@ void () secretdoor_move0 =
 	SUB_CalcMove(self.dest1, self.speed, secretdoor_move1);
 	if (self.noise2 != string_null)
 		sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
-	
-	if (!self.switchshadstyle && !self.style)
-		return;
-	
-	entity s = spawn();
-	s.classname = "shadowmonitor";
-	s.owner = self;
-	SUB_CallAsSelf(secret_shadowmonitor_go, s);
 }
 
 // Wait after first movement...
@@ -1023,6 +1029,14 @@ void () secretdoor_move2 =
 	if (self.noise2 != string_null)
 		sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	SUB_CalcMove(self.dest2, self.speed2, secretdoor_move3);
+	
+	if (!self.switchshadstyle && !self.style)
+		return;
+		
+	entity s = spawn();
+	s.classname = "shadowmonitor";
+	s.owner = self;
+	SUB_CallAsSelf(secret_shadowmonitor_go, s);
 }
 
 // Wait here until time to go back...
@@ -1042,7 +1056,6 @@ void () secretdoor_move3 =
 // Move backward...
 void () secretdoor_move4 =
 {
-	self.think = SUB_Null;
 	if (self.noise2 != string_null)
 		sound(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	SUB_CalcMove(self.dest1, self.speed2, secretdoor_move5);		
@@ -1297,7 +1310,7 @@ void () func_door_secret =
 		self.style *= -1;
 		self.customflags |= CFL_INVLIGHT;
 	}
-	bmodel_lightstyle(self, light_str(0, self));
+	bmodel_lightstyle(self, 1);
 	
 	self.use = secretdoor_use;
 	if ( !self.targetname || self.spawnflags & SECRET_YES_SHOOT)

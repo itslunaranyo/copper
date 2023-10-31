@@ -321,7 +321,7 @@ Keyvalues:
   "max_health" if auto, never set count to heal *target* above this much
 */
 /*FGD
-@Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(32 32 32) = target_heal : "Target : Heal.
+@Pointclass base(Targetname, Appearflags) color(192 64 0) size(32 32 32) = target_heal : "Target : Heal.
 Heals activator for 'healamount' when triggered. Use for healing pools, first aid dispensers, etc.
 If it has any targets, it heals them instead, even doors and buttons. This will not reset 'dead' doors or buttons with a wait of -1.
 
@@ -333,6 +333,10 @@ If 'trigger first' and 'auto set count' are set, will choose 'count' based on ho
 		4 : "First trigger activates" : 0
 		8 : "Auto-set 'count' on trigger-first" : 0
 	]
+	target(target_destination) : "Target: acts on all with matching targetname" 
+	target2(target_destination) : "Target 2: acts on all with matching targetname" 
+	target3(target_destination) : "Target 3: acts on all with matching targetname" 
+	target4(target_destination) : "Target 4: acts on all with matching targetname" 
 	healamount(integer) : "Healing per use" : 5
 	count(integer) : "Lifetime healing limit" : -1
 	strength(string) : "Scale auto-limit (-4 to scale by number of clients)" : "1"
@@ -511,13 +515,18 @@ MURDER	monsters are damaged to death, and spawners will credit unspawned kills
 RANDOM	randomly kill only one target out of all of them
 */
 /*FGD
-@Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_kill : 
+@Pointclass base(Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_kill : 
 "Removes all targets when triggered. for targets you really don't like." [
 	spawnflags(flags) =	[
 		1 : "Murder monsters instead of removing" : 0
-		2 : "Kill one target at random" : 0
+		2 : "Remove one target at random" : 0
 	]	
-	delay(string) : "Delay before kill" : "0"
+	target(target_destination) : "Target: removes all with matching targetname" 
+	target2(target_destination) : "Target 2: removes all with matching targetname" 
+	target3(target_destination) : "Target 3: removes all with matching targetname" 
+	target4(target_destination) : "Target 4: removes all with matching targetname" 
+	killtarget(target_destination) : "Killtarget: removes all with matching targetname" 
+	delay(string) : "Delay before removing" : "0"
 ]
 */
 void() target_kill =

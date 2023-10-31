@@ -1232,9 +1232,10 @@ void() target_debris =
 	- alt target: fade target, 2 on start, 3 on finish, 4 on return
 */
 
+// targetname scanning 20 times a frame is a little rude, so we check for
+// targets up front and remember them
 void(entity e) target_fade_add =
 {
-	dprint("target_fade_add\n");
 	entity fader;
 	if (self.enemy)
 	{
@@ -1254,8 +1255,6 @@ void(entity e) target_fade_add =
 	}
 }
 
-// targetname scanning 20 times a frame is a little rude, so we check for
-// targets up front and remember them
 void() target_fade_find =
 {
 	if (self.enemy) return;
@@ -1289,7 +1288,6 @@ void() target_fade_find =
 
 void() target_fade_done =
 {
-	dprint("target_fade_done\n");
 	entity t = self.chain;
 	entity ot;
 	while (t)
@@ -1306,20 +1304,89 @@ void(float f) target_fade_set =
 {
 	if (f == 0) f = -1;
 	entity t = self;
+	entity e;
 	while (t)
 	{
-		dprint("  setting alpha on something\n");
-		t.enemy.alpha = f;
+		e = t.enemy;		
+		e.alpha = f;
+		if ((e.style || e.switchshadstyle))
+		{
+			if (e.alpha2)
+				bmodel_lightstyle(e, zeroconvert(e.alpha2));
+			else if (e.style)
+				lightstyle(e.style, light_str(f));
+		}	
 		t = t.chain;
 	}
+	
+	if (self.style)
+		lightstyle(self.style, light_str(f));
 }
+
+// fade over distance stuff ===========
 
 void() target_fade_dist =
 {
 	target_fade_find();
+	
 	float dist, f;
-	dist = vlen(self.origin - activator.origin);
-	f = saturate((dist - self.lip) / self.distance);
+	vector dir;
+	
+	dir = vec_scale(activator.origin - self.origin, self.dest);
+
+	if (self.movedir)
+	{
+		dist = dir * self.movedir;
+		if (self.spawnflags & 1)
+			dist = max(0,dist);
+		else
+			dist = fabs(dist);
+	}
+	else
+		dist = vlen(dir);
+	
+	// state 0: outside
+	// state 1: entered transition
+	// state 2: entered center
+	// state 3: re-entered transition (transition after center)
+	// state 0: outside again
+	f = (dist - self.lip) / self.distance;
+	if (f > 1)	// outside
+	{
+		f = 1;
+		if (self.state == 3 || self.state == 1)
+		{
+			self.state = 0;
+			if (self.noise4 != string_null) sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
+			SUB_UseTargetsAlt(target4);
+		}
+	}
+	else if (f < 0)	// center
+	{
+		f = 0;
+		if (self.state == 1)
+		{
+			self.state = 2;
+			if (self.noise2 != string_null) sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
+			SUB_UseTargetsAlt(target3);
+		}
+	}
+	else	// transition
+	{
+		if (self.state == 0)
+		{
+			self.state = 1;
+			if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
+			SUB_UseTargetsAlt(target2);
+		}
+		else if (self.state == 2)
+		{
+			self.state = 3;
+			if (self.noise3 != string_null) sound (self, CHAN_VOICE, self.noise3, self.volume, ATTN_NORM);
+		}
+
+	}
+	f = lerp(self.alpha, self.alpha2, 1 - f);
 	
 	target_fade_set(f);
 	
@@ -1328,16 +1395,20 @@ void() target_fade_dist =
 	self.think = target_fade_done;
 }
 
+// fade over time stuff ===========
 
 void() target_fade_think =
 {
 	float f, a;
-	dprint("target_fade_think\n");
 	
 	if (time >= self.pain_finished)
 	{
 		f = 1;
 		self.use = target_fade_time;
+		if (self.state)
+			if (self.noise2 != string_null) sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
+		else
+			if (self.noise4 != string_null) sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
 	}
 	else
 	{
@@ -1363,14 +1434,9 @@ void() target_fade_think =
 		// in transition, blend proportionally
 		a = lerpHermite(self.alpha, self.alpha2, f);
 	
-	dprint3("  ", ftos(a), "\n");
 	target_fade_set(a);
 	if (self.use == target_fade_time)
 	{
-		//if (self.state)
-		//	SUB_UseTargetsAlt(target2);
-		//else
-		//	SUB_UseTargetsAlt(target4);
 		target_fade_done();
 	}
 }
@@ -1378,14 +1444,20 @@ void() target_fade_think =
 void() target_fade_time =
 {
 	if (activator.classname != "player") return;
-	dprint("target_fade_time\n");
+	
 	if (!(self.spawnflags & 1))
 		self.state = 1 - self.state;
 	
 	if (self.state)
+	{
+		if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
 		self.pain_finished = time + self.delay + self.speed;
+	}
 	else
+	{
+		if (self.noise3 != string_null) sound (self, CHAN_VOICE, self.noise3, self.volume, ATTN_NORM);
 		self.pain_finished = time + self.delay + self.speed2;
+	}
 	
 	target_fade_find();
 	
@@ -1395,56 +1467,98 @@ void() target_fade_time =
 		target_fade_think();
 }
 
-/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE
+/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE BY_DISTANCE
 Changes the alpha of its targets over time from 'alpha' to 'alpha2'. Triggering again will fade it back, unless ONE_WAY is set.
 Set REVERSE to swap the values.
 
-"delay" - pause before beginning to blend
-"speed" - time to spend blending, -1 for instant.
-"speed2" - time to spend blending back, if different than "speed". -1 for instant.
+If this targets brushmodels with switchable shadows or lightstyles, the lighting will fade appropriately.
+
+"alpha"		starting translucency. -1 for clear
+"alpha2"	ending translucency. -1 for clear
+"delay"		pause before beginning to blend
+"speed"		time to spend blending, -1 for instant.
+"speed2"	time to spend blending back, if different than "speed". -1 for instant.
+"style"		fade this lightstyle directly
+"noise"		sound to play on begin fade
+"noise2"	sound to play on end fade
+"noise3"	sound to play on begin reverse fade
+"noise4"	sound to play on end reverse fade
+
+If BY_DISTANCE is checked, it will set alpha immediately based on how far the activator is from its origin. 
+"distance"	max distance beyond which alpha will be set to 'alpha'
+"lip"		min distance within which alpha will be set to 'alpha2'
+"angle/angles"	constrain distance measurement to this axis (like a fogblend)
+ONE_WAY in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
+"dest"		alternate distance constraint (scale position by these three values)
+
+Alt Target Pattern: in distance mode, target is fading object, target2 on begin fade (enter distance range), target3 on complete fade (enter lip range), target4 on exit distance range
 */
 /*FGD
-@PointClass base(Appearflags, Targetname, Target) color(128 128 50) = target_fade : 
+@PointClass base(Appearflags, Targetname, Target, AltTarget) color(128 128 50) = target_fade : 
 "Target: Fade
-Changes the alpha of its targets over time from 'alpha' to 'alpha2'." 
+Changes the alpha of its targets over time from 'alpha' to 'alpha2'.
+If this targets brushmodels with switchable shadows or lightstyles, the lighting will fade appropriately.
+If 'Blend By Distance' is set, it will set alpha immediately based on how far the activator is from its origin.
+'One Way' in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
+
+Alt Target Pattern: in distance mode, target is fading object, target2 on begin fade (enter distance range), target3 on complete fade (enter lip range), target4 on exit distance range" 
 [
 	spawnflags(flags) = [
-		1 : "One-Way Only" : 0
-		2 : "Reverse Start/End" : 0
+		1 : "One Way" : 0
+		2 : "Reverse alpha/alpha2" : 0
+		2 : "Blend By Distance" : 0
 	]
 	delay(string) : "Pause before starting blend"
 	alpha(string) : "Start alpha" : "1.0"
 	alpha2(string) : "End alpha" : "0.0"
 	speed(string) : "Time to blend (-1 for instant)"
 	speed2(string) : "Time to blend back, if different (-1 for instant)"
+	distance(integer) : "Max distance for 'alpha'"
+	lip(integer) : "Min distance for 'alpha2'"
+	angle(integer) : "Constrain distance to this axis"
+	noise(string) : "Sound to play on begin fade"
+	noise2(string) : "Sound to play on end fade"
+	noise3(string) : "Sound to play on begin reverse fade"
+	noise4(string) : "Sound to play on end reverse fade"
 ]
 */
 void() target_fade =
 {
 	if (!SUB_ShouldSpawn()) return;
 
+	self.state = 0;
+	
+	self.alpha = zeroconvertdefault(self.alpha, 1);
+	self.alpha2 = zeroconvert(self.alpha2);
+	
+	if (!self.volume) self.volume = 1;
+	if (self.noise != string_null) precache_sound(self.noise);
+	if (self.noise2 != string_null) precache_sound(self.noise2);
+	if (self.noise3 != string_null) precache_sound(self.noise3);
+	if (self.noise4 != string_null) precache_sound(self.noise4);
+	
+	float ta;
 	if (self.spawnflags & 2)
-		self.state = 1;
-	else
-		self.state = 0;
-	if (self.spawnflags & 1)
-		self.state = 1 - self.state;
-	
-	if (!self.speed) self.speed = 1;
-	if (self.speed == -1) self.speed = 0;
-	
-	if (!self.speed2) self.speed2 = self.speed;
-	if (self.speed2 == -1) self.speed2 = 0;
-	
-	if (!self.alpha) self.alpha = 1;
-
-	if (self.distance > 0)
 	{
+		ta = self.alpha;
+		self.alpha = self.alpha2;
+		self.alpha2 = ta;
+		self.spawnflags -= 2;
+	}
+
+	if ((self.spawnflags & 4) && self.distance > 0)
+	{
+		if (!self.dest) self.dest = '1 1 1';
 		self.use = target_fade_dist;
 		self.distance -= self.lip;
+		if (self.angles)
+			SetMovedir();
 	}
 	else
 	{
+		self.speed = zeroconvertdefault(self.speed, 1);
+		self.speed2 = zeroconvertdefault(self.speed2, self.speed);
+
 		self.use = target_fade_time;
 		self.think = target_fade_think;
 	}

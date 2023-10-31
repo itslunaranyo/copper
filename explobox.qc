@@ -33,7 +33,7 @@ void() explobox_respawn =
 
 	self.alpha = 1;
 	setorigin(self, self.origin);
-	bmodel_lightstyle(self, light_str(0,self));
+	bmodel_lightstyle(self, 1);
 	ItemPiff();
 }
 
@@ -84,7 +84,7 @@ void() explobox_explode_go =
 	else
 		boom.think = BecomeExplosion;
 	
-	bmodel_lightstyle(self, light_str(1,self));
+	bmodel_lightstyle(self, 0);
 	
 	if (!self.wait)
 	{
@@ -149,7 +149,7 @@ void() explobox_appear =
 	}
 	setorigin (self, self.origin);	
 	setmodel (self, self.model);
-	bmodel_lightstyle(self,light_str(0,self));
+	bmodel_lightstyle(self, 1);
 	
 	self.use = explobox_use;
 }
@@ -160,7 +160,7 @@ void() explobox_start_invis =
 	self.solid = SOLID_NOT;
 	self.movetype = MOVETYPE_NONE;
 	self.modelindex = 0;
-	bmodel_lightstyle(self,light_str(1,self));
+	bmodel_lightstyle(self, 0);
 }
 
 
@@ -302,6 +302,6 @@ void() func_explobox =
 	self.movetype = MOVETYPE_PUSH;
 	setmodel(self,self.model);
 	self.dmg = zeroconvertdefault(self.dmg,150);
-	bmodel_lightstyle(self, light_str(0,self));
+	bmodel_lightstyle(self, 1);
 	explobox_setup();
 }

@@ -330,7 +330,7 @@ Spawnflags:
 "unlock_only"	Will only unlock its targets rather than toggling
 */
 /*FGD
-@Pointclass base(Target, Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_lock : 
+@Pointclass base(Targetname, Appearflags) color(192 64 0) size(16 16 16) = target_lock : 
 "Locks and unlocks targeted entities independent of their toggle/start_open/etc states.  Works on various entities:
   - A locked func_door won't respond to touches or triggers. Use this for doors behind temporary bars.
   - A locked func_plat behaves as an unreleased LOW_TRIGGER plat
@@ -344,6 +344,10 @@ If 'wait' is set, will automatically undo itself after 'wait' seconds."
 		2: "Lock only" : 0
 		4: "Unlock only" : 0
 	]
+	target(target_destination) : "Target: acts on all with matching targetname" 
+	target2(target_destination) : "Target 2: acts on all with matching targetname" 
+	target3(target_destination) : "Target 3: acts on all with matching targetname" 
+	target4(target_destination) : "Target 4: acts on all with matching targetname" 
 	wait(string) : "Wait before undoing" : 0
 	rand(string) : "Additional random wait" : 0
 ]

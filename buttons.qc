@@ -350,14 +350,14 @@ void() skillbutton_shadowmonitor_go =
 {
 	float frac;
 	entity o = self.enemy;
-	if (o.state == STATE_TOP)
+	if (o.state == STATE_TOP)	// at pos2
 		frac = 0;
-	else if (o.state == STATE_BOTTOM)
+	else if (o.state == STATE_BOTTOM)	// at pos1
 		frac = 1;
 	else
 		frac = vlen(o.origin - o.pos2) / vlen(o.pos2 - o.pos1);
 	
-	bmodel_lightstyle(o, light_str(frac, o));
+	bmodel_lightstyle(o, frac);
 	
 	// pay attention to owner state so we stop thinking when the door is done moving
 	if (o.state == STATE_BOTTOM)
@@ -373,7 +373,7 @@ void() skillbutton_shadowmonitor_go =
 
 void() skillbutton_activate =
 {
-	if (self.classname == "shadowmonitor")
+	if (self.classname == "btn_shadowmonitor")
 		return;
 	
 	if (skill == self.strength)
@@ -382,7 +382,7 @@ void() skillbutton_activate =
 		skillbutton_go_down();
 	
 	// do this to catch the first frame one
-	if (self.owner.classname == "shadowmonitor")
+	if (self.owner.classname == "btn_shadowmonitor")
 	{
 		self = self.owner;
 		skillbutton_shadowmonitor_go();
@@ -474,7 +474,7 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 	if (self.style || self.switchshadstyle)
 	{
 		entity m = spawn();
-		m.classname = "shadowmonitor";
+		m.classname = "btn_shadowmonitor";
 		m.enemy = self;
 		m.owner = skill_head;
 		self.owner = m;
@@ -483,7 +483,7 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 			self.style *= -1;
 			self.customflags |= CFL_INVLIGHT;
 		}
-		bmodel_lightstyle(self, light_str(1, self));
+		bmodel_lightstyle(self, 1);
 	}
 	skill_head = self;
 

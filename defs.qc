@@ -282,7 +282,7 @@ string	keyType;
 .string		target3;
 .string		target4;
 
-.float		alpha;
+.float		alpha, alpha2;
 
 // lights
 .float		style;
@@ -399,7 +399,6 @@ string	keyType;
 .float version = worldtype;
 .string	model2 = wad;		// for debris emitter
 .string model3 = map;
-.float alpha2 = volume;
 
 
 //===========================================================================
