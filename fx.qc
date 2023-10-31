@@ -1357,6 +1357,7 @@ void() target_fade_dist =
 		if (self.state == 3 || self.state == 1)
 		{
 			self.state = 0;
+			if (self.noise4 != string_null) sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
 			SUB_UseTargetsAlt(target4);
 		}
 	}
@@ -1366,6 +1367,7 @@ void() target_fade_dist =
 		if (self.state == 1)
 		{
 			self.state = 2;
+			if (self.noise2 != string_null) sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
 			SUB_UseTargetsAlt(target3);
 		}
 	}
@@ -1374,15 +1376,17 @@ void() target_fade_dist =
 		if (self.state == 0)
 		{
 			self.state = 1;
+			if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
 			SUB_UseTargetsAlt(target2);
 		}
 		else if (self.state == 2)
 		{
 			self.state = 3;
+			if (self.noise3 != string_null) sound (self, CHAN_VOICE, self.noise3, self.volume, ATTN_NORM);
 		}
 
 	}
-	f = lerp(self.alpha, self.alpha2, f);
+	f = lerp(self.alpha, self.alpha2, 1 - f);
 	
 	target_fade_set(f);
 	
@@ -1401,6 +1405,10 @@ void() target_fade_think =
 	{
 		f = 1;
 		self.use = target_fade_time;
+		if (self.state)
+			if (self.noise2 != string_null) sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
+		else
+			if (self.noise4 != string_null) sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
 	}
 	else
 	{
@@ -1441,9 +1449,15 @@ void() target_fade_time =
 		self.state = 1 - self.state;
 	
 	if (self.state)
+	{
+		if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
 		self.pain_finished = time + self.delay + self.speed;
+	}
 	else
+	{
+		if (self.noise3 != string_null) sound (self, CHAN_VOICE, self.noise3, self.volume, ATTN_NORM);
 		self.pain_finished = time + self.delay + self.speed2;
+	}
 	
 	target_fade_find();
 	
@@ -1465,6 +1479,10 @@ If this targets brushmodels with switchable shadows or lightstyles, the lighting
 "speed"		time to spend blending, -1 for instant.
 "speed2"	time to spend blending back, if different than "speed". -1 for instant.
 "style"		fade this lightstyle directly
+"noise"		sound to play on begin fade
+"noise2"	sound to play on end fade
+"noise3"	sound to play on begin reverse fade
+"noise4"	sound to play on end reverse fade
 
 If BY_DISTANCE is checked, it will set alpha immediately based on how far the activator is from its origin. 
 "distance"	max distance beyond which alpha will be set to 'alpha'
@@ -1498,6 +1516,10 @@ Alt Target Pattern: in distance mode, target is fading object, target2 on begin 
 	distance(integer) : "Max distance for 'alpha'"
 	lip(integer) : "Min distance for 'alpha2'"
 	angle(integer) : "Constrain distance to this axis"
+	noise(string) : "Sound to play on begin fade"
+	noise2(string) : "Sound to play on end fade"
+	noise3(string) : "Sound to play on begin reverse fade"
+	noise4(string) : "Sound to play on end reverse fade"
 ]
 */
 void() target_fade =
@@ -1508,6 +1530,12 @@ void() target_fade =
 	
 	self.alpha = zeroconvertdefault(self.alpha, 1);
 	self.alpha2 = zeroconvert(self.alpha2);
+	
+	if (!self.volume) self.volume = 1;
+	if (self.noise != string_null) precache_sound(self.noise);
+	if (self.noise2 != string_null) precache_sound(self.noise2);
+	if (self.noise3 != string_null) precache_sound(self.noise3);
+	if (self.noise4 != string_null) precache_sound(self.noise4);
 	
 	float ta;
 	if (self.spawnflags & 2)
