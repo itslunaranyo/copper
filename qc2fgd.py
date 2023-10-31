@@ -36,15 +36,13 @@ def getQCs():
 
 def go():
 	cwd = os.path.dirname(os.path.realpath(__file__))
-	qcDir = cwd + "\\"
-	fgdDir = os.path.normpath(cwd + "\\..\\")
+	fgdDir = os.path.normpath(os.path.join(cwd, ".."))
 	fgdName = ""
 	if len(sys.argv) > 1:
 		fgdName = sys.argv[1]
 	else:
 		fgdName = os.path.basename(fgdDir)
 	fgdFile = fgdName + ".fgd"
-	fgdDir += "\\"
 
 	print("Scanning *.qc for FGD comments...")
 	defOut = """// Copper Quake game definition file (.fgd)
@@ -65,7 +63,7 @@ def go():
 	for qcfn in qcfiles:
 		if not qcfn.endswith(".qc"):
 			continue
-		with open(qcDir+qcfn, "r") as qcfile:
+		with open(os.path.join(cwd, qcfn), "r") as qcfile:
 			qc = qcfile.read()
 		defs, n = getQuakeds(qc)
 		if (n):
@@ -74,8 +72,8 @@ def go():
 			numDefs += n
 			defOut += "\n"
 	
-	dfn = fgdDir + fgdFile
-	print("Writing to",dfn)
+	dfn = os.path.join(fgdDir, fgdFile)
+	print("Writing to", dfn)
 	with open(dfn, "w") as df:
 		df.write(defOut)
 	print("Completed, found",numDefs)

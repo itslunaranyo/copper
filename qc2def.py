@@ -48,30 +48,28 @@ def getQuakeds(qc):
 
 def go():
 	cwd = os.path.dirname(os.path.realpath(__file__))
-	qcDir = cwd + "\\"
-	defDir = os.path.normpath(cwd + "\\..\\")
+	defDir = os.path.normpath(os.path.join(cwd, ".."))
 	defName = ""
 	if len(sys.argv) > 1:
 		defName = sys.argv[1]
 	else:
 		defName = os.path.basename(defDir)
 	defFile = defName + ".def"
-	defDir += "\\"
 
 	print("Scanning *.qc for def comments...")
 	defOut = ""
 	numDefs = 0
 	
-	for qcfn in os.listdir(qcDir):
+	for qcfn in os.listdir(cwd):
 		if not qcfn.endswith(".qc"):
 			continue
-		with open(qcDir+qcfn, "r") as qcfile:
+		with open(os.path.join(cwd, qcfn), "r") as qcfile:
 			qc = qcfile.read()
 		defs, n = getQuakeds(qc)
 		defOut += defs
 		numDefs += n
 	
-	dfn = defDir + defFile
+	dfn = os.path.join(defDir, defFile)
 	print("Writing to",dfn)
 	with open(dfn, "w") as df:
 		df.write(defOut)
