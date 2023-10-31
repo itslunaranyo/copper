@@ -1323,6 +1323,8 @@ void(float f) target_fade_set =
 		lightstyle(self.style, light_str(f));
 }
 
+// fade over distance stuff ===========
+
 void() target_fade_dist =
 {
 	target_fade_find();
@@ -1342,8 +1344,44 @@ void() target_fade_dist =
 	}
 	else
 		dist = vlen(dir);
-		
-	f = saturate((dist - self.lip) / self.distance);
+	
+	// state 0: outside
+	// state 1: entered transition
+	// state 2: entered center
+	// state 3: re-entered transition (transition after center)
+	// state 0: outside again
+	f = (dist - self.lip) / self.distance;
+	if (f > 1)	// outside
+	{
+		f = 1;
+		if (self.state == 3 || self.state == 1)
+		{
+			self.state = 0;
+			SUB_UseTargetsAlt(target4);
+		}
+	}
+	else if (f < 0)	// center
+	{
+		f = 0;
+		if (self.state == 1)
+		{
+			self.state = 2;
+			SUB_UseTargetsAlt(target3);
+		}
+	}
+	else	// transition
+	{
+		if (self.state == 0)
+		{
+			self.state = 1;
+			SUB_UseTargetsAlt(target2);
+		}
+		else if (self.state == 2)
+		{
+			self.state = 3;
+		}
+
+	}
 	f = lerp(self.alpha, self.alpha2, f);
 	
 	target_fade_set(f);
@@ -1353,6 +1391,7 @@ void() target_fade_dist =
 	self.think = target_fade_done;
 }
 
+// fade over time stuff ===========
 
 void() target_fade_think =
 {
@@ -1390,10 +1429,6 @@ void() target_fade_think =
 	target_fade_set(a);
 	if (self.use == target_fade_time)
 	{
-		//if (self.state)
-		//	SUB_UseTargetsAlt(target2);
-		//else
-		//	SUB_UseTargetsAlt(target4);
 		target_fade_done();
 	}
 }
@@ -1437,16 +1472,23 @@ If BY_DISTANCE is checked, it will set alpha immediately based on how far the ac
 "angle/angles"	constrain distance measurement to this axis (like a fogblend)
 ONE_WAY in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
 "dest"		alternate distance constraint (scale position by these three values)
+
+Alt Target Pattern: in distance mode, target is fading object, target2 on begin fade (enter distance range), target3 on complete fade (enter lip range), target4 on exit distance range
 */
 /*FGD
-@PointClass base(Appearflags, Targetname, Target) color(128 128 50) = target_fade : 
+@PointClass base(Appearflags, Targetname, Target, AltTarget) color(128 128 50) = target_fade : 
 "Target: Fade
-Changes the alpha of its targets over time from 'alpha' to 'alpha2'." 
+Changes the alpha of its targets over time from 'alpha' to 'alpha2'.
+If this targets brushmodels with switchable shadows or lightstyles, the lighting will fade appropriately.
+If 'Blend By Distance' is set, it will set alpha immediately based on how far the activator is from its origin.
+'One Way' in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
+
+Alt Target Pattern: in distance mode, target is fading object, target2 on begin fade (enter distance range), target3 on complete fade (enter lip range), target4 on exit distance range" 
 [
 	spawnflags(flags) = [
 		1 : "One Way" : 0
 		2 : "Reverse alpha/alpha2" : 0
-		2 : "Blend By Distance Instead" : 0
+		2 : "Blend By Distance" : 0
 	]
 	delay(string) : "Pause before starting blend"
 	alpha(string) : "Start alpha" : "1.0"
