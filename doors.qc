@@ -969,20 +969,17 @@ void() secret_shadowmonitor_go =
 	
 	if (o.think == secretdoor_move2 || o.think == secretdoor_move6)
 	{
-		dprint("done at 1\n");
 		opac = 1;
 		done = TRUE;
 	}
 	else if (o.think == SUB_Null)
 	{
-		dprint("done at 0\n");
 		opac = 0;
 		if (o.wait == -1)
 			done = TRUE;
 	}
 	else if (o.think == secretdoor_move4)
 	{
-		dprint("wait at 0\n");
 		opac = 0;
 		self.nextthink += o.wait;
 	}
@@ -991,14 +988,12 @@ void() secret_shadowmonitor_go =
 		mv = o.dest2 - o.dest1;
 		p = o.origin - o.dest2;
 		opac = vlen(p) / vlen(mv);
-		dprint3("sec opac: ", ftos(opac), "\n");
 	}
 
 	bmodel_lightstyle(o, opac);
 
 	if (done)
 	{
-		dprint("shad sec dying\n");
 		remove(self);
 		return;
 	}

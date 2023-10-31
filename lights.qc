@@ -178,16 +178,13 @@ void(entity b, float opacity) bmodel_lightstyle =
 	if (opacity == 0) b.alpha2 = -1;
 	else b.alpha2 = opacity;
 	
-	//dprint3("for ", b.targetname, " -- ");
-	//dprint5("op: ", ftos(opacity), " a: ", ftos(a), " -- ");
-	
 	if (b.customflags & CFL_INVLIGHT)
 		opacity = 1 - opacity;
 	
 	// 0 for either will override the other and admit light, so we multiply
 	// finally, invert so 0 (brightest) becomes a high value
 	f = 1 - opacity * a;
-	//dprint3("brightness: ", ftos(f), "\n");
+
 	string l = light_str(f);
 
 	if (b.style)
