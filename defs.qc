@@ -213,6 +213,7 @@ void		end_sys_fields;			// flag for structure dumping
 */
 
 // globals
+#pragma noref 1
 
 float	gameover;		// set when a rule exits
 
@@ -232,6 +233,8 @@ nosave float	gamestarted;
 nosave float	cleanUpClientShit;
 nosave float	clients;
 nosave float	clientsAlive;
+nosave float	clientsAliveMask;
+nosave float	globalStatSupported;
 
 float	skill;
 float	coop_time;
@@ -246,7 +249,6 @@ float	trace_debug;
 
 // moved from ai.qc or maybe combat.qc - used for target finding
 float	enemy_vis, enemy_range;//, enemy_infront;
-float	enemy_yaw();
 
 // when a monster becomes angry at a player, that monster will be used
 // as the sight target the next frame so that monsters near that one
@@ -258,11 +260,13 @@ float	sight_entity_time;
 entity	lastspawn, bodyqueue_head;
 
 // moved from client.qc
-float	intermission_running, intermission_exittime;
+float	intermission, intermission_exittime;
 float	modelindex_eyes, modelindex_player;
 
 float	icantsee;
-float	isKex;	// running the quake rerelease
+// these are set in worldspawn() and thus reset every game start
+nosave float	isKex;	// running the quake rerelease
+nosave float	isCSQC;	// running something with passable csqc support
 
 string	keyType;
 
@@ -316,6 +320,13 @@ string	keyType;
 .float		bubble_count;	// keeps track of the number of bubbles
 .float		healthtime;
 .string		deathtype;		// keeps track of how the player died
+
+#ifndef NO_CSQC
+// fields for csqc HUD stats
+.float		clientdata;
+.float		tint;
+.vector		tint_color;
+#endif
 
 // fog
 .vector		fog_color, fog_color2;
@@ -506,7 +517,10 @@ void(entity e) setspawnparms		= #78;		// set parm1... to the
 												// for coop respawn
 
 float(string s) checkextension		= #99;		// check cvar("pr_checkextension") before calling
-
+#ifndef NO_CSQC
+void(float num, float type, .__variant fld) clientstat = #232;
+void(float num, float type, string name) globalstat = #233;
+#endif
 //================================================
 
 //	angles(string) : "Direction, specifically (pitch yaw roll)"
@@ -560,4 +574,7 @@ float(string s) checkextension		= #99;		// check cvar("pr_checkextension") befor
 		16384 : "Alt Target Pattern" : 0
 	]
 ]
+=======
 */
+
+#pragma noref 0

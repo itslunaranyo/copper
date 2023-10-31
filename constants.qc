@@ -256,6 +256,28 @@ const float	STAT_TOTALSECRETS	= 11;	// hmmm ...
 const float	STAT_TOTALMONSTERS	= 12;	// must send this if new monsters are spawned after the map starts
 const float	STAT_SECRETS		= 13;	// bumped on client side by svc_foundsecret
 const float	STAT_MONSTERS		= 14;	// bumped by svc_killedmonster
+const float STAT_ITEMS 			= 15;	// self.items | (self.items2<<23)
+										// In order to decode this stat properly, you need to use 
+										// getstatbits(STAT_ITEMS,0,23) to read self.items, and 
+										// getstatbits(STAT_ITEMS,23,11) to read self.items2 or 
+										// getstatbits(STAT_ITEMS,28,4) to read the visible part 
+										// of serverflags, whichever is applicable
+const float STAT_VIEWHEIGHT		= 16;	// player.view_ofs_z
+const float STAT_VIEW2			= 20;	// This stat contains the number of the entity in the server's .view2 field
+const float STAT_VIEWZOOM		= 21;	// Scales fov and sensitivity. Part of DP_VIEWZOOM
+const float STAT_IDEALPITCH		= 25;
+const float STAT_PUNCHANGLE_X	= 26;
+const float STAT_PUNCHANGLE_Y	= 27;
+const float STAT_PUNCHANGLE_Z	= 28;
+
+const float STAT_USER			= 32; // Custom user stats start here (lower values are reserved for engine use)
+const float STAT_KEYCOUNTS		= 32;
+const float STAT_CLIENTDATA		= 33;
+const float STAT_TINTAMOUNT		= 34;
+const float STAT_TINTCOLOR_R	= 35;	// you can send a vector as a stat but there's no accompanying getstatv
+const float STAT_TINTCOLOR_G	= 36;	// so we have to send the three components separately and getstatf them
+const float STAT_TINTCOLOR_B	= 37;
+
 
 // temporary entities
 const float	TE_SPIKE		= 0;

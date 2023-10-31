@@ -600,6 +600,9 @@ void() PutClientInServer =
 	DecodeLevelParms();
 	SetChangeParms();
 	W_ResetWeaponState();
+	
+	// put global key type in the high bits so the CSQC hud gets to see it :/
+	self.worldtype = (self.worldtype & 255) + world.worldtype * 256;
 
 	// we respawned with keys not taken away, make sure .items reflects this
 	if (self.worldtype & 15) self.items |= IT_KEY1;
@@ -861,7 +864,7 @@ void() IntermissionThink =
 		self.impulse = 0;
 	}
 	
-	if (!intermission_running) return;
+	if (!intermission) return;
 	
 	// auto-cycle intermission camera after six seconds
 	else if (time > self.lifetime_finished)
@@ -1468,7 +1471,7 @@ void() PlayerPreThink =
 		fog_setFromEnt( self, self );
 		if ( !( self.customflags & (CFL_PLUNGE|CFL_LIMBO) ) )
 		{
-			stuffcmd(self,"\nv_cshift\n");
+			TintScreen(self, 0);
 		}
 		else if ( self.customflags & CFL_LIMBO )
 		{
@@ -1476,7 +1479,7 @@ void() PlayerPreThink =
 		}
 	}
 
-	if (intermission_running || self.deadflag == DEAD_SPECTATING )
+	if (intermission || self.deadflag == DEAD_SPECTATING )
 	{
 		IntermissionThink ();	// otherwise a button could be missed between
 		return;					// the think tics
@@ -1542,7 +1545,7 @@ Called every frame after physics are run
 */
 void() PlayerPostThink =
 {
-	if ( intermission_running ) return;
+	if ( intermission ) return;
 	
 	if (self.view_ofs == '0 0 0')
 		return;		// intermission or finale
@@ -1641,7 +1644,7 @@ void() ClientConnect =
 //	clientsAlive += 1;	// happens on putclientinserver
 	
 // a client connecting during an intermission can cause problems
-	if (intermission_running)
+	if (intermission)
 		ExitIntermission ();
 }
 
@@ -2010,10 +2013,10 @@ Only used on start map for the return point from an episode. Will fire its targe
 @PointClass base(PlayerClass) = info_player_start2 : "Player episode return point. Fires targets when a player spawns here." [
 	svflags(Flags) =
 	[
-		1		: "Episode 1" : 1
-		2		: "Episode 2" : 1
-		4		: "Episode 3" : 1
-		8		: "Episode 4" : 1
+		1		: "Episode 1" : 0
+		2		: "Episode 2" : 0
+		4		: "Episode 3" : 0
+		8		: "Episode 4" : 0
 		16		: "Bit 5" :  0
 		32		: "Bit 6" :  0
 		64		: "Bit 7" :  0
@@ -2031,7 +2034,6 @@ Only used on start map for the return point from an episode. Will fire its targe
 		262144	: "Bit 19" : 0
 		524288	: "Bit 20" : 0
 		1048576	: "Bit 21" : 0
-		2097152	: "Bit 22" : 0
 	]
 	style(Choices) : "Requirement" : 0 =
 	[
@@ -2048,7 +2050,7 @@ void() info_player_start2 =
 	fog_fixKeys();
 	
 	if (!self.svflags)
-		self.svflags = SVFL_ALLEPISODES;
+		self.svflags = 2097151;	// all bits up to 21
 	if (self.style < 0 || self.style > 2)
 		self.style = 0;
 }

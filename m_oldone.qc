@@ -123,7 +123,7 @@ void() shub_set_viewpoints =
 	local entity	pos, pl;
 
 	intermission_exittime = time + A_SHITLOAD;	// no exit yet
-	intermission_running = 1;
+	intermission = 1;
 
 	// find the intermission spot
 	pos = find (world, classname, "info_intermission");
@@ -309,7 +309,7 @@ void() shub_finale_4 =
 		// allow the player to click back to a reset start map
 		nextmap = self.map;
 		intermission_exittime = time + 3;
-		intermission_running = 2;
+		intermission = 2;
 		serverflags = 0;	// clear all the runes and stuff
 		
 		// start the end text

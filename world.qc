@@ -207,7 +207,7 @@ void() worldspawn =
 {
 	lastspawn = world;
 	startingserverflags = serverflags;
-	
+
 	InitBodyQueue ();
 	InitLightStyles();	// moved to lights.qc
 
@@ -235,7 +235,32 @@ void() worldspawn =
 	if (cvar("pr_checkextension"))
 	{
 		if (checkextension("QUAKE_EX"))
+		{
+			// do absolutely nothing in the rerelease
 			isKex = TRUE;
+		}
+#ifndef NO_CSQC
+		else
+		{
+			isCSQC = TRUE;
+			/*
+			// globalstat is inconsistently implemented (ironwail) because the "EXT_CSQC" 
+			// extension is actually undefined and meaningless
+			if (checkextension("EXT_CSQC"))
+			{
+				globalstat(STAT_CLIENTS, 2, "clients");
+				globalstat(STAT_CLIENTDATA, 2, "clientsAliveMask");	// client death status monitor
+			}
+			else
+			*/
+			clientstat(STAT_KEYCOUNTS, 2, worldtype);	// multiple keys on hud
+			clientstat(STAT_CLIENTDATA, 2, clientdata);	// shitty client death status monitor
+			clientstat(STAT_TINTAMOUNT, 2, tint);		// backdoor v_cshift
+			clientstat(STAT_TINTCOLOR_R, 2, tint_color_x);
+			clientstat(STAT_TINTCOLOR_G, 2, tint_color_y);
+			clientstat(STAT_TINTCOLOR_B, 2, tint_color_z);
+		}
+#endif
 	}
 
 // the area based ambient sounds MUST be the first precache_sounds
@@ -380,6 +405,37 @@ void() StartFrame =
 	framecount++;
 	//cvar_set("registered",ftos(framecount));
 	
+#ifndef NO_CSQC
+	// assemble two bytes out of client count and a bitmask of who's dead to send to 
+	// players for display on the hud and scoreboard	
+	if (coop || deathmatch)
+	{
+		entity e = nextent(world);
+		float p = 16;
+		float clientDataMask;
+		clientDataMask = clients & 15;
+
+		while (e.flags & FL_CLIENT)
+		{
+			if (e.health > 0 && e.deadflag != DEAD_DEAD)
+			clientDataMask |= p;
+			p *= 2;
+			e = nextent(e);
+		}
+		
+		// globalstat() isn't reliable in quake ports that implement completely random 
+		// assortments of csqc extensions, but somehow clientstat() is implemented in
+		// every engine that implements any csqc, so we have to copy the number to every 
+		// player and send it as a client stat instead. so it goes.
+		e = nextent(world);
+		while (e.flags & FL_CLIENT)
+		{
+			e.clientdata = clientDataMask;
+			e = nextent(e);
+		}
+	}
+#endif
+
 	/*
 	'activator' should be a parameter of *_use(), but it's a global. so it goes.
 
