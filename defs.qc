@@ -574,7 +574,6 @@ void(float num, float type, string name) globalstat = #233;
 		16384 : "Alt Target Pattern" : 0
 	]
 ]
-=======
 */
 
 #pragma noref 0
