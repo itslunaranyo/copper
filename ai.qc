@@ -1344,39 +1344,29 @@ ai_melee
 */
 void() ai_melee =
 {
-	local vector	delta;
-	local float 	ldmg;
+	float 	ldmg;
 
 	if (!self.enemy)
 		return;		// removed before stroke
-		
-	delta = self.enemy.origin - self.origin;
 
-	if (vlensqr(delta) > 60*60)
-		return;
-		
-	if (self.enemy.type == "zombie")
-		ldmg = 15;	// trigger zombie pain so ai_melee'ing monsters don't just slash away endlessly
-	else
-		ldmg = 3 + random() * 2; //(random() + random() + random()) * 3;
-		
-	T_Damage(self.enemy, self, self, ldmg, DMGTYPE_MELEE);
+	if (vlen(self.enemy.origin - self.origin) <= 60 || EntitiesTouching(self, self.enemy))
+	{
+		ldmg = 3 + random() * 2; //(random() + random() + random()) * 3;		
+		T_Damage(self.enemy, self, self, ldmg, DMGTYPE_MELEE);
+	}
 }
 
 
 void() ai_melee_side =
 {
-	local vector	delta;
-	local float 	ldmg;
+	float 	ldmg;
 
 	if (!self.enemy)
 		return;		// removed before stroke
 		
 	ai_charge_side();
 	
-	delta = self.enemy.origin - self.origin;
-
-	if (vlensqr(delta) > 60*60)
+	if (vlen(self.enemy.origin - self.origin) > 60)
 		return;
 	if (!CanDamage (self.enemy, self.origin))
 		return;
