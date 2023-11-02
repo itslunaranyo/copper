@@ -44,6 +44,7 @@ void() SetMovedir =
 	self.angles = t_angle;
 }
 
+// ================================================================
 
 /*
 =============
@@ -124,6 +125,48 @@ void(entity ent, vector tdest, float tspeed, void() func) SUB_CalcMoveEnt =
 
 	SUB_CalcMove (tdest, tspeed, func);
 	self = stemp;
+}
+
+
+// ================================================================
+
+void() shadowmonitor_think =
+{
+	float frac;
+	entity o = self.owner;
+	
+	frac = vlen(o.origin - self.pos2) / vlen(self.pos2 - self.pos1);
+	if (self.customflags & CFL_INVLIGHT)
+		frac = 1 - frac;
+	bmodel_lightstyle(o, frac);
+	
+	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
+
+	// remove last so we don't miss a final eval
+	if (self.nextthink <= time || 
+		time > self.lifetime_finished || 
+		self.state != o.state)
+		remove(self);
+}
+
+// move while blending lightstyles smoothly over the distance traveled
+
+// to avoid damaging existing movement logic with extra thinks, we wrap
+// it and create a helper entity to do this instead
+void(vector tstart, vector tdest, float tspeed, void() endfn, float invert) SUB_CalcMoveLight =
+{
+	entity mon = spawn();
+	mon.owner = self;
+	mon.state = self.state;	// removes self if these stop matching
+	mon.lifetime_finished = time + vlen(tdest - self.origin) / tspeed;
+	mon.think = shadowmonitor_think;
+	mon.nextthink = time;
+	mon.pos1 = tstart;
+	mon.pos2 = tdest;
+	if (invert)
+		mon.customflags |= CFL_INVLIGHT;
+		
+	SUB_CalcMove(tdest, tspeed, endfn);
 }
 
 
