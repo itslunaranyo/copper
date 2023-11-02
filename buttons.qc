@@ -295,23 +295,24 @@ entity skill_head;
 void() skillbutton_go_up =
 {
 	if (self.state == STATE_UP || self.state == STATE_TOP) return;
+	
+	float spd;
 	self.state = STATE_UP;
 	self.frame = 1;
 	if (self.max_health)
-	{
 		self.takedamage = DAMAGE_NO;
-	}
 	
 	if (initCleanup || time < 1.2)
-	{
-		SUB_CalcMove (self.pos2, A_SHITLOAD, skillbutton_hit_top);
-	}
+		spd = A_SHITLOAD;
 	else
 	{
 		if (self.noise != string_null)
 			sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
-		SUB_CalcMove (self.pos2, self.speed, skillbutton_hit_top);
+		spd = self.speed;
 	}
+
+	SUB_CalcMoveLight(self.pos1, self.pos2, spd, skillbutton_hit_top, FALSE);
+
 	SUB_UseTargetsAlt(target);
 }
 
@@ -320,6 +321,7 @@ void() skillbutton_hit_top =
 	self.state = STATE_TOP;
 	if (!SUB_UseTargetsAlt(target2))
 		SUB_UseTargetsSilent();
+	bmodel_lightstyle(self, 0);
 	
 	// special message handling:
 	// one button will always be set at map start, and we don't want a mystery message
@@ -335,13 +337,18 @@ void() skillbutton_hit_top =
 void() skillbutton_go_down =
 {
 	if (self.state == STATE_DOWN || self.state == STATE_BOTTOM) return;
+	
+	float spd;
 	self.state = STATE_DOWN;
 	self.enemy = world;
 	
 	if (initCleanup || time < 1.2)
-		SUB_CalcMove (self.pos1, A_SHITLOAD, skillbutton_hit_bottom);
+		spd = A_SHITLOAD;
 	else
-		SUB_CalcMove (self.pos1, self.speed2, skillbutton_hit_bottom);
+		spd = self.speed2;
+	
+	SUB_CalcMoveLight(self.pos2, self.pos1, spd, skillbutton_hit_bottom, TRUE);
+
 	SUB_UseTargetsAlt(target3);
 }
 
@@ -349,6 +356,7 @@ void() skillbutton_hit_bottom =
 {
 	self.state = STATE_BOTTOM;
 	self.frame = 0;	
+	bmodel_lightstyle(self, 1);
 	if (self.max_health)
 	{
 		self.takedamage = DAMAGE_YES;
@@ -357,39 +365,10 @@ void() skillbutton_hit_bottom =
 	SUB_UseTargetsAlt(target4);
 }
 
-// sadly this has to be sliiightly different than door_shadowmonitor or i'd reuse it
-void() skillbutton_shadowmonitor_go =
-{
-	float frac;
-	entity o = self.enemy;
-	if (o.state == STATE_TOP)	// at pos2
-		frac = 0;
-	else if (o.state == STATE_BOTTOM)	// at pos1
-		frac = 1;
-	else
-		frac = vlen(o.origin - o.pos2) / vlen(o.pos2 - o.pos1);
-	
-	bmodel_lightstyle(o, frac);
-	
-	// pay attention to owner state so we stop thinking when the door is done moving
-	if (o.state == STATE_BOTTOM)
-		return;
-
-	if (o.state == STATE_TOP)
-		self.nextthink = time + (o.nextthink - o.ltime);
-	else
-		self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
-		
-	self.think = skillbutton_shadowmonitor_go;
-}
-
 void() skillbutton_activate =
 {
 	float match;
 	
-	if (self.classname == "btn_shadowmonitor")
-		return;
-		
 	self.nextthink = 0;
 	
 	// skill_str is already set immediately after loading a game, and is always
@@ -401,13 +380,6 @@ void() skillbutton_activate =
 		skillbutton_go_up();
 	else
 		skillbutton_go_down();
-	
-	// do this to catch the first frame one
-	if (self.owner.classname == "btn_shadowmonitor")
-	{
-		self = self.owner;
-		skillbutton_shadowmonitor_go();
-	}
 }
 
 void() skillbutton_touch =
@@ -492,13 +464,10 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 
 	if (skill_head)
 		self.owner = skill_head;
+	skill_head = self;
+
 	if (self.style || self.switchshadstyle)
 	{
-		entity m = spawn();
-		m.classname = "btn_shadowmonitor";
-		m.enemy = self;
-		m.owner = skill_head;
-		self.owner = m;
 		if (self.style < 0)
 		{
 			self.style *= -1;
@@ -506,8 +475,7 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 		}
 		bmodel_lightstyle(self, 1);
 	}
-	skill_head = self;
-
+	
 	self.state = STATE_BOTTOM;
 	self.movetype = MOVETYPE_PUSH;
 	self.solid = SOLID_BSP;
