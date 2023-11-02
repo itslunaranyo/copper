@@ -369,8 +369,6 @@ void() skillbutton_activate =
 {
 	float match;
 	
-	self.nextthink = 0;
-	
 	// skill_str is already set immediately after loading a game, and is always
 	// set by activating a skill-changing entity, so it's the most accurate
 	match = ((skill_str == string_null && skill == self.strength) ||
