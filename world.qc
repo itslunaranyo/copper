@@ -377,9 +377,9 @@ void() StartFrame =
 {
 	teamplay = cvar("teamplay");
 	
-	if (cleanUpClientShit)
+	if (initCleanup)
 	{
-		cleanUpClientShit -= 1;
+		initCleanup -= 1;
 		
 		if (skill_str != string_null)
 		{
@@ -390,7 +390,7 @@ void() StartFrame =
 	else if (!gamestarted && framecount > 2)
 	{
 		if (framecount != 3)
-			cleanUpClientShit += 2;
+			initCleanup += 2;
 		
 		gamestarted = TRUE;
 	}

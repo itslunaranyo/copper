@@ -230,7 +230,7 @@ float	framecount;
 float	reset_flag;
 float	startingserverflags;
 nosave float	gamestarted;
-nosave float	cleanUpClientShit;
+nosave float	initCleanup;
 nosave float	clients;
 nosave float	clientsAlive;
 nosave float	clientsAliveMask;

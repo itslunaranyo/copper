@@ -150,7 +150,7 @@ fog_set
 void( entity client, float density, vector color, float sky ) fog_set =
 {
 	if (client.classname != "player") return;
-	if (!cleanUpClientShit)
+	if (!initCleanup)
 	{
 		if (client.fog_density == density && client.fog_color == color && client.fog_sky == sky)
 			return FALSE;

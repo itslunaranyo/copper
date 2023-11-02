@@ -302,7 +302,7 @@ void() skillbutton_go_up =
 		self.takedamage = DAMAGE_NO;
 	}
 	
-	if (cleanUpClientShit || time < 1.2)
+	if (initCleanup || time < 1.2)
 	{
 		SUB_CalcMove (self.pos2, A_SHITLOAD, skillbutton_hit_top);
 	}
@@ -338,7 +338,7 @@ void() skillbutton_go_down =
 	self.state = STATE_DOWN;
 	self.enemy = world;
 	
-	if (cleanUpClientShit || time < 1.2)
+	if (initCleanup || time < 1.2)
 		SUB_CalcMove (self.pos1, A_SHITLOAD, skillbutton_hit_bottom);
 	else
 		SUB_CalcMove (self.pos1, self.speed2, skillbutton_hit_bottom);

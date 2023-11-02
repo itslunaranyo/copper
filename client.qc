@@ -639,7 +639,7 @@ void() PutClientInServer =
 	}
 	if (!self.fog_sky)
 		self.fog_sky = cvar("r_skyfog");
-	cleanUpClientShit = 2;
+	initCleanup = 2;
 
 // oh, this is a hack!
 	setmodel (self, "progs/eyes.mdl");
@@ -1466,7 +1466,7 @@ Called every frame before physics are run
 */
 void() PlayerPreThink =
 {
-	if (cleanUpClientShit)
+	if (initCleanup)
 	{
 		fog_setFromEnt( self, self );
 		if ( !( self.customflags & (CFL_PLUNGE|CFL_LIMBO) ) )
