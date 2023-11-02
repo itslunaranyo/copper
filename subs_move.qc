@@ -156,6 +156,7 @@ void() shadowmonitor_think =
 void(vector tstart, vector tdest, float tspeed, void() endfn, float invert) SUB_CalcMoveLight =
 {
 	entity mon = spawn();
+	mon.classname = "shadowmonitor";
 	mon.owner = self;
 	mon.state = self.state;	// removes self if these stop matching
 	mon.lifetime_finished = time + vlen(tdest - self.origin) / tspeed;
