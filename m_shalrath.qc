@@ -209,7 +209,7 @@ void() ShalHome =
 	
 	// go faster at long distance to close the gap, so snipey vores have a better presence
 	dist = vlen(self.enemy.origin - self.origin);
-	dist = saturate( (dist-120) / 512 );
+	dist = saturate( (dist-200) / 600 );
 	
 	if (skill < 3)
 	{
