@@ -34,7 +34,7 @@ TintScreen
 void(entity who, float amt) TintScreen
 {
 //	bprint(ftos(amt)); bprint("\n");
-	if (isCSQC)
+	if (noTint)
 	{
 		who.tint = amt;
 		who.tint_color = '0 0 0';
@@ -62,7 +62,7 @@ void(entity who, float amt, vector color) TintScreenColor
 	color_y = ceil(color_y);
 	color_z = ceil(color_z);
 	
-	if (isCSQC)
+	if (noTint)
 	{
 		who.tint = amt;
 		who.tint_color = color;
@@ -86,10 +86,7 @@ void(entity who, float amt, vector color) TintScreenColor
 ============
 TintScreenFog
 
-for people who turn off cshift because it ruins their stream quality, or because
-they're just super wrong
-
-and 'amt' better be 0-1, pal
+an ugly substitute for cshift
 ============
 */
 void(entity who, float amt, vector color) TintScreenFog
@@ -155,16 +152,7 @@ void(entity e) void_unplunge =
 	e.model = "progs/player.mdl";
 
 	SUB_CallAsSelf(W_ResetWeaponState, e);	// restore weaponmodel
-	if (noTint)
-	{
-		TintScreenFog(e, 0, '0.5 0.5 0.5');
-		e.fog_color2 = VEC_ORIGIN;
-		e.fog_density2 = 0;
-		e.fog_sky2 = 0;
-		noTint = 0;
-	}
-	else
-		TintScreen(e,0);
+	TintScreen(e,0);
 }
 
 // --------------------------------
@@ -212,10 +200,7 @@ void() void_func_touch =
 	//	other.customflags = not(other.customflags, CFL_UNDYING);
 	//	other.customflags = not(other.customflags, CFL_PLUNGE);
 		
-		if (noTint)
-			TintScreenFog(other, 1, self.fadecolor);
-		else
-			TintScreenColor(other, 255, self.fadecolor);
+		TintScreenColor(other, 255, self.fadecolor);
 		other.velocity = '0 0 0';
 		other.solid = SOLID_NOT;
 		other.movetype = MOVETYPE_NONE;
@@ -333,10 +318,7 @@ void() void_fallthink =
 	plummet = 1 - plummet * plummet;	// exponential falloff seems to look more linear, since the player accelerates exponentially
 	plummet = min( ceil( plummet * 255 ), 255);
 	
-	if (noTint)
-		TintScreenFog(self.enemy, plummet/255, self.fadecolor);
-	else
-		TintScreenColor(self.enemy, plummet, self.fadecolor);
+	TintScreenColor(self.enemy, plummet, self.fadecolor);
 	
 	self.nextthink = time + 0.0333;
 }
@@ -431,10 +413,6 @@ void() void_trigger_touch =
 	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
 	// at the same time to determine if that 0 is valid
 	noTint = (cvar("gl_cshiftpercent") < CSHIFT_CUTOFF) && cvar("gl_farclip") && !coop;
-#ifndef NO_CSQC
-	if (isCSQC)
-		noTint = FALSE;	// rely on the hud for this instead
-#endif
 	// doesn't work in coop bc the server's values will be used to determine tint/fog for clients
 }
 
