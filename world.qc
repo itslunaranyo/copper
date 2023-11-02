@@ -263,6 +263,8 @@ void() worldspawn =
 #endif
 	}
 
+	cdtrack = &world.sounds;	// absolute madness. see void() target_music_use
+
 // the area based ambient sounds MUST be the first precache_sounds
 
 // player precaches	

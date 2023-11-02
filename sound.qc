@@ -457,6 +457,36 @@ void() target_sound =
 
 //============================================================================
 
+void() target_music_use =
+{
+	WriteByte(MSG_ALL, SVC_CDTRACK);
+	WriteByte(MSG_ALL, self.sounds);
+	WriteByte(MSG_ALL, self.sounds);
+	
+	// assignment-to-world circumvention hack:
+	*cdtrack = self.sounds;	// so it doesn't go silent after a reload
+	// madness.
+}
+
+/*QUAKED target_music (0.5 0 0.6) (-12 -12 -12) (12 12 12)
+play a cd track when triggered.
+
+"sounds" track number. defaults to 2, the most badass one.
+*/
+/*FGD
+@PointClass base(Targetname) color(120 0 150) = target_music : "Triggered music"
+[
+	sounds(integer) : "track to play" : 2
+]
+*/
+void() target_music =
+{
+	self.sounds = zeroconvertdefault(self.sounds, 2);
+	self.use = target_music_use;
+}
+
+//============================================================================
+
 void() noise_think =
 {
 	self.nextthink = time + 0.5;

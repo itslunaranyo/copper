@@ -271,6 +271,8 @@ nosave float	isCSQC;	// running something with passable csqc support
 
 string	keyType;
 
+float *cdtrack;	// fteqcc supports pointers. madness. see void() worldspawn
+
 //================================================
 
 // world fields
