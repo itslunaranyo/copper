@@ -377,6 +377,24 @@ void() StartFrame =
 {
 	teamplay = cvar("teamplay");
 	
+	if (cleanUpClientShit)
+	{
+		cleanUpClientShit -= 1;
+		
+		if (skill_str != string_null)
+		{
+			dprint("restoring skill from save\n");
+			cvar_set("skill",skill_str);
+		}
+	}
+	else if (!gamestarted && framecount > 2)
+	{
+		if (framecount != 3)
+			cleanUpClientShit += 2;
+		
+		gamestarted = TRUE;
+	}
+		
 	float sk = cvar("skill");
 	entity skbtn;
 	if (sk != skill)
@@ -386,22 +404,13 @@ void() StartFrame =
 		while (skbtn)
 		{
 			self = skbtn;
+			dprint("activating skillbutton from startframe\n");
 			skillbutton_activate();
 			skbtn = skbtn.owner;
 		}
 		self = world;
 	}	
 	
-	if (cleanUpClientShit)
-		cleanUpClientShit -= 1;
-	else if (!gamestarted && framecount > 2)
-	{
-		if (framecount != 3)
-			cleanUpClientShit += 2;
-		
-		gamestarted = TRUE;
-	}
-		
 	framecount++;
 	//cvar_set("registered",ftos(framecount));
 	

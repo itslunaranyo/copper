@@ -760,7 +760,8 @@ trigger_setskill & target_setskill
 void(string sk) skill_set =
 {
 	cvar_set ("skill", sk);
-	skill = cvar("skill");
+	//skill = cvar("skill");	// set by skill button check loop
+	skill_str = sk;
 }
 
 void() target_setskill_use

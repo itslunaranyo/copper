@@ -237,6 +237,7 @@ nosave float	clientsAliveMask;
 nosave float	globalStatSupported;
 
 float	skill;
+string	skill_str;	// for preserving skill across death/reloads
 float	coop_time;
 
 // for balancing: total monster HP/ammo -HP/zombies/grenades in the level

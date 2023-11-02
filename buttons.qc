@@ -297,13 +297,21 @@ void() skillbutton_go_up =
 	if (self.state == STATE_UP || self.state == STATE_TOP) return;
 	self.state = STATE_UP;
 	self.frame = 1;
-	if (self.noise != string_null)
-		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 	if (self.max_health)
 	{
 		self.takedamage = DAMAGE_NO;
 	}
-	SUB_CalcMove (self.pos2, self.speed, skillbutton_hit_top);
+	
+	if (cleanUpClientShit || time < 1.2)
+	{
+		SUB_CalcMove (self.pos2, A_SHITLOAD, skillbutton_hit_top);
+	}
+	else
+	{
+		if (self.noise != string_null)
+			sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
+		SUB_CalcMove (self.pos2, self.speed, skillbutton_hit_top);
+	}
 	SUB_UseTargetsAlt(target);
 }
 
@@ -328,8 +336,12 @@ void() skillbutton_go_down =
 {
 	if (self.state == STATE_DOWN || self.state == STATE_BOTTOM) return;
 	self.state = STATE_DOWN;
-	self.enemy = world;	
-	SUB_CalcMove (self.pos1, self.speed2, skillbutton_hit_bottom);
+	self.enemy = world;
+	
+	if (cleanUpClientShit || time < 1.2)
+		SUB_CalcMove (self.pos1, A_SHITLOAD, skillbutton_hit_bottom);
+	else
+		SUB_CalcMove (self.pos1, self.speed2, skillbutton_hit_bottom);
 	SUB_UseTargetsAlt(target3);
 }
 
@@ -373,10 +385,19 @@ void() skillbutton_shadowmonitor_go =
 
 void() skillbutton_activate =
 {
+	float match;
+	
 	if (self.classname == "btn_shadowmonitor")
 		return;
+		
+	self.nextthink = 0;
 	
-	if (skill == self.strength)
+	// skill_str is already set immediately after loading a game, and is always
+	// set by activating a skill-changing entity, so it's the most accurate
+	match = ((skill_str == string_null && skill == self.strength) ||
+			(skill_str != string_null && skill_str == self.netname));
+	
+	if (match)
 		skillbutton_go_up();
 	else
 		skillbutton_go_down();
@@ -393,17 +414,17 @@ void() skillbutton_touch =
 {
 	if (self.state != STATE_BOTTOM) return;
 	self.enemy = other;
-	cvar_set("skill", self.netname);
+	skill_set(self.netname);
 }
 void() skillbutton_use =
 {
 	self.enemy = activator;
-	cvar_set("skill", self.netname);
+	skill_set(self.netname);
 }
 void() skillbutton_die =
 {
 	self.enemy = damage_attacker;
-	cvar_set("skill", self.netname);
+	skill_set(self.netname);
 }
 
 
@@ -544,5 +565,5 @@ Alt Target Pattern: 'target' when touched, 'target2' when fully depressed, 'targ
 	}
 
 	self.think = skillbutton_activate;	// assume correct position and set up any related target states
-	self.nextthink = 0.2;
+	self.nextthink = self.ltime + 0.2;
 }
