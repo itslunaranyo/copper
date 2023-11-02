@@ -241,7 +241,7 @@ void() func_wall =
 	if (self.noise2) precache_sound_safe(self.noise2);
 	precache_model_safe(self.model);
 	
-	if (self.mangle)
+	//if (self.mangle)
 		self.angles = self.mangle;
 	self.use = func_wall_use;
 	//self.angles = '0 0 0';
@@ -283,7 +283,7 @@ Keys:
 "targetname"	entity name
 */
 /*FGD
-@PointClass base(Wall) = func_wall_point : "Wall. Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
+@PointClass base(Wall, Angle) = func_wall_point : "Wall. Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
 Not static: Use a func_static for inconsequential bmodels.
 
 Select a .bsp or .mdl to show with 'model'. 
@@ -294,7 +294,11 @@ If 'Toggle Visibility' is set, will disappear and reappear when triggered instea
 	mangle(string) : "Orientation of external model"
 ]
 */
-void() func_wall_point = { func_wall(); }
+void() func_wall_point = {
+	if (self.angles && self.mangle == VEC_ORIGIN)
+		self.mangle = self.angles; 
+	func_wall();
+}
 
 /*QUAKED func_static (0 .5 .8) ?
 Like a func_wall but calls makestatic.  Static entities are always nonsolid.
@@ -317,12 +321,12 @@ Like a func_wall but calls makestatic.  Static entities are always nonsolid.
 "model"		filename of model to stand in for this entity. can be bsp or mdl.
 */
 /*
-@PointClass base(Appearflags, Func) = func_static_point : "Static (untriggerable) nonsolid model (point)" [
+@PointClass base(Appearflags, Func, Angle) = func_static_point : "Static (untriggerable) nonsolid model (point)" [
 	model(string) : "External model"
 	mangle(string) : "Orientation of external model"
 ]
 */
-void() func_static_point = { func_static(); }
+void() func_static_point = { func_wall_point(); makestatic(self); }
 
 
 /*QUAKED func_illusionary (0 .5 .8) ?
