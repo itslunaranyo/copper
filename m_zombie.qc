@@ -569,6 +569,8 @@ void() zombie_return =
 	if (pc == CONTENT_SOLID || pc == CONTENT_LAVA || pc == CONTENT_SKY)
 		return;	// in something
 	
+	self.customflags |= CFL_OMNIVISION;
+	
 	if (self.velocity != '0 0 0' || has_invis(self.enemy))
 	{
 		self.nextthink = time + 5;
