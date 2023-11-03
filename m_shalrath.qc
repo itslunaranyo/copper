@@ -268,7 +268,7 @@ void() ShalHome =
 		}
 		else // evile homing
 		{
-			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.dest, rate * 5);
+			self.velocity = SHAL_BALL_VEL * normalize(self.dest + '0 0 10' - self.origin);
 		}
 		
 		self.velocity *= 1 + dist;
