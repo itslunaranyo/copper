@@ -612,9 +612,9 @@ void() zombie_return =
 	self.movetype = MOVETYPE_BOUNCE;
 	setsize (self, '-16 -16 0', '16 16 56');
 	setorigin(self,self.origin - '0 0 25');
-	if (self.cnt >= 5)
+	if (self.cnt >= 10)
 		return;
-	self.nextthink = time + 5;
+	self.nextthink = time + self.cnt;
 }
 
 //============================================================================
