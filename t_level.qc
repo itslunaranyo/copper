@@ -8,6 +8,15 @@
 
 void() GotoNextMap =
 {
+	// tell the csqc hud to clear the intermission stuff
+	// or else it draws over the LOADING bar :(
+	entity e = nextent(world);
+	while (e.flags & FL_CLIENT)
+	{
+		e.clientdata = -1;
+		e = nextent(e);
+	}
+	
 	if (cvar("samelevel"))	// if samelevel is set, stay on same level
 		changelevel (mapname);	// name of current level
 	else
@@ -105,7 +114,6 @@ void() ExitIntermission =
 		return;
 	}
 
-		
 	dprint("fell off the end of exitintermission\n");
 	return;
 }

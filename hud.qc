@@ -743,7 +743,7 @@ void(vector screensize) Hud_DrawTint =
 
 void(vector screensize, float scoreboard) CSQC_DrawHud =
 {
-	if (intermission) return;
+	if (intermission || coopdata == -1) return;
 	float viewsize = cvar("viewsize");
 	HUD_UpdateStats();
 	Hud_DrawTint(screensize);
@@ -813,7 +813,7 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 
 void(vector screensize, float scoreboard) CSQC_DrawScores =
 {
-	if (!intermission) return;
+	if (!intermission || coopdata == -1) return;
 	vector pos, div;
 	float value, mins, secs;
 	string s;
