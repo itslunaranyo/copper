@@ -56,7 +56,6 @@ void(string gibname, float dm) ThrowHead =
 	self.frame = 0;
 	self.think = SUB_Null;
 	self.nextthink = 0;
-	self.ideal_yaw = self.angles_y;	// stop returned nightmare zombies from gyrating on the ground for some reason
 	
 	self.movetype = MOVETYPE_BOUNCE;
 	self.takedamage = DAMAGE_NO;
