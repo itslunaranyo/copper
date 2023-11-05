@@ -301,11 +301,6 @@ void() monster_knight =
 	}
 	precache_model ("progs/knight.mdl");
 	precache_model ("progs/h_knight.mdl");
-
-	// FIXME debug shit remove this
-	//precache_model3 ("progs/knight_s.mdl");
-	//precache_model3 ("progs/knight_s2.mdl");
-
 	precache_sound ("knight/kdeath.wav");
 	precache_sound ("knight/khurt.wav");
 	precache_sound ("knight/ksight.wav");
