@@ -100,17 +100,20 @@ void(vector pos) Hud_DrawLevelInfoBar =
 	drawstring(pos + '312 12' - '1 0' * w, s, '8 8', '1 1 1', 1, 0);
 	gap -= w;
 	
-	if (skill == 3) s = "skill \b3\b";
-	else if (skill == 2) s = "skill 2";
-	else if (skill == 1) s = "skill 1";
-	else s = "skill 0";
-	
-	/*
-	float mins, secs;
-	mins = floor(time/60);
-	secs = floor(time - mins*60);
-	s = strcat(ftos(mins), ":", FormatFloat(secs, 2, "0"));
-	*/
+	//if (world.model == "maps/start.bsp")
+	//{
+		if (skill == 3) s = "skill \b3\b";
+		else if (skill == 2) s = "skill 2";
+		else if (skill == 1) s = "skill 1";
+		else s = "skill 0";
+	//}
+	//else
+	//{
+	//	float mins, secs;
+	//	mins = floor(time/60);
+	//	secs = floor(time - mins*60);
+	//	s = strcat(ftos(mins), ":", FormatFloat(secs, 2, "0"));
+	//}
 	w = stringwidth(s, TRUE, '8 8');
 	drawstring(pos + '8 12' + '1 0' * kw + '0.5 0 0' * (gap - w), s, '8 8', '1 1 1', 1, 0);
 };
