@@ -516,20 +516,8 @@ void() flytrain_killed =
 
 void() flytrain_think =
 {
-	vector delta, wishvel;
-
-	if (time > self.pain_finished)
-	{
-		self.pain_finished = time + 0.5;
-		self.pos1_x = crandom() * self.width;
-		self.pos1_y = crandom() * self.width;
-		self.pos1_z = crandom() * self.height;
-		if (self.buddy.velocity != VEC_ORIGIN)
-			self.pos1 = self.pos1 * 0.5;
-	}
-	
-	delta = (self.buddy.origin + self.pos1) - self.origin - self.movedir;
-	wishvel = self.buddy.velocity;
+	vector ang, delta, wishvel;
+	float d, t;
 	
 	self.takedamage = self.buddy.takedamage;
 	
@@ -540,15 +528,27 @@ void() flytrain_think =
 		setorigin(self, self.buddy.origin - self.movedir);
 	}
 	else
-		wishvel += delta;
+	{
+		// rosette movement looks more orbital than the original bounce of random offsets
+		t = localtime(self);
+		ang_y = (t * self.dest_x) % 360;
+		makevectors(ang);
+		ang = SinCos(t * self.dest_y);
+		d = ang_x * self.width;
+		self.pos1 = v_forward * d;
+		self.pos1_z = sin(t * self.dest_z) * self.height * ang_x;
+		
+		delta = (self.buddy.origin) - self.origin - self.movedir;
+		wishvel = self.buddy.velocity + delta;
+	}
 	
-	self.velocity = (self.velocity * 4 + wishvel) * 0.2;
+	self.velocity = (self.velocity * 4 + wishvel) * 0.2 + (self.pos1 - self.pos2) * 4;
+	self.pos2 = self.pos1;
 	self.nextthink = localtime(self) + 0.05;
 }
 
 void() flytrain_init =
 {
-	dprint("in flytrain_init\n");
 	setorigin (self, self.buddy.origin - self.movedir);
 	self.think = flytrain_think;
 	flytrain_think();
@@ -556,10 +556,6 @@ void() flytrain_init =
 
 void() flytrain_setup =
 {
-	if (!self.target)
-		objerror("flytrain without a target");
-		
-	dprint("in flytrain_setup\n");
 	// spawn a nonsolid point ent to follow our path sensibly and 
 	//	handle all train-like logic, bc it's a func_train
 	// we shadow it at all times with floaty drifty movement to keep 
@@ -576,6 +572,14 @@ void() flytrain_setup =
 	self.buddy.health = self.health;
 	self.buddy.sounds = self.sounds;
 	self.buddy.solid = -1;
+	if (!self.target)
+	{
+		dprint3("flytrain without a target at ", vtos(self.origin + self.movedir), " will hover in place\n");
+		self.buddy.enemy = spawn();
+		setorigin(self.buddy.enemy, self.origin + self.movedir);
+		self.buddy.enemy.classname = "path_corner";
+		self.buddy.enemy.wait = -1;		
+	}
 	SUB_CopyTargets(self.buddy);
 	self.buddy.targetname = self.targetname;
 	self.buddy.owner = self;
@@ -603,6 +607,12 @@ void() flytrain_setup =
 			self.takedamage = DAMAGE_YES;
 		}
 	}
+	
+	self.dest_x = 4 + random();
+	self.dest_y = 8 + random() * 2;
+	self.dest_z = 1.5 + random() * 2;
+	if (self.speed2 <= 0) self.speed2 = 10;
+	self.dest *= self.speed2;
 	
 	self.think = flytrain_init;	// wait for buddy to call train_find
 	self.nextthink = localtime(self) + 0.25; // magic amount of time :|
@@ -639,12 +649,13 @@ void() func_flytrain =
 {
 	if (!SUB_ShouldSpawn()) return;
 	dprint("in flytrain\n");
-	flytrain_setup();
 	
 	precache_model_safe(self.model);
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
 	self.movedir = (self.mins + self.maxs) * 0.5;
+	
+	flytrain_setup();
 }
 
 /*QUAKED func_flytrain_point (0 .5 .8) (-8 -8 -8) (8 8 8) - TOGGLE
@@ -674,12 +685,13 @@ void() func_flytrain_point =
 {	
 	if (!SUB_ShouldSpawn()) return;
 
-	flytrain_setup();
 	precache_model_safe(self.model);
 	setmodel (self, self.model);
 	setsize (self, self.mins , self.maxs);
 	self.classname = "func_flytrain";
 	self.movedir = '0 0 0';
+	
+	flytrain_setup();
 }
 
 //============================================================================
@@ -767,6 +779,10 @@ void() train_use =
 void() train_wait =	// arrival at a pathcorner
 {
 	entity corner = self.enemy;
+	if (corner.wait)
+		self.wait = corner.wait;
+	else
+		self.wait = self.pausetime;
 	
 	SUB_UseTargetsAlt(target2);
 
@@ -831,10 +847,6 @@ void() train_next =	// departure for next pathcorner
 			return;
 		}
 	}
-	if (corner.wait)
-		self.wait = corner.wait;
-	else
-		self.wait = self.pausetime;
 	
 	self.enemy = corner;
 	SUB_UseTargetsAlt(target3);
@@ -882,19 +894,16 @@ void() train_next =	// departure for next pathcorner
 
 void() func_train_find =
 {
-	entity corner;
+	if (!self.enemy)
+		self.enemy = findunlockedtarget(self, world);
 
-	corner = findunlockedtarget(self, world);
-	self.enemy = corner;
-	//self.target = corner.target;
-	setorigin (self, corner.origin - self.movedir);
-	if ((self.spawnflags & TRAIN_INHERIT) && corner.speed > 0)
-		self.speed = corner.speed;
+	//self.target = self.enemy.target;
+	setorigin (self, self.enemy.origin - self.movedir);
+	if ((self.spawnflags & TRAIN_INHERIT) && self.enemy.speed > 0)
+		self.speed = self.enemy.speed;
 	if (self.targetname == string_null)
 	{	// not triggered, so start immediately
-		train_on();
-		self.nextthink = localtime(self) + 0.1;
-		self.think = train_next;
+		train_wait();	// still go through wait in case we start at a wait -1 corner
 	}
 }
 
@@ -902,8 +911,9 @@ void() func_train_setup =
 {
 	if (!self.speed)
 		self.speed = 100;
-	if (!self.target)
+	if (!self.target && !self.enemy)
 		objerror("func_train without a target");
+	
 	self.dmg = zeroconvertdefault(self.dmg, 2);
 	if (!self.dmgtime)
 		self.dmgtime = 0.5;
@@ -934,9 +944,8 @@ void() func_train_setup =
 
 	// start trains on the second frame, to make sure their targets have had
 	// a chance to spawn
-	self.nextthink = localtime(self) + 0.1;
 	self.think = func_train_find;
-
+	self.nextthink = localtime(self) + 0.1;
 }
 
 /*QUAKED func_train (0 .5 .8) ? PATH_SPEED TOGGLE SMOOTHSPEED
@@ -1393,6 +1402,7 @@ void() misc_teleporttrain =
 	// do this first so train_find finds it
 	
 	if (!self.speed) self.speed = 100;
+	self.speed2 /= 6;	// old teletrains have old dumb speed2 values from old dumb fly code
 	self.pausetime = -1;
 	self.solid = -1;
 	
