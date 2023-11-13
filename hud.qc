@@ -666,12 +666,14 @@ void() HUD_UpdateStats =
 {
 	float olditems, olditems2, i, f;
 	
+	coopdata = getstatf(STAT_CLIENTDATA);
+	if (intermission || coopdata == -1) return;
+	
 	olditems = stat_items;	
 	olditems2 = stat_items2;	
 	stat_items = getstatbits(STAT_ITEMS, 0, 23);
 	stat_items2 = getstatbits(STAT_ITEMS, 23, 9);
 	keytype = getstatbits(STAT_KEYCOUNTS, 8, 8);
-	coopdata = getstatf(STAT_CLIENTDATA);
 	scr_tint = getstatf(STAT_TINTAMOUNT);
 	scr_tintcolor_x = getstatf(STAT_TINTCOLOR_R);
 	scr_tintcolor_y = getstatf(STAT_TINTCOLOR_G);
@@ -754,9 +756,9 @@ void(vector screensize) Hud_DrawTint =
 
 void(vector screensize, float scoreboard) CSQC_DrawHud =
 {
+	HUD_UpdateStats();
 	if (intermission || coopdata == -1) return;
 	float viewsize = cvar("viewsize");
-	HUD_UpdateStats();
 	Hud_DrawTint(screensize);
 	
 	if (viewsize > 110)
@@ -824,12 +826,12 @@ void(vector screensize, float scoreboard) CSQC_DrawHud =
 
 void(vector screensize, float scoreboard) CSQC_DrawScores =
 {
+	HUD_UpdateStats();
 	if (!intermission || coopdata == -1) return;
 	vector pos, div;
 	float value, mins, secs;
 	string s;
 	
-	HUD_UpdateStats();
 	pos = [screensize_x / 2 - 160, screensize_y / 2 - 120];
 	
 	if (deathmatch)
