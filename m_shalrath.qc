@@ -196,6 +196,17 @@ void() ShalHome =
 		return;
 	}
 	
+	if (!self.deadflag)
+	{
+		if ( self.owner.health <= 0		// if our mama dies
+			|| self.owner.customflags & CFL_PLUNGE )	// or falls in a hole
+		{
+			self.deadflag = TRUE;
+			setmodel(self, "progs/v_spike2.mdl");	// stop sparkling
+			setsize(self, VEC_ORIGIN, VEC_ORIGIN);
+		}
+	}
+	
 	self.think = ShalHome;
 	self.nextthink = time + SHAL_BALL_THINK_RATE;
 	rate = SHAL_BALL_TURN_RATE;
@@ -214,9 +225,7 @@ void() ShalHome =
 	if (skill < 3)
 	{
 		// 'poor' homing (half turn rate):
-		if ( self.owner.health <= 0		// if our mama dies
-			|| self.owner.customflags & CFL_PLUNGE	// or falls in a hole
-			
+		if ( self.deadflag		// if our mama dies or falls in a hole
 			//|| !visible(self.enemy)		// if we lost LOS
 			// took ^^ this one out, because it made voreballs even more effective at going
 			// around corners, which meant that courageous players had a nice new dodge move
@@ -252,23 +261,24 @@ void() ShalHome =
 		enemy_vis = visible(self.enemy);
 		if (enemy_vis)	// go straight to follow player around corners
 		{
-			// remember last seen position for corner hax
+			// remember last seen positions for corner hax
+			self.dest2 = self.dest;
 			self.dest = self.enemy.origin;
 		}
 		
 		// poor homing
-		if ( self.owner.health <= 0	 || self.owner.customflags & CFL_PLUNGE
+		if ( self.deadflag		// if our mama dies or falls in a hole
 			|| pointcontents(self.origin) < CONTENT_SOLID )
 		{
 			if (dot > 0)
 			{
 				rate *= max(1, 1.5 * (1 - dot));
 			}
-			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.dest, rate * 0.5);
+			self.velocity = SHAL_BALL_VEL * ShalTurnToward(self.dest2, rate * 0.5);
 		}
 		else // evile homing
 		{
-			self.velocity = SHAL_BALL_VEL * normalize(self.dest + '0 0 10' - self.origin);
+			self.velocity = SHAL_BALL_VEL * normalize(self.dest2 + '0 0 10' - self.origin);
 		}
 		
 		self.velocity *= 1 + dist;
@@ -375,6 +385,7 @@ void() monster_shalrath =
 	precache_model2 ("progs/shalrath.mdl");
 	precache_model2 ("progs/h_shal.mdl");
 	precache_model2 ("progs/v_spike.mdl");
+	precache_model2 ("progs/v_spike2.mdl");
 	
 	precache_sound2 ("shalrath/attack.wav");
 	precache_sound2 ("shalrath/attack2.wav");
