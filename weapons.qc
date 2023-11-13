@@ -161,22 +161,25 @@ W_BetterWeapon
 Deathmatch weapon change rules for picking up a weapon
 =============
 */
-void(float new) W_BetterWeapon =
+void(entity e, float new) W_BetterWeapon =
 {
+	entity oself = self;
 	if (!deathmatch)
 	{
 		// don't switch to explosive weapons with quad
 		// 1.12: don't switch to explosives when invisible either, since you can't see the stupid viewmodel
-		if ( (has_quad(self) || has_invis(self)) &&
+		if ( (has_quad(e) || has_invis(e)) &&
 			(new == IT_ROCKET_LAUNCHER || new == IT_GRENADE_LAUNCHER))
 			return;
 		// don't switch to a lightning gun when standing in water
-		if (self.waterlevel >= 2 && new == IT_LIGHTNING)
+		if (e.waterlevel >= 2 && new == IT_LIGHTNING)
 			return;
 	}	
+	self = e;
 	if (!deathmatch || W_RankForWeapon (new) < W_RankForWeapon (self.weapon) )
 		self.weapon = new;
 	W_ResetWeaponState();
+	self = oself;
 }
 
 float(float weap) W_HasAmmo =
@@ -212,6 +215,11 @@ float() W_BestWeapon =
 		return IT_SHOTGUN;
 	if (self.items & IT_AXE)
 		return IT_AXE;
+		
+	if(W_HasAmmo(IT_ROCKET_LAUNCHER))
+		return IT_ROCKET_LAUNCHER;
+	if(W_HasAmmo (IT_GRENADE_LAUNCHER))
+		return IT_GRENADE_LAUNCHER;
 	return 0;
 }
 

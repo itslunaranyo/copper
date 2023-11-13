@@ -81,14 +81,10 @@ void() weapon_touch =
 
 	weapon_give(other);
 	// change to the weapon
-	entity	stemp;
-	stemp = self;
-	self = other;
 	if (nsw)
-		W_ResetWeaponState();
+		SUB_CallAsSelf(W_ResetWeaponState, other);
 	else
-		W_BetterWeapon(stemp.items);
-	self = stemp;
+		W_BetterWeapon(other, self.items);
 
 	if (coop == 1)
 	{
@@ -373,9 +369,12 @@ void() ammo_touch =
 	sound (other, CHAN_ITEM, "weapons/lock4.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
-	// if changed current ammo, update it
-	SUB_CallAsSelf(W_SetCurrentAmmo, other);
-
+	if (!self.weapon)
+		SUB_CallAsSelf(W_SelectBestWeapon, other);
+	else
+		// if changed current ammo, update it	
+		SUB_CallAsSelf(W_SetCurrentAmmo, other);
+	
 	ItemTouched();
 }
 

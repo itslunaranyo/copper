@@ -61,17 +61,13 @@ void() BackpackTouch =
 
 	if (self.items && (other.items & self.items) == 0)
 	{
-		entity oself;
 		acount = TRUE;
 		other.items |= self.items;
 		sprint (other, "the ");
 		sprint (other, self.netname);
 	
-		oself = self;
-		self = other;
 		// change to the weapon
-		W_BetterWeapon(oself.items);
-		self = oself;
+		W_BetterWeapon(other, self.items);
 	}
 
 	if (self.armorvalue)
@@ -125,8 +121,9 @@ void() BackpackTouch =
 		
 	stuffcmd (other, "bf\n");
 
-	if (coop == 1 && self.buddy && self.buddy == other)
-		SUB_CallAsSelf(W_SelectBestWeapon, other);
+	if ((coop == 1 && self.buddy && self.buddy == other)
+		|| (!other.weapon))
+		SUB_CallAsSelf(W_SelectBestWeapon, other);		
 	else
 		SUB_CallAsSelf(W_SetCurrentAmmo, other);
 	ItemTouched();
