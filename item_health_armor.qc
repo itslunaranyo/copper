@@ -165,8 +165,6 @@ float ARMORTYPE_RED = 0.7;
 /*
 ============
 armor_set_type
-
-coverage derived from last armor grabbed, but drops off to a lower tier below 100 * type
 ============
 */
 void(entity e) armor_set_type =
@@ -243,7 +241,9 @@ float(entity e, float amt, float absorb, float replace) armor_give =
 	}
 	else
 	{
-		if (e.armortype == 0)
+		if (absorb > e.armortype)
+			e.armortype = absorb;
+		else if (e.armortype == 0)
 			e.armortype = ARMORTYPE_GREEN;
 		e.armorvalue += amt;
 	}
