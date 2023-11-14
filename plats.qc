@@ -531,7 +531,7 @@ void() flytrain_think =
 	{
 		// rosette movement looks more orbital than the original bounce of random offsets
 		t = localtime(self);
-		ang_y = (t * self.dest_x) % 360;
+		ang_y = (t * self.dest_x) % 360 + self.lip;
 		makevectors(ang);
 		ang = SinCos(t * self.dest_y);
 		d = ang_x * self.width;
@@ -613,6 +613,7 @@ void() flytrain_setup =
 	self.dest_z = 1.5 + random() * 2;
 	if (self.speed2 <= 0) self.speed2 = 10;
 	self.dest *= self.speed2;
+	self.lip = random() * 360;
 	
 	self.think = flytrain_init;	// wait for buddy to call train_find
 	self.nextthink = localtime(self) + 0.25; // magic amount of time :|
