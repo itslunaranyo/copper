@@ -473,10 +473,10 @@ void Hud_DrawIBarWeapons(vector pos)
 	float currweap = getstatf(STAT_ACTIVEWEAPON);
 	float i;
 	pos_y += 8;
-	for (i = 1; i < 8; i++)
+	for (i = 0; i < 7; i++)
 	{
-		if (stat_items & weaponflags[i])
-			Hud_DrawWeapon(i, pos + '24 0' * i, (currweap == weaponflags[i]));
+		if (stat_items & weaponflags[i+1])
+			Hud_DrawWeapon(i+1, pos + '24 0' * i, (currweap == weaponflags[i+1]));
 	}
 }
 
