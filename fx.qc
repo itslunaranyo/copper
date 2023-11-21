@@ -1103,6 +1103,7 @@ void() target_debris_use =
 		
 		chunk = toss_projectile(org, normalize(dir) * spd, "debris");
 		chunk.type = "debris";
+		chunk.solid = SOLID_NOT;
 		
 		// loop through 3 models if we have 3, alternate 2 if we 
 		// have 2, or always use the only one if we have 1
