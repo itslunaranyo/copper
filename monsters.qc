@@ -273,6 +273,7 @@ entity( void() spawnthink ) mon_spawner_use =
 		setsize(mon,self.mins,self.maxs);
 		mon.think = mon_spawner_tryspawn;
 		mon.think1 = spawnthink;
+		mon.spawnflags |= SPAWN_NO_TFRAG;
 	}
 	else
 	{

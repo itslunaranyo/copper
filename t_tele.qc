@@ -400,6 +400,9 @@ void() tdeath_touch =
 		}
 	}
 
+	if ((other.flags & FL_MONSTER) && (other.spawnflags & SPAWN_NO_TFRAG))
+		return;
+
 	if (other.health)
 		T_Damage (other, self, self, 50000, DMGTYPE_TELEFRAG);
 }
