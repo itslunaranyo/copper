@@ -138,13 +138,14 @@ void() shadowmonitor_think =
 	frac = vlen(o.origin - self.pos2) / vlen(self.pos2 - self.pos1);
 	if (self.customflags & CFL_INVLIGHT)
 		frac = 1 - frac;
+	dprint3("  sm ", ftos(frac*100), "%\n");
 	bmodel_lightstyle(o, frac);
 	
 	self.nextthink = time + min(0.05, (o.nextthink - o.ltime));
 
 	// remove last so we don't miss a final eval
 	if (self.nextthink <= time || 
-		time > self.lifetime_finished || 
+		localtime(o) > self.lifetime_finished || 
 		self.state != o.state)
 		remove(self);
 }
@@ -156,10 +157,11 @@ void() shadowmonitor_think =
 void(vector tstart, vector tdest, float tspeed, void() endfn, float invert) SUB_CalcMoveLight =
 {
 	entity mon = spawn();
+	dprint("spawning a shadowmonitor\n");
 	mon.classname = "shadowmonitor";
 	mon.owner = self;
 	mon.state = self.state;	// removes self if these stop matching
-	mon.lifetime_finished = time + vlen(tdest - self.origin) / tspeed;
+	mon.lifetime_finished = localtime(self) + vlen(tdest - self.origin) / tspeed;
 	mon.think = shadowmonitor_think;
 	mon.nextthink = time;
 	mon.pos1 = tstart;
