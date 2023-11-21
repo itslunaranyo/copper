@@ -76,7 +76,7 @@ void() door_go_down =
 	}
 	
 	self.state = STATE_DOWN;
-	SUB_CalcMove (self.pos1, self.speed2, door_hit_bottom);
+	SUB_CalcMoveLight(self.pos2, self.pos1, self.speed, door_hit_bottom, TRUE);
 	
 	SUB_UseTargetsAlt(target3);
 }
@@ -97,7 +97,7 @@ void() door_go_up =
 	
 	sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
 	self.state = STATE_UP;
-	SUB_CalcMove (self.pos2, self.speed, door_hit_top);
+	SUB_CalcMoveLight(self.pos1, self.pos2, self.speed, door_hit_top, FALSE);
 	self.frame = !self.skin;
 
 	if (!SUB_UseTargetsAlt(target))
@@ -136,10 +136,7 @@ void() door_fire =
 		{
 			starte = self;
 			do {
-				if (self.classname == "shadowmonitor")
-					door_shadowmonitor_go();
-				else
-					door_go_down ();
+				door_go_down ();
 				self = self.enemy;
 			} while ( (self != starte) && (self != world) );
 			self = oself;
@@ -151,10 +148,7 @@ void() door_fire =
 	starte = self;
 	if ( !( self.spawnflags & DOOR_TOGGLE ) || ( self.spawnflags & DOOR_TOGGLE && self.state == STATE_BOTTOM) )
 	do {
-		if (self.classname == "shadowmonitor")
-			door_shadowmonitor_go();
-		else
-			door_go_up ();
+		door_go_up ();
 		self = self.enemy;
 	} while ( (self != starte) && (self != world) );
 	self = oself;
@@ -490,16 +484,20 @@ void(vector cmins, vector cmaxs) door_finalize =
 		return;
 	}
 
-	t = self;
-	do {
-		// put a light fade monitor in the enemy chain
-		if (self.style || self.switchshadstyle)
-		{
-			door_shadowmonitor(t);
-			break;
-		}
-		t = t.enemy;
-	} while (t != self);
+	if (self.style < 0)
+	{
+		self.style *= -1;
+		self.customflags |= CFL_INVLIGHT;
+	}
+	if (self.spawnflags & DOOR_START_OPEN)
+	{
+		if (self.customflags & CFL_INVLIGHT)
+			self.customflags -= CFL_INVLIGHT;
+		else
+			self.customflags |= CFL_INVLIGHT;
+	}
+	
+	bmodel_lightstyle(self, 1);
 
 	if (self.health)
 		return;
