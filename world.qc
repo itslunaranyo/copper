@@ -185,6 +185,9 @@ Keys:
 		1 : "Runemetal"
 		2 : "Base"
 	]
+	fog(string) : "Set fog via engine (D R G B)"
+	fog_density(string) : "Set fog density via mod"
+	fog_color(string) : "Set fog color via mod (R G B)"
 	sounds(integer) : "CD track to play" : 0
 	light(integer) : "Ambient light"
 	gravity(integer) : "Gravity"
