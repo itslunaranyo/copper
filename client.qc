@@ -637,7 +637,7 @@ void() PutClientInServer =
 	{
 		fog_save(self, world.fog_density, world.fog_color, world.fog_sky);
 	}
-	if (!self.fog_sky)
+	if (self.fog_sky == -1)
 		self.fog_sky = cvar("r_skyfog");
 	initCleanup = 2;
 
