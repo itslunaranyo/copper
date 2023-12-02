@@ -396,7 +396,7 @@ float(float weap) W_Select =
 {
 	if (self.items & weap == 0) return FALSE;
 	if (!W_HasAmmo(weap)) return FALSE;
-	if (self.weapon == weap) return FALSE;
+	if (self.weapon == weap) return TRUE;
 	
 	self.weapon = weap;
 	W_ResetWeaponState();
