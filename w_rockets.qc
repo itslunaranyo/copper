@@ -6,27 +6,38 @@ ROCKETS
 ===============
 */
 
-
-void(vector org, float rad) T_GibDownedZombies =
+// we defer this into its own think bc findradiusplus can be a little painful
+// and big radiusdamage calls are already a culprit for breaching the loop limit 
+void() gibdownedzombies_do =
 {
-	if (rad < 72) return;	// not a big enough blast
 	entity head;
-	head = findradiusplus(org + '0 0 16', rad, type, "zombie");
-	// look a little too high since we'll assume zombies are lower than their 
-	// actual origin, which is 24u off the ground
+	head = findradiusplus(self.origin, self.distance, type, "zombie");
 	
 	while(head)
 	{
 		if ( head.customflags & CFL_KNOCKEDDOWN &&	// on ground
 			 head.solid == SOLID_NOT && // can't be hurt otherwise
-			CanDamage(head, org) &&	// in sight
-			rad - vlen(head.origin - org) > 0.5 * head.health	// close enough to hurt
+			CanDamage(head, self.origin) &&	// in sight
+			self.distance - vlen(head.origin - self.origin) > 0.5 * head.health	// close enough to hurt
 			)
 		{
 			T_Damage (head, self, self.trueowner, head.health + 10);
 		}
 		head = head.chain;
 	}
+	remove(self);
+}
+
+void(vector org, float rad) T_GibDownedZombies =
+{
+	if (rad < 72) return;	// not a big enough blast
+	entity gibber = spawn();
+	// look a little too high since we'll assume zombies are lower than their 
+	// actual origin, which is 24u off the ground
+	setorigin(gibber, org + '0 0 16');
+	gibber.think = gibdownedzombies_do;
+	gibber.distance = rad;
+	gibber.nextthink = time;
 }
 
 
