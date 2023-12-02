@@ -175,6 +175,7 @@ RadiusDamage and melee attacks.
 float(entity targ, vector srcorg) CanDamage =
 {
 	vector corner;
+	float dist;
 	
 	// bmodels need special checking because their origin is 0,0,0
 	if (targ.movetype == MOVETYPE_PUSH)
@@ -190,7 +191,8 @@ float(entity targ, vector srcorg) CanDamage =
 		return FALSE;
 	}
 	
-	if (vlen(srcorg - targ.origin) > 512)
+	dist = vlen(srcorg - targ.origin);
+	if (dist > 512)
 		return FALSE;	// too far
 		
 	// center
@@ -198,7 +200,7 @@ float(entity targ, vector srcorg) CanDamage =
 	if (trace_fraction == 1)
 		return TRUE;
 	
-	if (vlen(srcorg - targ.origin) > 256)
+	if (dist > 256)
 		return FALSE;	// skip extra traces beyond sensible explosion sizes 
 
 	// lunaran: adapted from maddes fix
