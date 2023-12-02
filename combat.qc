@@ -216,24 +216,26 @@ float(entity targ, vector srcorg) CanDamage =
 		return TRUE;
 	
 	// check proper extents of wider monsters
+	// skip the more expensive trace for these bc we don't really need to test
+	// through notrace 7 times
 	corner = targ.size * 0.5 - '1 1 0';
 	corner_z = 0;
-	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
+	traceline(srcorg, targ.origin + corner, TRUE, self);
 	if (trace_fraction == 1)
 		return TRUE;
 		
 	corner_x *= -1;
-	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
+	traceline(srcorg, targ.origin + corner, TRUE, self);
 	if (trace_fraction == 1)
 		return TRUE;
 		
 	corner_y *= -1;
-	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
+	traceline(srcorg, targ.origin + corner, TRUE, self);
 	if (trace_fraction == 1)
 		return TRUE;
 		
 	corner_x *= -1;
-	traceline2(srcorg, targ.origin + corner, self, TRACE_NOMONSTERS);
+	traceline(srcorg, targ.origin + corner, TRUE, self);
 	if (trace_fraction == 1)
 		return TRUE;
 
