@@ -116,9 +116,10 @@ void() DecodeLevelParms =
 	self.ammo_nails = parm5;
 	self.ammo_rockets = parm6;
 	self.ammo_cells = parm7;
-	self.weapon = parm8;
 	self.armortype = parm9;
 	
+	//self.weapon = parm8;
+	W_Select(parm8);
 	armor_set_type(self);
 }
 
@@ -1519,7 +1520,7 @@ void() PlayerPreThink =
 		self.velocity = '0 0 0';
 
 	if(time > self.attack_finished && 
-		self.currentammo == 0 && 
+		!W_HasAmmo(self.weapon) && 
 		self.weapon != IT_AXE
 		)
 	{
