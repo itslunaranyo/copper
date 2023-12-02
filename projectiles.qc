@@ -53,6 +53,10 @@ void(vector start, vector end, entity ignore, float traceflags) traceline2 =
 		}
 		traceline (src, end, nomonsters, ig);
 		
+		if (traces == 0)
+			if ((traceflags & TRACE_WATER) == 0 && (trace_fraction == 1.0 || trace_ent == world))
+				return;
+		
 		// preserve the accuracy of the trace result flags
 		if (t_startsolid == -1) t_startsolid = trace_startsolid;
 		if (!trace_startsolid)
