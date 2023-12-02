@@ -276,15 +276,14 @@ float ArmorSave(entity targ, float damage, float dmgtype = 0)
 	if (!damage) return 0;
 	if (!targ.takedamage)
 		return 0;
+	// armor doesn't protect against things like drowning or target_items health adjustments
+	if (dmgtype & DMGTYPE_NOARMOR || targ.armorvalue <= 0)
+		return 0;
 	if (targ.flags & FL_GODMODE || has_invuln(targ) )
 		return 0;
 
 	float save, savefrac;
 	
-	// armor doesn't protect against things like drowning or target_items health adjustments
-	if (dmgtype & DMGTYPE_NOARMOR || targ.armorvalue <= 0)
-		return 0;
-
 	savefrac = targ.armortype * damage;
 
 	if (targ.classname == "player")
@@ -483,19 +482,20 @@ void(entity targ, entity inflictor, entity attacker, float damage, float dmgtype
 	}
 
 	// team play damage avoidance
-	if ( (teamplay == 1) && 
-		(targ.team > 0) && 
-		(targ.team == attacker.team) && 
-		(targ != attacker) && 
-		(attacker.classname == "player") && 
-		(inflictor.classname != "door") )	// because squishing a teammate is still possible
-		return;
+	if (teamplay && attacker.classname == "player")
+	{
+		if ((targ.team > 0) && 
+			(targ.team == attacker.team) && 
+			(targ != attacker) && 
+			(inflictor.classname != "door") )	// because squishing a teammate is still possible
+			return;
 
-	// teamplay is automatically damage avoidance in coop because friends are always a team
-	if (teamplay && coop && 
-		attacker.classname == "player" && targ.classname == "player" &&
-		attacker != targ)
-		return;
+		// teamplay is automatically damage avoidance in coop because friends are always a team
+		if (coop && 
+			targ.classname == "player" &&
+			attacker != targ)
+			return;
+	}
 
 	// ready to do the damage
 	damage = max(1, floor(damage));
