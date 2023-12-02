@@ -849,13 +849,13 @@ void() IntermissionThink =
 		if (self.attack_finished < time)
 		{
 			// stay on cameras twice as long if player cycles to them manually
-			if (self.impulse == 10)
+			if (self.impulse == 10 || self.impulse == 14)
 			{
 				move_player_to_next_intermission();
 				self.attack_finished = time + 0.2;
 				self.lifetime_finished = time + 12;
 			}
-			else if (self.impulse == 12)
+			else if (self.impulse == 12 || self.impulse == 13)
 			{
 				move_player_to_previous_intermission();
 				self.attack_finished = time + 0.2;
