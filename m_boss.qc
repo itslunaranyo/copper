@@ -169,12 +169,12 @@ void() boss_death1 = [$death1, boss_death2] {
 	if (self.health == -99)	// telefragged or crushed or something
 	{
 		self.solid = SOLID_NOT;
-		ThrowGib ("progs/gib1.mdl", 96);
-		ThrowGib ("progs/gib2.mdl", 97);
-		ThrowGib ("progs/gib3.mdl", 98);
-		ThrowGib ("progs/gib1.mdl", 99);
-		ThrowGib ("progs/gib2.mdl", 101);
-		ThrowGib ("progs/gib3.mdl", 103);
+		ThrowGib ("progs/gib1.mdl", GibVelocityForHealth(96));
+		ThrowGib ("progs/gib2.mdl", GibVelocityForHealth(97));
+		ThrowGib ("progs/gib3.mdl", GibVelocityForHealth(98));
+		ThrowGib ("progs/gib1.mdl", GibVelocityForHealth(99));
+		ThrowGib ("progs/gib2.mdl", GibVelocityForHealth(101));
+		ThrowGib ("progs/gib3.mdl", GibVelocityForHealth(103));
 	}
 }
 void() boss_death2 = [$death2, boss_death3] {}

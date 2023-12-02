@@ -26,26 +26,30 @@ vector(float dm) GibVelocityForHealth =
 	return v * voom;
 }
 
-void(entity gib, string gibname) MakeGib =
+entity(string gibname, vector vel) ThrowGib =
 {
-	gib.lifetime_finished = time + 8 + random() * 8;
+	entity gib;
+	gib = spawn();
+	
+	// gibs have to be thinking ballistic projectiles to pass through monsterclip/notrace
+	gib.owner = gib.trueowner = self;
+	gib.touch = projectile_touch_null;
 	gib.th_die = SUB_Remove;
-	
-	SUB_ChangeModel(gib, gibname);
-	gib.type = "gib";
+	gib.think = projectile_toss_think;
+	gib.nextthink = time;
+	gib.touch = projectile_touch_null;
+	gib.lifetime_finished = time + 6 + random() * 6;
+
+	setmodel(gib, gibname);
+	setsize (gib, VEC_ORIGIN, VEC_ORIGIN);
+	setorigin (gib, self.origin);
+
+	gib.velocity = gib.oldvelocity = vel;	
 	gib.avelocity = Vector(random(),random(),random()) * 600;
+
+	gib.movetype = MOVETYPE_BOUNCE;
 	
-	gib.frame = 0;
-	gib.flags = 0;
-}
-
-entity(string gibname, float dm) ThrowGib =
-{
-	local entity gib;
-
-	// gibs have to be thinking ballistic projectiles to pass through monsterclip/notrace :(
-	gib = toss_projectile(self.origin, GibVelocityForHealth(dm), "gib");
-	MakeGib(gib, gibname);
+	gib.type = "gib";
 	
 	return gib;
 }
@@ -70,21 +74,18 @@ void(string gibname, float dm) ThrowHead =
 }
 
 
-// Gib & GibSpray are split up since some monsters play special gib sounds (zombies/players) and
-// I want all monsters going through GibSpray for trigger_void tests
+// Gib & GibSpray are split up since some monsters play special gib sounds (zombies/players)
 void(string headmdl, float dm) GibSpray =
 {
-	ThrowGib ("progs/gib1.mdl", dm);
-	ThrowGib ("progs/gib2.mdl", dm);
-	ThrowGib ("progs/gib3.mdl", dm);
+	ThrowGib ("progs/gib1.mdl", GibVelocityForHealth(dm));
+	ThrowGib ("progs/gib2.mdl", GibVelocityForHealth(dm));
+	ThrowGib ("progs/gib3.mdl", GibVelocityForHealth(dm));
 	
-	if (self.classname != "player")
-		if (damage_attacker.classname == "trigger_void" || damage_attacker.classname == "func_void" )
-		{
-			SUB_Remove();
-			return;
-		}
-
+	if (self.classname != "player" && damage_attacker.classname == "func_void" )
+	{
+		SUB_Remove();
+		return;
+	}
 		
 	ThrowHead (headmdl, dm);
 }
@@ -157,8 +158,8 @@ void(string gibname) target_meat_fireworks_do =
 	spray_z = spray_z * crandom() + self.mangle_z * 4;
 	spray *= self.speed * 2;
 	
-	gib = toss_projectile(self.origin + self.pos1, spray, "gib");
-	MakeGib(gib, gibname);
+	gib = ThrowGib(gibname, spray);
+	setorigin(gib, self.origin + self.pos1);
 }
 
 void() target_meat_fireworks_go =
