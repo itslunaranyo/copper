@@ -228,7 +228,7 @@ void(entity attacker, float damage)	fish_pain =
 	PainFinished(1);
 }
 
-void() fish_gib =
+void() fish_throwgib =
 {
 	entity meat;
 	vector mvel;
@@ -241,6 +241,29 @@ void() fish_gib =
 	meat.lifetime_finished = time + 1;
 }
 
+void() fish_gib =
+{
+	vector org;
+	org = self.origin - '0 0 8';
+	
+	particle(org + '-12 12 12', '-24 24 24', 73, 24);
+	particle(org + '12 12 12',  '24 24 24', 73, 24);
+	particle(org + '-12 -12 12', '-24 -24 24', 73, 24);
+	particle(org + '12 -12 12', '24 -24 24', 73, 24);
+	particle(org + '-12 12 -12', '-24 24 -24', 73, 24);
+	particle(org + '12 12 -12', '24 24 -24', 73, 24);
+	particle(org + '-12 -12 -12', '-24 -24 -24', 73, 24);
+	particle(org + '12 -12 -12', '24 -24 -24', 73, 24);
+	
+	sound (self, CHAN_VOICE, "player/tornoff2.wav", 1, ATTN_NORM);
+	
+	fish_throwgib();
+	fish_throwgib();
+	fish_throwgib();
+	
+	remove(self);
+}
+
 void() fish_die =
 {
 	self.solid = SOLID_NOT;
@@ -248,25 +271,8 @@ void() fish_die =
 	// just spray a bunch of blood and bubbles
 	if (self.health < -30)
 	{
-		vector org;
-		org = self.origin - '0 0 8';
-		
-		particle(org + '-16 16 16', '-16 16 16', 73, 20);
-		particle(org + '16 16 16', '16 16 16', 73, 20);
-		particle(org + '-16 -16 16', '-16 -16 16', 73, 20);
-		particle(org + '16 -16 16', '16 -16 16', 73, 20);
-		particle(org + '-16 16 -16', '-16 16 -16', 73, 20);
-		particle(org + '16 16 -16', '16 16 -16', 73, 20);
-		particle(org + '-16 -16 -16', '-16 -16 -16', 73, 20);
-		particle(org + '16 -16 -16', '16 -16 -16', 73, 20);
-		
-		sound (self, CHAN_VOICE, "player/tornoff2.wav", 1, ATTN_NORM);
-		
-		fish_gib();
-		fish_gib();
-		fish_gib();
-		
-		SUB_RemoveSoon();
+		self.think = fish_gib;
+		self.nextthink = time;
 		return;
 	}
 	
