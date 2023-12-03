@@ -274,7 +274,7 @@ float() TransferKeys =
 					recipient.worldtype += (give - 1) * 16;
 				}
 			
-				silver -= give;
+				gold -= give;
 				key_take_golds(self, give);
 				
 				sprint(recipient, "You got ");
