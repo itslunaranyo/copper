@@ -484,15 +484,15 @@ float SPAWN_TGTITEMS_MIN = 16;
 */
 void(entity e) target_items_setweapon =
 {
-	if (self.weapon)
-	{
-		if (self.weapon & e.items)
-			e.weapon = self.weapon;
-	}
-	if (!(e.weapon & e.items))
-		SUB_CallAsSelf(W_SelectBestWeapon, e);
+	entity tgi = self;
+	self = e;
+	if (tgi.weapon)
+		W_Select(tgi.weapon);
+
+	if (!(self.weapon & self.items))
+		W_SelectBestWeapon();
 	
-	SUB_CallAsSelf(W_ResetWeaponState, e);
+	self = tgi;
 }
 
 void(entity e) target_items_giveinv_min =
@@ -601,6 +601,13 @@ float(entity e) target_items_takeinv =
 		armor_set_type(e);
 	}
 
+	if (self.health > 0)
+	{
+		T_Damage(e, self, activator, min(e.health, self.health), DMGTYPE_SCRIPT | DMGTYPE_NOARMOR);
+		if (e.health <= 0)
+			return FALSE;
+	}
+		
 	if (self.svflags)
 	{
 		float sf = zeroconvert(self.svflags);
@@ -669,16 +676,10 @@ float(entity e) target_items_takeinv =
 		if (it & IT_KEY2)
 			key_take_gold(e);
 			
-		target_items_setweapon(e);
 	}
 	
-	SUB_CallAsSelf(W_ResetWeaponState, e);
+	target_items_setweapon(e);
 	
-	if (self.health > 0)
-	{
-		T_Damage(e, self, activator, min(e.health, self.health), DMGTYPE_SCRIPT | DMGTYPE_NOARMOR);
-	}
-		
 	return TRUE;
 }
 

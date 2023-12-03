@@ -120,7 +120,7 @@ void(entity e, float new) W_BetterWeapon =
 
 float(float weap) W_HasAmmo =
 {
-	if (weap == IT_AXE) return TRUE;
+	if (!weap || weap == IT_AXE) return TRUE;
 	
 	if (weap == IT_SUPER_SHOTGUN)	return (self.ammo_shells >= 2);
 	if (weap == IT_SHOTGUN)			return (self.ammo_shells >= 1);
@@ -394,10 +394,13 @@ This should be the only function that changes .weapon
 */
 float(float weap) W_Select =
 {
-	if (self.items & weap == 0) return FALSE;
-	if (!W_HasAmmo(weap)) return FALSE;
-	if (self.weapon == weap) return TRUE;
-	
+	if (weap)
+	{
+		if (self.items & weap == 0) return FALSE;
+		if (!W_HasAmmo(weap)) return FALSE;
+		if (self.weapon == weap) return TRUE;
+	}
+
 	self.weapon = weap;
 	W_ResetWeaponState();
 	return TRUE;
