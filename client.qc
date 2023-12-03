@@ -535,12 +535,11 @@ entity() SelectSpawnPoint =
 	if (serverflags)	// return with a rune to start
 	{
 		spot = world;
-		dprint2(ftos(serverflags), "\n");
+
 		while (TRUE)
 		{
 			spot = find (spot, classname, "info_player_start2");
 			if (!spot) break;
-			dprint3("   ", ftos(spot.svflags), "\n");
 			
 			// all
 			if (spot.style == 1 && ((spot.svflags & serverflags) == spot.svflags))
