@@ -76,7 +76,7 @@ void() door_go_down =
 	}
 	
 	self.state = STATE_DOWN;
-	SUB_CalcMoveLight(self.pos2, self.pos1, self.speed, door_hit_bottom, TRUE);
+	SUB_CalcMoveLight(self.pos2, self.pos1, self.speed2, door_hit_bottom, TRUE);
 	
 	SUB_UseTargetsAlt(target3);
 }
