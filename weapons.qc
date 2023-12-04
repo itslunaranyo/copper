@@ -126,7 +126,7 @@ float(float weap) W_HasAmmo =
 	if (weap == IT_SHOTGUN)			return (self.ammo_shells >= 1);
 	if (weap == IT_NAILGUN)			return (self.ammo_nails >= 1);
 	if (weap == IT_SUPER_NAILGUN)	return (self.ammo_nails >= 2);
-	if (weap == IT_LIGHTNING)		return (self.ammo_cells >= 1 || (self.trigger_field != world)); // not touching an electrode
+	if (weap == IT_LIGHTNING)		return (self.ammo_cells >= 1);
 	if (weap == IT_GRENADE_LAUNCHER || weap == IT_ROCKET_LAUNCHER)
 		return (self.ammo_rockets >= 1);
 		
