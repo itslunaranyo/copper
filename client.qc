@@ -637,6 +637,11 @@ void() PutClientInServer =
 	{
 		fog_save(self, world.fog_density, world.fog_color, world.fog_sky);
 	}
+	else
+	{	// if there's a world fog key, save -1s so we don't stomp it
+		fog_save(self, -1, '0 0 0', -1);
+	}
+
 	if (self.fog_sky == -1)
 		self.fog_sky = cvar("r_skyfog");
 	initCleanup = 2;
