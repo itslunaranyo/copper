@@ -166,7 +166,7 @@ void() W_SelectBestShotgun =
 {
 	if (self.items & (IT_SHOTGUN|IT_SUPER_SHOTGUN))
 	{
-		if (!W_Select(IT_SUPER_SHOTGUN) && !W_Select(IT_SHOTGUN))
+		if (!W_Select(IT_SHOTGUN) && !W_Select(IT_SUPER_SHOTGUN))
 			sprint (self, "not enough ammo.\n");
 	}
 	else
@@ -179,7 +179,7 @@ void() W_SelectBestNailgun =
 {
 	if (self.items & (IT_NAILGUN|IT_SUPER_NAILGUN))
 	{
-		if (!W_Select(IT_SUPER_NAILGUN) && !W_Select(IT_NAILGUN))
+		if (!W_Select(IT_NAILGUN) && !W_Select(IT_SUPER_NAILGUN))
 			sprint (self, "not enough ammo.\n");
 	}
 	else
