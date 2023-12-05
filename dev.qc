@@ -177,7 +177,7 @@ void() dev_trigger =
 
 void(float i) dev_impulse =
 {
-	dprint3("dev impulse ", ftos(i), " triggering\n");
+	bprint3("dev impulse ", ftos(i), " triggering\n");
 	entity t;
 	activator = self;
 	t = world;
@@ -190,21 +190,21 @@ void(float i) dev_impulse =
 
 void() dev_impulse_list =
 {
-	dprint("dev impulses:\n");
+	bprint("dev impulses:\n");
 	entity t;
 	t = world;
 	do	{
 		t = find(t, classname, "tg_imp");
 		if (t)
 		{
-			dprint4("  ", ftos(t.impulse), ": ", t.owner.classname);
+			bprint4("  ", ftos(t.impulse), ": ", t.owner.classname);
 			if (t.owner.targetname != string_null)
-				dprint3(", tname: ", t.owner.targetname, "\n");
+				bprint3(", tname: ", t.owner.targetname, "\n");
 			else
-				dprint("\n");
+				bprint("\n");
 		}
 	} while ( t != world );
-	dprint("end of list.\n");
+	bprint("end of list.\n");
 }
 
 void() dev_enemychain =
