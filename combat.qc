@@ -572,30 +572,33 @@ void(entity inflictor, entity attacker, float damage, entity ignore, float dmgty
 	float 	points, dist;
 	entity	head;
 	
-	head = findradius(inflictor.origin, damage+40);
+	head = findradius(inflictor.origin, min(512, damage + 40));
 	
 	while (head)
 	{
 		if (head != ignore && head.takedamage)
 		{
-			dist = vlen (inflictor.origin - BoundsCenter(head));
-			points = damage - (0.5 * dist);
-			if (head == attacker)
-				points *= 0.5;
-				
-			// shambler takes half damage from all explosions
-			//if (head.classname == "monster_shambler" && (dmgtype & DMGTYPE_EXPLOSION))
-			//	points *= 0.5;
-			// already halved by T_Damage
-			
 			// don't set off shootable doors/buttons with splash unless the player means it
 			if ((head.movetype == MOVETYPE_PUSH || head.th_die == multi_killed) && head.type != "explobox")
 			{
+				dist = vlen (inflictor.origin - BoundsCenter(head));
 				// a grenade at rest touching shootable should intuitively trigger it
 				if ( !(inflictor.type == "grenade" && BoundsTouching(inflictor.origin, inflictor.origin, head.absmin, head.absmax, 2)) )
 					if (dist > damage / 3)
 						points = 0;
 			}
+			else
+			{
+				dist = vlen (inflictor.origin - head.origin);
+				points = damage - (0.5 * dist);
+				if (head == attacker)
+					points *= 0.5;
+			}
+			// shambler takes half damage from all explosions
+			//if (head.classname == "monster_shambler" && (dmgtype & DMGTYPE_EXPLOSION))
+			//	points *= 0.5;
+			// already halved by T_Damage
+			
 
 			if (points > 0 && CanDamage ( head, inflictor.origin ) )
 				T_Damage (head, inflictor, attacker, points, dmgtype);
