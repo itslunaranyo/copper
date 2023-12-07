@@ -526,24 +526,25 @@ void() flytrain_think =
 	{
 		self.buddy.teleport_time = 0;
 		setorigin(self, self.buddy.origin - self.movedir);
+		self.velocity = self.buddy.velocity;
 	}
 	else
 	{
 		// rosette movement looks more orbital than the original bounce of random offsets
-		t = localtime(self);
-		ang_y = (t * self.dest_x) % 360 + self.lip;
+		t = localtime(self) + self.lip;
+		ang_y = (sin(self.dest_x * t) + cos(self.dest_y * t)) * 90 + t;
+		d = cos(t * self.dest_z);
+		ang_z = d * 180;
 		makevectors(ang);
-		ang = SinCos(t * self.dest_y);
-		d = ang_x * self.width;
-		self.pos1 = v_forward * d;
-		self.pos1_z = sin(t * self.dest_z) * self.height * ang_x;
 		
-		delta = (self.buddy.origin) - self.origin - self.movedir;
+		self.pos1 = v_forward * self.width * d;
+		self.pos1_z = v_right_z * self.height;
+		
+		delta = (self.buddy.origin + self.pos1) - self.origin - self.movedir;
 		wishvel = self.buddy.velocity + delta;
+		self.velocity = (self.velocity * 4 + wishvel) * 0.2;
 	}
 	
-	self.velocity = (self.velocity * 4 + wishvel) * 0.2 + (self.pos1 - self.pos2) * 4;
-	self.pos2 = self.pos1;
 	self.nextthink = localtime(self) + 0.05;
 }
 
@@ -608,12 +609,12 @@ void() flytrain_setup =
 		}
 	}
 	
-	self.dest_x = 4 + random();
-	self.dest_y = 8 + random() * 2;
-	self.dest_z = 1.5 + random() * 2;
+	self.dest_x = 3 + random();
+	self.dest_y = 1 + random();
+	self.dest_z = 4 + random();
 	if (self.speed2 <= 0) self.speed2 = 10;
 	self.dest *= self.speed2;
-	self.lip = random() * 360;
+	self.lip = random() * 20;
 	
 	self.think = flytrain_init;	// wait for buddy to call train_find
 	self.nextthink = localtime(self) + 0.25; // magic amount of time :|
