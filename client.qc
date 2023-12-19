@@ -660,6 +660,7 @@ void() PutClientInServer =
 	player_stand1();
 	
 	// spawns fire targets when spawned at
+	activator = self;
 	SUB_UseEntTargets(spot);
 	if (serverflags & SVFL_RESPAWNING) clear_respawning_flag();
 	

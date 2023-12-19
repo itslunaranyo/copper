@@ -218,7 +218,6 @@ SUB_UseEntTargets
 void(entity t) SUB_UseEntTargets =
 {
 	if (t == world) return;
-	activator = self;
 	entity oself = self;
 	self = t;
 	SUB_UseTargets();

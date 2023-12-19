@@ -751,6 +751,7 @@ void() train_on =
 
 void() train_use =
 {
+	self.aiment = activator;	// .enemy is used so we store activating player here
 	if ((self.spawnflags & TRAIN_TOGGLE) && (self.origin + self.movedir) != self.enemy.origin)
 	{
 		if (self.state == STATE_ON)
@@ -786,6 +787,13 @@ void() train_wait =	// arrival at a pathcorner
 	else
 		self.wait = self.pausetime;
 	
+	// if a player is riding the train, treat them as activator
+	activator = self.aiment;
+	if (activator.classname != "player")
+	{
+		activator = get_closest_client();
+		self.aiment = activator;
+	}
 	SUB_UseTargetsAlt(target2);
 
 	if (self.wait == -1)
@@ -807,10 +815,7 @@ void() train_wait =	// arrival at a pathcorner
 		train_next();
 	}
 	
-	// trains now fire their pathcorners' targets on arrival
-	// if a player is riding the train, treat them as activator
-	if (activator.classname != "player")
-		activator = get_closest_client();
+	// fire pathcorners' targets on arrival
 	SUB_UseEntTargets(corner);
 	// fire them after sorting corner wait stuff, in case the corner triggers
 	// the train itself (useful for wait-locking a pathcorner with a relay)
