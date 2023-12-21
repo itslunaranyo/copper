@@ -341,8 +341,9 @@ fog_blendTimeThink
 */
 void() fog_blendTimeThink =
 {
-	float f, ldensity, lsky;
+	float f, ldensity, lsky, force;
 	vector lcolor;
+	entity pl;
 	
 	if (time >= self.pain_finished)
 	{
@@ -370,12 +371,14 @@ void() fog_blendTimeThink =
 		ldensity = self.fog_density2;
 		lcolor = self.fog_color2;
 		lsky = self.fog_sky2;
+		force = TRUE;
 	}
 	else if (f == 0)
 	{
 		ldensity = self.fog_density;
 		lcolor = self.fog_color;
 		lsky = self.fog_sky;
+		force = TRUE;
 	}
 	else
 	{
@@ -385,19 +388,20 @@ void() fog_blendTimeThink =
 		lsky = fog_lerpHermite(self.fog_sky, self.fog_sky2, f);
 	}
 	
-	if (self.spawnflags & 4)
+	if (force || fog_sigdif(pl, ldensity, lcolor, lsky))
 	{
-		entity pl;
-		pl = nextent(world);
-		while (pl.flags & FL_CLIENT)
+		if (self.spawnflags & 4)
 		{
-			if (fog_sigdif(pl, ldensity, lcolor, lsky))
+			pl = nextent(world);
+			while (pl.flags & FL_CLIENT)
+			{
 				fog_set(pl, ldensity, lcolor, lsky);
-			pl = nextent(pl);
+				pl = nextent(pl);
+			}
 		}
+		else
+			fog_set(self.enemy, ldensity, lcolor, lsky);
 	}
-	else if (fog_sigdif(self.enemy, ldensity, lcolor, lsky))
-		fog_set(self.enemy, ldensity, lcolor, lsky);
 }
 
 /*QUAKED target_fogblend (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE GLOBAL
