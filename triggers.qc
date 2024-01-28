@@ -862,7 +862,8 @@ void() trigger_onlyregistered_touch =
 Only fires if playing the registered version, otherwise prints the message
 */
 /*FGD
-@SolidClass base(Trigger) = trigger_onlyregistered : "Trigger: Registered only" []
+@SolidClass base(Trigger) = trigger_onlyregistered : "Trigger: Registered only
+Only fires if playing the registered version, otherwise prints 'message'." []
 */
 void() trigger_onlyregistered =
 {
