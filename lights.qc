@@ -942,13 +942,15 @@ void() target_lightstyle_use =
 	}
 }
 
-/*QUAKED target_lightstyle (.5 .8 .5) (-8 -8 -8) (8 8 8)
+/*QUAKED target_lightstyle (.5 .8 .5) (-8 -8 -8) (8 8 8) START_ON
 This entity changes a global lightstyle when triggered. Set "style" to the lightstyle you want to override, and set "message" to the brightness pattern you want to set it to. If style is not set, and this entity targets any triggerable lights, it sets the brightness pattern of those lights when triggered instead. Note that targeting anything at a light makes it a triggerable light with its own style automatically.
 
 Setting style to -1 will override lightstyle 0, which is all static lights in the entire level.
 
 "count" limit number of uses, 0 = infinite
 "delay" pause between trigger and activation
+
+START_ON: fires itself once when the map starts
 */
 /*FGD
 @PointClass base(Appearflags, Targetname) color(128 210 128) = target_lightstyle : 
@@ -963,6 +965,9 @@ Changes a global lightstyle when triggered."
 	target2(target_destination) : "Target 2: acts on all with matching targetname" 
 	target3(target_destination) : "Target 3: acts on all with matching targetname" 
 	target4(target_destination) : "Target 4: acts on all with matching targetname" 
+	spawnflags(flags) = [
+		1 : "Go at map start" : 0
+	]
 ]
 */
 void() target_lightstyle =
@@ -973,4 +978,10 @@ void() target_lightstyle =
 	if (self.message == string_null)
 		self.message = "azam";	// suitably garish accidental default
 	self.use = target_lightstyle_use;
+	
+	if (self.spawnflags & 1)
+	{
+		self.think = target_lightstyle_go;
+		self.nextthink = time + 0.1;
+	}
 }
