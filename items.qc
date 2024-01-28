@@ -30,12 +30,12 @@ ItemFall
 */
 void() ItemFall =
 {
-	if (!(self.spawnflags & ITEM_SUSPENDED))
-		return;
+	self.flags &~= FL_ONGROUND;
 	self.solid = SOLID_TRIGGER;
 	self.movetype = MOVETYPE_TOSS;	
 	self.velocity = '0 0 1';
-	self.spawnflags = not(self.spawnflags, ITEM_SUSPENDED);
+	
+	self.spawnflags &~= ITEM_SUSPENDED;
 }
 
 /*
@@ -408,7 +408,7 @@ Causes all targeted items which are SUSPENDED to drop when triggered.
 */
 /*FGD
 @PointClass base(Appearflags, Targetname) size(32 32 32) color(192 64 0) = target_drop : 
-"Target Drop. Causes all targeted items which are Suspended to drop when triggered."
+"Target Drop. Causes all targeted items which are suspended to drop when triggered."
 [
 	target(target_destination) : "Target: acts on all items with a matching targetname" 
 	target2(target_destination) : "Target 2: acts on all items with a matching targetname" 
