@@ -591,7 +591,7 @@ void(entity inflictor, entity attacker, float damage, entity ignore, float dmgty
 			{
 				dist = vlen (inflictor.origin - head.origin);
 				points = damage - (0.5 * dist);
-				if (head == attacker)
+				if (head == attacker && inflictor.type != "explobox")	// barrels never did half-self-splash in vanilla
 					points *= 0.5;
 			}
 			// shambler takes half damage from all explosions

@@ -70,9 +70,12 @@ void() explobox_explode_go =
 	self.health = 0;	// ensure triggered exploboxes don't hurt themselves and loop again
 	
 	entity boom = spawn();
+	// exploboxes are bmodels so their origins are at the origin, so use the explosion as the inflictor
 	setorigin(boom, BoundsCenter(self));
 	boom.deathtype = self.deathtype;
-	if (self.dmg > 0) T_RadiusDamage (boom, self.enemy, self.dmg, boom, DMGTYPE_EXPLOSION);
+	boom.type = "explobox";	// ensure barrelness propagates through the boom
+	if (self.dmg > 0)
+		T_RadiusDamage (boom, self.enemy, self.dmg, boom, DMGTYPE_EXPLOSION);
 	boom.nextthink = time;
 	if (self.spawnflags & 1)
 	{
