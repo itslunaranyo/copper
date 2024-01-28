@@ -139,17 +139,25 @@ void() trap_spikeshooter =
 	self.use = shooter_once_think;
 	if (self.spawnflags & SF_SHOOT_OGRENADE)
 	{
+		if (self.deathtype == string_null)
+			self.deathtype = "blew up";
 		self.speed = zeroconvertdefault(self.speed, 400);
 	}
 	if (self.spawnflags & SF_SHOOT_LASER)
 	{
+		if (self.deathtype == string_null)
+			self.deathtype = "was blasted by a laser";
 		precache_model2 ("progs/laser.mdl");
 		
 		precache_sound2 ("enforcer/enfire.wav");
 		precache_sound2 ("enforcer/enfstop.wav");
 	}
 	else
+	{
+		if (self.deathtype == string_null)
+			self.deathtype = "was spiked";
 		precache_sound_safe ("weapons/spike2.wav");
+	}
 }
 
 /*QUAKED trap_shooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ? AT_ACTIVATOR
