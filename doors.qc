@@ -503,7 +503,12 @@ void() door_link =
 				masterdoor.targetname = self.targetname;
 				self.targetname = string_null;
 			}
-			masterdoor.items |= self.items;
+			if (self.items)	// keylocked
+			{
+				masterdoor.items |= self.items;
+				masterdoor.noise3 = self.noise3;
+				masterdoor.noise4 = self.noise4;
+			}
 			if (self.health != 0 && masterdoor.health == 0)
 				masterdoor.health = self.health;
 
@@ -571,6 +576,11 @@ void() door_key_init =
 	}
 	if (self.items)
 	{
+		if (self.owner != self)
+		{
+			self.noise3 = self.owner.noise3;
+			self.noise4 = self.owner.noise4;
+		}
 		entity t = self;
 		do {
 			t.wait = -1;
