@@ -265,7 +265,7 @@ void() void_fall_hitbottom =
 	}
 	
 	self.enemy.armorvalue = 0;
-	T_Damage(self.enemy, self, self, 5000, DMGTYPE_FALLING);
+	T_Damage(self.enemy, self.owner, self.owner, 5000, DMGTYPE_FALLING);
 	
 	SUB_RemoveSoon();
 }
@@ -315,6 +315,7 @@ void() void_fallthink =
 	}
 	
 	plummet = (self.enemy.origin_z - self.lip) / self.height;
+	bprint2(ftos(plummet), "\n");
 	plummet = 1 - plummet * plummet;	// exponential falloff seems to look more linear, since the player accelerates exponentially
 	plummet = min( ceil( plummet * 255 ), 255);
 	
@@ -402,12 +403,14 @@ void() void_trigger_touch =
 	fall.nextthink = time + 0.05;
 	fall.think = void_fallthink;
 	fall.enemy = e;
-	fall.owner = self;
+	fall.owner = self.owner;
 	fall.height = self.height;
 	fall.oldorigin = e.origin;	// track player's descent
 	fall.lip = e.origin_z - self.height; // z at bottom
 	fall.pain_finished = time + self.wait;
 	fall.fadecolor = self.fadecolor;
+	
+	eprint(fall);
 	
 	// gl_cshiftpercent isn't native to OG quake, so the cvar call fails and returns 0 
 	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
@@ -572,6 +575,7 @@ void() func_void =
 	
 	// create another solid entity with the same bounds with solid_trigger as a catch on the way down
 	self.enemy = spawn();
+	self.enemy.classname = "void_plunge_trigger";
 	self.enemy.movetype = MOVETYPE_NONE;
 	self.enemy.solid = SOLID_TRIGGER;
 	self.enemy.owner = self;
@@ -592,4 +596,7 @@ void() func_void =
 	setsize (self.enemy, self.mins + offset - '0 0 32', self.maxs + offset + '0 0 32');
 	
 	self.lock = void_lock;
+
+	eprint(self);
+	eprint(self.enemy);
 }
