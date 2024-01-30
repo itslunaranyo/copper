@@ -178,8 +178,8 @@ void() target_meat_fireworks_go =
 		spray_x *= crandom();
 		spray_y *= crandom();
 		spray_z *= crandom();
-		spray += self.owner.mangle * 0.5;
-		SpawnMeatSpray(self.origin + self.pos1, spray * self.owner.speed);
+		spray += self.owner.mangle;
+		SpawnMeatSpray(self.origin + self.pos1, spray * self.owner.speed * 4);
 	}
 	
 	target_meat_fireworks_do(self.owner.model);
