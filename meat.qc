@@ -152,11 +152,11 @@ void(string gibname) target_meat_fireworks_do =
 {
 	vector spray;
 	entity gib;
-	spray = '1 1 1' - self.mangle;
-	spray_x = spray_x * crandom() + self.mangle_x * 4;
-	spray_y = spray_y * crandom() + self.mangle_y * 4;
-	spray_z = spray_z * crandom() + self.mangle_z * 4;
-	spray *= self.speed * 2;
+	spray = '1 1 1' - self.owner.mangle;
+	spray_x = spray_x * crandom() + self.owner.mangle_x * 4;
+	spray_y = spray_y * crandom() + self.owner.mangle_y * 4;
+	spray_z = spray_z * crandom() + self.owner.mangle_z * 4;
+	spray *= self.owner.speed * 2;
 	
 	gib = ThrowGib(gibname, spray);
 	setorigin(gib, self.origin + self.pos1);
@@ -168,31 +168,31 @@ void() target_meat_fireworks_go =
 	float i;
 	meat_noise();
 	
-	self.pos1_x = (random()-0.5) * self.size_x;
-	self.pos1_y = (random()-0.5) * self.size_y;
-	self.pos1_z = (random()-0.5) * self.size_z;
+	self.pos1_x = (random()-0.5) * self.owner.size_x;
+	self.pos1_y = (random()-0.5) * self.owner.size_y;
+	self.pos1_z = (random()-0.5) * self.owner.size_z;
 
 	for (i = 0; i < 3; i++)
 	{
-		spray = '1 1 1' - self.mangle;
+		spray = '1 1 1' - self.owner.mangle;
 		spray_x *= crandom();
 		spray_y *= crandom();
 		spray_z *= crandom();
-		spray += self.mangle * 0.5;
-		SpawnMeatSpray(self.origin + self.pos1, spray * self.speed);
+		spray += self.owner.mangle * 0.5;
+		SpawnMeatSpray(self.origin + self.pos1, spray * self.owner.speed);
 	}
 	
-	target_meat_fireworks_do(self.model);
+	target_meat_fireworks_do(self.owner.model);
 	
-	if (self.cnt == 2)
-		target_meat_fireworks_do(self.model2);
+	if (self.owner.cnt == 2)
+		target_meat_fireworks_do(self.owner.model2);
 	else
-		target_meat_fireworks_do(self.model);
+		target_meat_fireworks_do(self.owner.model);
 		
-	if (self.cnt == 3)
-		target_meat_fireworks_do(self.model3);
+	if (self.owner.cnt == 3)
+		target_meat_fireworks_do(self.owner.model3);
 	else
-		target_meat_fireworks_do(self.model);
+		target_meat_fireworks_do(self.owner.model);
 }
 
 void() target_meat_fireworks_use =
@@ -211,11 +211,12 @@ void() target_meat_fireworks_use =
 	for (i = 0; i < self.count; i++)
 	{
 		meats = spawn();
+		meats.owner = self;
 		setorigin(meats, self.origin);
 		meats.think = target_meat_fireworks_go;
-		meats.mangle = self.mangle;
-		meats.speed = self.speed;
-		meats.size = self.size;
+	//	meats.mangle = self.mangle;
+	//	meats.speed = self.speed;
+	//	meats.size = self.size;
 		meats.nextthink = time + tnext;
 		tnext += self.wait + self.rand * random();
 	}
@@ -247,7 +248,10 @@ Keys
 */
 void() target_meat_fireworks =
 {
+	dprint("target_meat_fireworks\n");
+	
 	if (!SUB_ShouldSpawn()) return;
+	self.owner = self;	// delayed emitters have owner as this also
 	self.speed = zeroconvertdefault(self.speed, 128);
 	self.count = zeroconvertdefault(self.count, 1);
 	self.use = target_meat_fireworks_use;
