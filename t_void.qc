@@ -315,7 +315,6 @@ void() void_fallthink =
 	}
 	
 	plummet = (self.enemy.origin_z - self.lip) / self.height;
-	bprint2(ftos(plummet), "\n");
 	plummet = 1 - plummet * plummet;	// exponential falloff seems to look more linear, since the player accelerates exponentially
 	plummet = min( ceil( plummet * 255 ), 255);
 	
@@ -409,8 +408,6 @@ void() void_trigger_touch =
 	fall.lip = e.origin_z - self.height; // z at bottom
 	fall.pain_finished = time + self.wait;
 	fall.fadecolor = self.fadecolor;
-	
-	eprint(fall);
 	
 	// gl_cshiftpercent isn't native to OG quake, so the cvar call fails and returns 0 
 	// in winquake/weird engines because the cvar doesn't exist, so use a cvar introduced
@@ -596,7 +593,4 @@ void() func_void =
 	setsize (self.enemy, self.mins + offset - '0 0 32', self.maxs + offset + '0 0 32');
 	
 	self.lock = void_lock;
-
-	eprint(self);
-	eprint(self.enemy);
 }

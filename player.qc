@@ -437,8 +437,6 @@ void() GibPlayer =
 
 	if (damage_attacker.classname == "trigger_void" || damage_attacker.classname == "func_void" )
 	{
-		bprint3("da   ", damage_attacker.classname, "\n");
-		bprint3("dan2 ", damage_attacker.noise2, "\n");
 		sound (self, CHAN_VOICE, damage_attacker.noise2, 1, ATTN_NONE);
 		TintScreenColor(self, 255, '32 0 0');
 		//stuffcmd( self, "\nv_cshift 16 0 0 255\n");
