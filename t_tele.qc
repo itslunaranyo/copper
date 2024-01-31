@@ -396,6 +396,7 @@ void() tdeath_touch =
 		if (self.owner.classname != "player")
 		{	// other monsters explode themselves
 			T_Damage (self.owner, self, self, 50000, DMGTYPE_TELEFRAG);
+			remove(self);	// our purpose is served
 			return;
 		}
 	}
@@ -408,9 +409,6 @@ entity(vector org, entity death_owner) spawn_tdeath =
 {
 	entity death;
 
-	// dumb hack so the world isn't flooded with a tdeath for every monster at map start
-	if (time < 2) return world;	
-	
 	death = spawn();
 	death.classname = "teledeath";
 	death.movetype = MOVETYPE_NONE;
