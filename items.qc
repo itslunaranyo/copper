@@ -30,6 +30,7 @@ ItemFall
 */
 void() ItemFall =
 {
+	if (!(self.flags & FL_ITEM)) return;
 	self.flags &~= FL_ONGROUND;
 	self.solid = SOLID_TRIGGER;
 	self.movetype = MOVETYPE_TOSS;	
@@ -390,6 +391,7 @@ void(string tname) target_drop_do =
 	do	{
 		t = find (t, targetname, tname);
 		if (!t) break;
+		if (!(t.flags & FL_ITEM)) continue;
 		
 		SUB_CallAsSelf(ItemFall, t);
 	} while (t);
