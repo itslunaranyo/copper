@@ -200,6 +200,9 @@ void() ImpulseCommands =
 	case 15:
 		W_SelectBestWeapon();
 		break;
+	case 16:
+		W_SelectLastWeapon();
+		break;
 
 	case 40:
 		dev_impulse_list();

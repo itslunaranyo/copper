@@ -386,6 +386,12 @@ void() W_ResetWeaponState =
 	W_SetCurrentAmmo();
 }
 
+void() W_SelectLastWeapon =
+{
+	if (self.attack_state)
+		W_Select(self.attack_state);
+}
+
 /*
 ============
 W_Select
@@ -396,9 +402,10 @@ float(float weap) W_Select =
 {
 	if (weap)
 	{
+		if (self.weapon == weap) return TRUE;
 		if (self.items & weap == 0) return FALSE;
 		if (!W_HasAmmo(weap)) return FALSE;
-		if (self.weapon == weap) return TRUE;
+		self.attack_state = self.weapon;
 	}
 
 	self.weapon = weap;
