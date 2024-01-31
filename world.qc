@@ -216,7 +216,7 @@ void() worldspawn =
 
 	if (!self.gravity)
 	{
-		if (self.model == "maps/e1m8.bsp")
+		if (mapname == "e1m8")
 		{
 			self.gravity = 100;
 		}
@@ -226,6 +226,9 @@ void() worldspawn =
 		}
 	}
 	cvar_set("sv_gravity", ftos(self.gravity));
+	
+	// learn to map petersen i hate u
+	if (mapname == "e4m5") sandyMadeThis = TRUE;
 	
 	// make sure these are set for spawnfuncs, which happen before the first startframe()
 	teamplay = cvar("teamplay");

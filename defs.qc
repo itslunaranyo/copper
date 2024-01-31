@@ -273,6 +273,8 @@ string	keyType;
 
 float *cdtrack;	// fteqcc supports pointers. madness. see void() worldspawn
 
+float sandyMadeThis; // for special-casing SOMEBODY's stale keyvalues and clumsy mapping
+
 //================================================
 
 // world fields
