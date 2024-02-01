@@ -1233,6 +1233,11 @@ void() target_debris =
 	- alt target: fade target, 2 on start, 3 on finish, 4 on return
 */
 
+#define ALPHA_START health
+#define ALPHA_END max_health
+#define TIME_START healthtime
+#define TIME_END pain_finished
+
 // targetname scanning 20 times a frame is a little rude, so we check for
 // targets up front and remember them
 void(entity e) target_fade_add =
@@ -1287,7 +1292,7 @@ void() target_fade_find =
 	}
 }
 
-void() target_fade_done =
+void() target_fade_cleanup =
 {
 	entity t = self.chain;
 	entity ot;
@@ -1303,6 +1308,8 @@ void() target_fade_done =
 
 void(float f) target_fade_set =
 {
+	self.strength = f;
+
 	if (f == 0) f = -1;
 	entity t = self;
 	entity e;
@@ -1324,10 +1331,117 @@ void(float f) target_fade_set =
 		lightstyle(self.style, light_str(f));
 }
 
+void(float a_from, float a_to, float f) target_fade_lerp =
+{
+	float blend;
+	
+	if (f >= 1)
+		blend = a_to;
+	else if (f <= 0)
+		blend = a_from;
+	else
+		blend = lerp(a_from, a_to, f);
+	
+	target_fade_set(blend);
+}
+
+// fade over time stuff ===========
+
+void() target_fade_think =
+{
+	float f, n, d;
+	n = time - self.TIME_START;
+	d = self.TIME_END - self.TIME_START;
+	if (d == 0)
+		f = 1;
+	else
+		f = n / d;
+	target_fade_lerp(self.ALPHA_START, self.ALPHA_END, f);
+	
+	if (f >= 1)
+		self.think1();
+	else
+		self.nextthink = time + 0.05;
+}
+
+void(float a, float tlen, void() endfn) target_fade_to =
+{
+	self.ALPHA_START = self.strength;
+	self.ALPHA_END = a;
+	self.TIME_START = time;
+	self.TIME_END = time + tlen;
+	
+	self.think = target_fade_think;
+	self.nextthink = time;
+	self.think1 = endfn;
+}
+
+void() target_fade_time_done =
+{
+	if (self.state)
+	{
+		if (self.noise2 != string_null)
+			sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
+	}
+	else
+	{
+		if (self.noise4 != string_null)
+			sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
+	}
+	self.nextthink = time + 1;
+	self.think = target_fade_cleanup;
+}
+
+void() target_fade_time =
+{
+	if (activator.classname != "player") return;
+	if (time < self.attack_finished) return;
+	
+	target_fade_find();
+	
+	if (!(self.spawnflags & 1))
+		self.state = 1 - self.state;
+	
+	if (self.state)
+	{
+		if (self.noise != string_null)
+			sound(self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
+
+		target_fade_to(self.alpha2, self.delay + self.speed, target_fade_time_done);
+		self.attack_finished = time + self.delay + self.speed;
+	}
+	else
+	{
+		if (self.noise3 != string_null)
+			sound(self, CHAN_VOICE, self.noise3, self.volume, ATTN_NORM);
+
+		target_fade_to(self.alpha, self.delay + self.speed2, target_fade_time_done);
+		self.attack_finished = time + self.delay + self.speed2;
+	}
+		
+	if (self.delay > 0)
+	{
+		self.TIME_START = time + self.delay;
+		self.nextthink = self.TIME_START;
+	}
+}
+
 // fade over distance stuff ===========
+
+void() target_fade_dist_done =
+{
+	self.nextthink = time + 1;
+	self.think = target_fade_cleanup;
+}
 
 void() target_fade_dist =
 {
+	if (time < self.attack_finished)
+		return;
+	
+	dprint("in target_fade_dist\n");
+	self.attack_finished = time + self.speed;
+	
 	target_fade_find();
 	
 	float dist, f;
@@ -1389,83 +1503,15 @@ void() target_fade_dist =
 	}
 	f = lerp(self.alpha, self.alpha2, 1 - f);
 	
-	target_fade_set(f);
-	
-	// clean up/refresh our target list if not being used
-	self.nextthink = time + 1;
-	self.think = target_fade_done;
+	target_fade_to(f, self.speed, target_fade_dist_done);
 }
 
-// fade over time stuff ===========
-
-void() target_fade_think =
+void() target_fade_init =
 {
-	float f, a;
-	
-	if (time >= self.pain_finished)
-	{
-		f = 1;
-		self.use = target_fade_time;
-		if (self.state)
-			if (self.noise2 != string_null) sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
-		else
-			if (self.noise4 != string_null) sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
-	}
-	else
-	{
-		// don't allow retriggering before the blend is done
-		self.use = SUB_Null;
-		self.nextthink = time + 0.05;
-		if (self.state && self.speed)
-			f = 1 - (self.pain_finished - time) / self.speed;
-		else if (!self.state && self.speed2)
-			f = 1 - (self.pain_finished - time) / self.speed2;
-		else
-			f = 1;
-	}
-
-	if (self.state == 0)
-		f = 1 - f;
-	
-	if (f == 1)
-		a = self.alpha2;
-	else if (f == 0)
-		a = self.alpha;
-	else
-		// in transition, blend proportionally
-		a = lerpHermite(self.alpha, self.alpha2, f);
-	
-	target_fade_set(a);
-	if (self.use == target_fade_time)
-	{
-		target_fade_done();
-	}
-}
-
-void() target_fade_time =
-{
-	if (activator.classname != "player") return;
-	
-	if (!(self.spawnflags & 1))
-		self.state = 1 - self.state;
-	
-	if (self.state)
-	{
-		if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
-		self.pain_finished = time + self.delay + self.speed;
-	}
-	else
-	{
-		if (self.noise3 != string_null) sound (self, CHAN_VOICE, self.noise3, self.volume, ATTN_NORM);
-		self.pain_finished = time + self.delay + self.speed2;
-	}
-	
 	target_fade_find();
-	
-	if (self.delay > 0)
-		self.nextthink = time + self.delay;
-	else
-		target_fade_think();
+	target_fade_set(self.alpha);
+	self.think = target_fade_cleanup;
+	self.nextthink = time + 1;
 }
 
 /*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE BY_DISTANCE
@@ -1507,7 +1553,8 @@ Alt Target Pattern: in distance mode, target is fading object, target2 on begin 
 	spawnflags(flags) = [
 		1 : "One Way" : 0
 		2 : "Reverse alpha/alpha2" : 0
-		2 : "Blend By Distance" : 0
+		4 : "Blend By Distance" : 0
+		8 : "Hold Blend" : 0
 	]
 	delay(string) : "Pause before starting blend"
 	alpha(string) : "Start alpha" : "1.0"
@@ -1549,6 +1596,7 @@ void() target_fade =
 
 	if ((self.spawnflags & 4) && self.distance > 0)
 	{
+		self.speed = zeroconvertdefault(self.speed, 0.2);
 		if (!self.dest) self.dest = '1 1 1';
 		self.use = target_fade_dist;
 		self.distance -= self.lip;
@@ -1561,6 +1609,7 @@ void() target_fade =
 		self.speed2 = zeroconvertdefault(self.speed2, self.speed);
 
 		self.use = target_fade_time;
-		self.think = target_fade_think;
 	}
+	self.think = target_fade_init;
+	self.nextthink = time + 0.2;
 }
