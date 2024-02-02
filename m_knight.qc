@@ -79,8 +79,8 @@ void()	knight_run1	=[	$runb1,		knight_run2	]
 	if (random() < 0.2 && time > self.show_hostile)
 		sound (self, CHAN_VOICE, "knight/idle.wav", 1,  ATTN_IDLE);
 		
-	ai_run(16);
 	nmfast();
+	ai_run(16);
 }
 void()	knight_run2	=[	$runb2,		knight_run3	] {nmfast(); ai_run(20);}
 void()	knight_run3	=[	$runb3,		knight_run4	] {nmfast(); ai_run(13);}
@@ -98,9 +98,8 @@ void()	knight_runatk1	=[	$runattack1,		knight_runatk2	]
 	else
 		sound (self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
 		
-	ai_charge(20);
-		//bprint(vtos(self.origin));	bprint("\n");
 	nmfast();
+	ai_charge(20);
 }
 void()	knight_runatk2	=[	$runattack2,	knight_runatk3	] {nmfast(); ai_charge_side();  }
 void()	knight_runatk3	=[	$runattack3,	knight_runatk4	] {nmfast(); ai_charge_side(); }
@@ -116,8 +115,8 @@ void()	knight_runatk11	=[	$runattack11,	knight_run1	] {nmfast(); ai_charge(10); 
 void()	knight_atk1	=[	$attackb1,		knight_atk2	]
 {
 	sound (self, CHAN_WEAPON, "knight/sword1.wav", 1, ATTN_NORM);
-	ai_charge(0);
 	nmfast();
+	ai_charge(0);
 }
 void()	knight_atk2	=[	$attackb2,		knight_atk3	] {nmfast(); ai_charge(7);}
 void()	knight_atk3	=[	$attackb3,		knight_atk4	] {nmfast(); ai_charge(4);  }

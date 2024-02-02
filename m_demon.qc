@@ -87,7 +87,11 @@ float() DemonCheckCharge =
 	return TRUE;
 }
 
-void()	demon1_run1	= [ $run1, demon1_run2 ] { nmfast(); ai_run(20); DemonCheckCharge();}
+void()	demon1_run1	= [ $run1, demon1_run2 ] { nmfast(); 
+	if (DemonCheckCharge())
+		return;
+	ai_run(20);
+}
 void()	demon1_run2	= [ $run2, demon1_run3 ] { nmfast(); ai_run(15);}
 void()	demon1_run3	= [ $run3, demon1_run4 ] { nmfast(); ai_run(36);}
 void()	demon1_run4	= [ $run4, demon1_run5 ] { nmfast(); ai_run(20);}

@@ -156,6 +156,7 @@ local float 	ldmg;
 		return;
 
 	ai_charge(10);
+	if (self.deadflag) return;
 
 	delta = self.enemy.origin - self.origin;
 

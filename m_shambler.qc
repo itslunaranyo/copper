@@ -127,7 +127,6 @@ void(float side) ShamClaw =
 
 	if (!self.enemy)
 		return;
-	ai_charge(10);
 
 	if (vdist(self.enemy.origin, self.origin) > 100)
 		return;
@@ -152,7 +151,7 @@ void() sham_swingl3 =[      $swingl3,      sham_swingl4   ] {nmfast(); ai_charge
 void() sham_swingl4 =[      $swingl4,      sham_swingl5   ] {nmfast(); ai_charge(3);}
 void() sham_swingl5 =[      $swingl5,      sham_swingl6   ] {nmfast(); ai_charge(7);}
 void() sham_swingl6 =[      $swingl6,      sham_swingl7   ] {nmfast(); ai_charge(9);}
-void() sham_swingl7 =[      $swingl7,      sham_swingl8   ] {ai_charge(5); ShamClaw(250);}
+void() sham_swingl7 =[      $swingl7,      sham_swingl8   ] {ai_charge(15); ShamClaw(250);}
 void() sham_swingl8 =[      $swingl8,      sham_swingl9   ] {ai_charge(4);}
 void() sham_swingl9 =[      $swingl9,      sham_run1  ] {
 	ai_charge(8);
@@ -171,11 +170,11 @@ void() sham_swingr3 =[      $swingr3,      sham_swingr4   ] {nmfast(); ai_charge
 void() sham_swingr4 =[      $swingr4,      sham_swingr5   ] {nmfast(); ai_charge(7);}
 void() sham_swingr5 =[      $swingr5,      sham_swingr6   ] {nmfast(); ai_charge(3);}
 void() sham_swingr6 =[      $swingr6,      sham_swingr7   ] {nmfast(); ai_charge(6);}
-void() sham_swingr7 =[      $swingr7,      sham_swingr8   ] {ai_charge(6); ShamClaw(-250);}
+void() sham_swingr7 =[      $swingr7,      sham_swingr8   ] {ai_charge(16); ShamClaw(-250);}
 void() sham_swingr8 =[      $swingr8,      sham_swingr9   ] {ai_charge(3);}
 void() sham_swingr9 =[      $swingr9,      sham_run1  ] {
 	ai_charge(11);
-	if (random()<0.5 && 
+	if (!self.deadflag && random()<0.5 && 
 		vdist(self.enemy.origin, self.origin) < 100 && 
 		CheckClearAttack())
 		self.think = sham_swingl1;
