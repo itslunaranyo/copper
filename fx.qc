@@ -1506,6 +1506,64 @@ void() target_fade_dist =
 	target_fade_to(f, self.speed, target_fade_dist_done);
 }
 
+// hold fade stuff ===========
+
+void() target_fade_hold_bottom =
+{
+	self.state = STATE_BOTTOM;
+	if (self.noise4 != string_null) sound (self, CHAN_VOICE, self.noise4, self.volume, ATTN_NORM);
+	SUB_UseTargetsAlt(target4);
+	self.think = target_fade_cleanup;
+	self.nextthink = time + 1;
+}
+
+void() target_fade_down =
+{
+	self.state = STATE_DOWN;
+	target_fade_to(self.alpha, self.speed2, target_fade_hold_bottom);
+}
+
+void() target_fade_hold_top =
+{
+	self.state = STATE_TOP;
+	if (self.noise2 != string_null) sound (self, CHAN_VOICE, self.noise2, self.volume, ATTN_NORM);
+	SUB_UseTargetsAlt(target3);
+	
+	self.nextthink = time + self.wait;
+	self.think = target_fade_down;
+}
+
+void() target_fade_hold =
+{
+	float t;
+	dprint("target_fade_hold?\n");
+	if (self.state == STATE_BOTTOM)
+	{
+		dprint("   tfh bottom\n");
+		target_fade_find();
+		self.state = STATE_UP;
+		if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
+		target_fade_to(self.alpha2, self.speed, target_fade_hold_top);
+		SUB_UseTargetsAlt(target2);
+	}
+	else if (self.state == STATE_TOP)
+	{
+		dprint("   tfh top\n");
+		self.nextthink = time + self.wait;
+	}
+	else if (self.state == STATE_DOWN)
+	{
+		dprint("   tfh down\n");
+		self.state = STATE_UP;
+		t = (self.TIME_END - time) / self.speed2;
+		target_fade_to(self.alpha2, t * self.speed, target_fade_hold_top);
+	}
+	else if (self.state == STATE_UP)
+	{
+		dprint("   tfh up, noop\n");
+	}
+}
+
 void() target_fade_init =
 {
 	target_fade_find();
@@ -1514,7 +1572,7 @@ void() target_fade_init =
 	self.nextthink = time + 1;
 }
 
-/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE BY_DISTANCE
+/*QUAKED target_fade (.5 .5 .2) (-8 -8 -8) (8 8 8) ONE_WAY REVERSE BY_DISTANCE HOLD
 Changes the alpha of its targets over time from 'alpha' to 'alpha2'. Triggering again will fade it back, unless ONE_WAY is set.
 Set REVERSE to swap the values.
 
@@ -1538,6 +1596,8 @@ If BY_DISTANCE is checked, it will set alpha immediately based on how far the ac
 ONE_WAY in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
 "dest"		alternate distance constraint (scale position by these three values)
 
+If HOLD is checked, it will exhibit door-like behavior when triggered: triggering multiple times while fading is ignored, triggering while faded extends the wait, and triggering while fading back starts fading out again. If not triggered when faded out, it will wait for 'wait' seconds until returning.
+
 Alt Target Pattern: in distance mode, target is fading object, target2 on begin fade (enter distance range), target3 on complete fade (enter lip range), target4 on exit distance range
 */
 /*FGD
@@ -1547,6 +1607,7 @@ Changes the alpha of its targets over time from 'alpha' to 'alpha2'.
 If this targets brushmodels with switchable shadows or lightstyles, the lighting will fade appropriately.
 If 'Blend By Distance' is set, it will set alpha immediately based on how far the activator is from its origin.
 'One Way' in distance mode constrains motion along 'angle' to the positive direction, instead of symmetrically.
+If 'Hold Blend' is checked, it will exhibit door-like behavior when triggered: triggering multiple times while fading is ignored, triggering while faded extends the wait, and triggering while fading back starts fading out again. If not triggered when faded out, it will wait for 'wait' seconds until returning.
 
 Alt Target Pattern: in distance mode, target is fading object, target2 on begin fade (enter distance range), target3 on complete fade (enter lip range), target4 on exit distance range" 
 [
@@ -1607,8 +1668,15 @@ void() target_fade =
 	{
 		self.speed = zeroconvertdefault(self.speed, 1);
 		self.speed2 = zeroconvertdefault(self.speed2, self.speed);
-
-		self.use = target_fade_time;
+		
+		if (self.spawnflags & 8)
+		{
+			self.use = target_fade_hold;
+			self.state = STATE_BOTTOM;
+			self.wait = zeroconvertdefault(self.wait, 3);
+		}
+		else
+			self.use = target_fade_time;
 	}
 	self.think = target_fade_init;
 	self.nextthink = time + 0.2;
