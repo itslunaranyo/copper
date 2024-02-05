@@ -582,6 +582,8 @@ void(entity inflictor, entity attacker, float damage, entity ignore, float dmgty
 			if ((head.movetype == MOVETYPE_PUSH || head.th_die == multi_killed) && head.type != "explobox")
 			{
 				dist = vlen (inflictor.origin - BoundsCenter(head));
+				points = damage - (0.5 * dist);
+
 				// a grenade at rest touching shootable should intuitively trigger it
 				if ( !(inflictor.type == "grenade" && BoundsTouching(inflictor.origin, inflictor.origin, head.absmin, head.absmax, 2)) )
 					if (dist > damage / 3)
