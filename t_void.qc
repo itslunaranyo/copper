@@ -250,7 +250,7 @@ void() void_func_touch =
 void() void_fall_hitbottom =
 {
 	self.enemy.takedamage = DAMAGE_YES;	// need this first for salvation damage check
-	if (void_salvation(self.owner.owner, self.enemy))
+	if (void_salvation(self.owner, self.enemy))
 		return;
 	
 	self.enemy.customflags = not(self.enemy.customflags, CFL_UNDYING);
