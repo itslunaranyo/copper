@@ -259,11 +259,19 @@ void() ShalHome =
 	{
 		// nightmare: vanilla-evil homing with corner following to force engagement rather than encourage it
 		enemy_vis = visible(self.enemy);
+		
+		self.dest2 = self.dest;
 		if (enemy_vis)	// go straight to follow player around corners
 		{
 			// remember last seen positions for corner hax
-			self.dest2 = self.dest;
 			self.dest = self.enemy.origin;
+		}
+		else if (self.dest2 == self.dest)
+		{
+			// player has been out of sight for two frames, don't keep changing velocity or
+			// when we reach that point we'll dance around it weirdly
+			self.oldvelocity = self.velocity;
+			return;
 		}
 		
 		// poor homing
