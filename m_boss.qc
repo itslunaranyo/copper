@@ -56,7 +56,7 @@ void() boss_rise13	=[	$rise13, boss_rise14 ] {}
 void() boss_rise14	=[	$rise14, boss_rise15 ] {}
 void() boss_rise15	=[	$rise15, boss_rise16 ] {}
 void() boss_rise16	=[	$rise16, boss_rise17 ] {}
-void() boss_rise17	=[	$rise17, boss_missile1 ] {}
+void() boss_rise17	=[	$rise17, boss_missile1 ] {self.pain_finished = 0;}
 
 void() boss_idle1	=[	$walk1, boss_idle2 ] {ai_face();}
 void() boss_idle2	=[	$walk2, boss_idle3 ] {ai_face();}
@@ -287,27 +287,40 @@ void(vector p) boss_missile =
 
 void(entity attacker, float damage) boss_pain =
 {
+	float d;
+	
 	if (self.spawnflags & 1)
 	{
-		if (time < self.pain_finished) return;
-		if (damage < 64)
+		if (time < self.pain_finished)
 			return;
-		if (damage < random() * 400)
-			return;
+			
+		if (self.health + damage < self.max_health)	// always pain the first time, to ensure players recognize we're takedamage 1
+		{
+			if (self.customflags & CFL_ZAPPED)	// boost LG stun chance a little
+				d = damage;
+			else
+				d = max(0, damage - 30);
+				
+			if (d <= 0)
+				return;
+			if (d < random() * 400)
+				return;
+		}
 	}
 	
 	sound (self, CHAN_VOICE, "boss1/pain.wav", 1, ATTN_NORM);
 	
-	float p;
-	p = floor(3 * self.health / self.max_health);
-	self.pain_finished = time + 3;
+	d = floor(3 * self.health / self.max_health);
 	
-	if (p >= 2)
+	if (d >= 2)
 		boss_shocka1();
-	else if (p == 1)
+	else if (d == 1)
 		boss_shockb1();
-	else if (p == 0)
+	else if (d == 0)
 		boss_shockc1();
+		
+	// potentially shorter than the missile throw anim
+	self.pain_finished = time + 1 + random() + random() * 2;
 }
 
 void() boss_awake =
