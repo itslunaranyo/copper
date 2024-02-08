@@ -1101,6 +1101,8 @@ void() WaterMove =
 {
 	if (self.movetype == MOVETYPE_NOCLIP) {
 		self.air_finished = time + 120;
+		self.waterlevel = 0;
+		self.watertype = 0;
 		return;
 	}
 	if (self.health < 0)
