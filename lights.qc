@@ -949,15 +949,16 @@ This entity changes a global lightstyle when triggered. Set "style" to the light
 
 Setting style to -1 will override lightstyle 0, which is all static lights in the entire level.
 
+"targetname" if unspecified, will auto-fire itself once at map start
 "count" limit number of uses, 0 = infinite
 "delay" pause between trigger and activation
 
-START_ON: fires itself once when the map starts
+START_ON: fire itself once when the map starts regardless of targetname
 */
 /*FGD
 @PointClass base(Appearflags, Targetname) color(128 210 128) = target_lightstyle : 
 "Target : Lightstyle
-Changes a global lightstyle when triggered."
+Changes a global lightstyle when triggered. Will auto-fire at spawn if it has no targetname."
 [
 	message(string) : "Brightness pattern"
 	style(integer) : "Lightstyle to change (0-63)" : 0
@@ -981,7 +982,7 @@ void() target_lightstyle =
 		self.message = "azam";	// suitably garish accidental default
 	self.use = target_lightstyle_use;
 	
-	if (self.spawnflags & 1)
+	if (self.spawnflags & 1 || self.targetname == string_null)
 	{
 		self.think = target_lightstyle_go;
 		self.nextthink = time + 0.1;
