@@ -146,7 +146,8 @@ void() door_fire =
 
 	// trigger all paired doors
 	starte = self;
-	if ( !( self.spawnflags & DOOR_TOGGLE ) || ( self.spawnflags & DOOR_TOGGLE && self.state == STATE_BOTTOM) )
+	if ( !( self.spawnflags & DOOR_TOGGLE ) || 
+		( self.spawnflags & DOOR_TOGGLE && (self.state == STATE_BOTTOM || self.state == STATE_DOWN) ) )
 	do {
 		door_go_up ();
 		self = self.enemy;
