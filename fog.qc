@@ -313,9 +313,7 @@ target_fogblend_use
 */
 void() target_fogblend_use =
 {
-	if (activator.classname != "player") return;
-	
-	self.enemy = activator;
+	self.enemy = SUB_PlayerizeActivator();
 	
 	if (!(self.spawnflags & 1))
 		self.state = 1 - self.state;

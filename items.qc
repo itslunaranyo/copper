@@ -792,7 +792,7 @@ void(entity e) target_items_setinv =
 
 void() target_items_use =
 {
-	entity act = activator;
+	entity act = SUB_PlayerizeActivator();
 	if (act.classname != "player") return;
 	if (act.health <= 0) return;
 	

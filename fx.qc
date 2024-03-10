@@ -705,7 +705,7 @@ void() target_explosion_use =
 	entity bewm;
 	vector offset;
 	
-	self.enemy = activator;
+	self.enemy = SUB_PlayerizeActivator();
 	
 	playercount_convert(count);
 	if (self.count == 1 && self.delay == 0 && self.rand == 0)
@@ -715,7 +715,7 @@ void() target_explosion_use =
 			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
 		setorigin(bewm, self.origin + offset);
 		bewm.think = target_explosion_go;
-		bewm.enemy = activator;
+		bewm.enemy = self.enemy;
 		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time;
 		bewm.dmg = self.dmg;
@@ -731,7 +731,7 @@ void() target_explosion_use =
 			offset = Vector(random() * self.size_x, random() * self.size_y, random() * self.size_z) - self.size * 0.5;
 		setorigin(bewm, self.origin + offset);
 		bewm.think = target_explosion_go;
-		bewm.enemy = activator;
+		bewm.enemy = self.enemy;
 		bewm.spawnflags = self.spawnflags;
 		bewm.nextthink = time + tnext;
 		bewm.dmg = self.dmg;
@@ -1394,7 +1394,6 @@ void() target_fade_time_done =
 
 void() target_fade_time =
 {
-	if (activator.classname != "player") return;
 	if (time < self.attack_finished) return;
 	
 	target_fade_find();
@@ -1447,7 +1446,7 @@ void() target_fade_dist =
 	float dist, f;
 	vector dir;
 	
-	dir = vec_scale(activator.origin - self.origin, self.dest);
+	dir = vec_scale(SUB_PlayerizeActivator().origin - self.origin, self.dest);
 
 	if (self.movedir)
 	{
@@ -1681,3 +1680,8 @@ void() target_fade =
 	self.think = target_fade_init;
 	self.nextthink = time + 0.2;
 }
+
+#undefine ALPHA_START
+#undefine ALPHA_END
+#undefine TIME_START
+#undefine TIME_END
