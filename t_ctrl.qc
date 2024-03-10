@@ -11,6 +11,10 @@ including entities that aren't real triggers but are named trigger_*
 ================================================================
 */
 
+const float SPAWN_RELAY_MSGONCE = 1;
+const float SPAWN_RELAY_RANDOM = 2;
+const float SPAWN_RELAY_HOLD = 4;
+
 void() trigger_relay_msg =
 {
 	activator = self.enemy;
@@ -19,8 +23,28 @@ void() trigger_relay_msg =
 	if (self.noise)
 		sound (self, CHAN_VOICE, self.noise, 1, ATTN_NORM);
 
-	if (self.spawnflags & 1)
+	if (self.spawnflags & SPAWN_RELAY_MSGONCE)
 		self.message = string_null;
+}
+
+void() trigger_relay_release =
+{
+	activator = self.enemy;
+	self.attack_finished = 0;
+	if (self.spawnflags & SPAWN_ALT_TARG)
+	{
+		SUB_UseTargetsAlt(target3);
+		SUB_UseTargetsAlt(target4);
+	}
+	else SUB_UseTargets();
+	
+	if (self.noise2 != string_null)
+	{
+		if (self.delay > 0)
+			sound_delayed(self, CHAN_VOICE, self.noise2, 1, ATTN_NORM, self.delay);
+		else
+			sound (self, CHAN_VOICE, self.noise2, 1, ATTN_NORM);
+	}	
 }
 
 void() trigger_relay_use =
@@ -31,16 +55,29 @@ void() trigger_relay_use =
 		return;
 	}
 	
+	if (self.spawnflags & SPAWN_RELAY_HOLD && self.attack_finished > time)
+	{
+		self.attack_finished = time + self.wait;
+		self.nextthink = time + self.wait;
+		return;
+	}
+	
 	self.enemy = activator;
 	
-	if (self.spawnflags & 2)
+	if (self.spawnflags & SPAWN_RELAY_RANDOM)
 	{
 		SUB_CountTargets();
 		SUB_UseRandomTarget();
 	}
+	else if (self.spawnflags & (SPAWN_RELAY_HOLD | SPAWN_ALT_TARG))
+	{
+		SUB_PrintMessage();
+		SUB_UseTargetsAlt(target);
+		SUB_UseTargetsAlt(target2);
+	}
 	else SUB_UseTargets();
 
-	if (self.spawnflags & 1)
+	if (self.spawnflags & SPAWN_RELAY_MSGONCE)
 		self.message = string_null;
 	
 	if (self.noise != string_null)
@@ -58,10 +95,17 @@ void() trigger_relay_use =
 		if (self.count == 0)
 			remove(self);
 	}
+	
+	if (self.spawnflags & SPAWN_RELAY_HOLD)
+	{
+		self.attack_finished = time + self.wait;
+		self.nextthink = time + self.wait;
+		self.think = trigger_relay_release;
+	}
 }
 
 
-/*QUAKED trigger_relay (.5 .0 .5) (-8 -8 -8) (8 8 8) MSG_ONCE RANDOM
+/*QUAKED trigger_relay (.5 .0 .5) (-8 -8 -8) (8 8 8) MSG_ONCE RANDOM HOLD
 This fixed size trigger cannot be touched, it can only be fired by other events.  Target this with a target_lock to selectively disable/reenable it for logic fun.
 
 Keys:
@@ -77,14 +121,19 @@ Keys:
 Spawnflags:
 "MSG_ONCE"	only print its message on the first firing, otherwise it prints every time
 "RANDOM"	randomly fire one of its targets (and/or kill one of its killtargets) instead of them all
+"HOLD"		fire only the first time triggered (toggle on), and fire again after 'wait' seconds have passed without being triggered (toggle off)
+
+Alt Target Pattern: If 'Hold', 'target'/'target2' on first trigger, 'target3'/'target4' on end trigger
 */
 /*FGD
-@PointClass size(16 16 16) color(160 0 160) base(Appearflags, TriggerSounds, Target, Targetname) = trigger_relay : "Trigger: Relay.
-This fixed size trigger cannot be touched, it can only be fired by other events. Target this with a target_lock to selectively disable/reenable it for logic fun."
+@PointClass size(16 16 16) color(160 0 160) base(Appearflags, TriggerSounds, Target, Targetname, AltTarget) = trigger_relay : "Trigger: Relay.
+This fixed size trigger cannot be touched, it can only be fired by other events. Target this with a target_lock to selectively disable/reenable it for logic fun.
+The 'Hold' spawnflag will cause the relay to fire only the first time it is triggered (toggle on), and fire again after 'wait' seconds have passed without being triggered (toggle off)."
 [
 	spawnflags(flags) =	[
 		1 : "Only print message once" : 0
 		2 : "Choose one target at random" : 0
+		4 : "Hold" : 0
 	]
 	message(string) : "Print when triggered"
 	count(integer) : "Limit uses (then self destruct)" : 0
@@ -382,7 +431,7 @@ void() counter_use =
 	playercount_convert(count);
 	
 	if (time < self.attack_finished) return;
-	self.enemy = activator;
+	self.enemy = SUB_PlayerizeActivator();
 	
 	// eager reset spawnflag: reset 'wait' seconds after any trigger, not just upon
 	//	completion - for requiring a number of impulses within a window of time
@@ -399,27 +448,27 @@ void() counter_use =
 	if (self.state != self.count)
 	{
 		float rem = self.count - self.state;
-		if (activator.classname == "player" && !(self.spawnflags & SPAWNFLAG_NOMESSAGE))
+		if (self.enemy.classname == "player" && !(self.spawnflags & SPAWNFLAG_NOMESSAGE))
 		{
 			if (rem >= 6)
-				centerprint (activator, "There are more to go ...");
+				centerprint (self.enemy, "There are more to go ...");
 			else if (rem == 5)
-				centerprint (activator, "There are 5 more to go ...");
+				centerprint (self.enemy, "There are 5 more to go ...");
 			else if (rem == 4)
-				centerprint (activator, "There are 4 more to go ...");
+				centerprint (self.enemy, "There are 4 more to go ...");
 			else if (rem == 3)
-				centerprint (activator, "There are 3 more to go ...");
+				centerprint (self.enemy, "There are 3 more to go ...");
 			else if (rem == 2)
-				centerprint (activator, "Only 2 more to go ...");
+				centerprint (self.enemy, "Only 2 more to go ...");
 			else
-				centerprint (activator, "Only 1 more to go ...");
+				centerprint (self.enemy, "Only 1 more to go ...");
 		}
 		return;
 	}
 	
 	self.nextthink = 0;
 	
-	if (activator.classname == "player" && self.message != string_null)
+	if (self.enemy.classname == "player" && self.message != string_null)
 		SUB_PrintMessage();
 //		centerprint(activator, self.message);
 	

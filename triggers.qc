@@ -181,6 +181,8 @@ void() InitTriggerSounds =
 	
 	if (self.noise)
 		precache_sound_safe (self.noise);
+	if (self.noise2)
+		precache_sound_safe (self.noise2);
 }
 
 //=============================================================================
