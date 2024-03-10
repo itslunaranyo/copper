@@ -394,6 +394,22 @@ void() SUB_UseTargetsSilent =
 		SUB_UseTargetsGo();
 }
 
+// sniff around the activator's neighborhood for an involved player
+entity() SUB_PlayerizeActivator =
+{
+	if (activator.classname == "player")
+		return activator;
+		
+	if (activator.flags & FL_MONSTER)
+	{
+		if (activator.enemy.classname == "player")
+			return activator.enemy;
+		if (activator.oldenemy.classname == "player")
+			return activator.oldenemy;
+	}
+	
+	return world;
+}
 
 /*
 =============
