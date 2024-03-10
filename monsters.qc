@@ -384,51 +384,56 @@ float(float wake, float hurt, float bloody, float dead) monster_alt_use =
 	if (!(self.spawnflags & SPAWN_ALT_TARG))
 		return FALSE;
 
-	// make a player activator even if the monster is infighting
-	if (self.enemy.classname != "player")
-	{
-		if (self.oldenemy.classname == "player")
-			activator = self.oldenemy;
-		else
-			activator = get_closest_client();
-	}
-	else activator = self.enemy;
+	entity t;
+	entity oact = activator;
 
+	// Monsters use themselves as activators for all events except death, which tries
+	// to find the most relevant player if they weren't killed by one. This is so
+	// monsters can activate teleport targets and not teleport the player randomly
+	// instead.
 	
 	if (self.delay)
 	{
-		entity t;
-		// create a temp object to fire at a later time
-		t = spawn();
-		t.classname = "DelayedUse";
-		t.nextthink = time + self.delay;
-		t.think = SUB_UseTargetsGo;
-		t.enemy = activator;
-		
-		if (wake)
+		if (wake||hurt||bloody)
 		{
-			t.target = self.target;
-			self.target = string_null;
+			// create a temp object to fire at a later time
+			t = spawn();
+			t.classname = "DelayedUse";
+			t.nextthink = time + self.delay;
+			t.think = SUB_UseTargetsGo;
+			t.enemy = self;
+			
+			if (wake)
+			{
+				t.target = self.target;
+				self.target = string_null;
+			}
+			if (hurt)
+			{
+				t.target2 = self.target2;
+				self.target2 = string_null;
+			}
+			if (bloody)
+			{
+				t.target3 = self.target3;
+				self.target3 = string_null;
+			}	
 		}
-		if (hurt)
-		{
-			t.target2 = self.target2;
-			self.target2 = string_null;
-		}
-		if (bloody)
-		{
-			t.target3 = self.target3;
-			self.target3 = string_null;
-		}		
 		if (dead)
 		{
+			t = spawn();
+			t.classname = "DelayedUse";
+			t.nextthink = time + self.delay;
+			t.think = SUB_UseTargetsGo;
+			t.enemy = activator;
 			t.message = self.message;
-			t.target4 = self.target4;
+			t.target = self.target4;
 			t.killtarget = self.killtarget;
 		}		
 	}
 	else
 	{
+		activator = self;
 		if (wake)
 		{
 			SUB_UseTargetsByField(target);
@@ -447,11 +452,13 @@ float(float wake, float hurt, float bloody, float dead) monster_alt_use =
 		
 		if (dead)
 		{
+			activator = oact;
 			SUB_PrintMessage();
 			SUB_UseTargetsByField(target4);
 			SUB_KillTargets(self.killtarget);
 		}
 	}
+	activator = oact;
 	return TRUE;
 }
 
@@ -469,9 +476,6 @@ void() monster_death_use =
 	if (!self.target && !self.target2 && !self.target3 && !self.target4 && !self.killtarget)
 		return;
 	
-	if (monster_alt_use((self.enemy.flags & FL_CLIENT), TRUE, TRUE, TRUE))
-		return;
-		
 	// make a player activator even if the monster was killed while infighting
 	if (self.enemy.classname != "player")
 	{
@@ -482,6 +486,9 @@ void() monster_death_use =
 	}
 	else activator = self.enemy;
 	
+	if (monster_alt_use((self.enemy.flags & FL_CLIENT), TRUE, TRUE, TRUE))
+		return;
+		
 	SUB_UseTargets ();
 }
 
