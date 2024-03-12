@@ -1681,7 +1681,7 @@ void() target_fade =
 	self.nextthink = time + 0.2;
 }
 
-#undefine ALPHA_START
-#undefine ALPHA_END
-#undefine TIME_START
-#undefine TIME_END
+#undef ALPHA_START
+#undef ALPHA_END
+#undef TIME_START
+#undef TIME_END
