@@ -534,7 +534,8 @@ float(entity e) teleport_target_check =
 	if (self.spawnflags & TELEPORT_MONSTER_ONLY)
 		if (!(e.flags & FL_MONSTER))
 			return FALSE;
-	if (e.movetype == MOVETYPE_NOCLIP)
+	if (e.movetype == MOVETYPE_NOCLIP && 
+		!(e.impulse == 100 || (e.impulse >= 20 && e.impulse <= 40)))	// force if using dev cheats
 		return FALSE;
 	// only teleport living creatures
 	if (e.health <= 0 || e.solid != SOLID_SLIDEBOX)
