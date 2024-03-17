@@ -8,6 +8,8 @@ A guide to compiling Copper into progs.dat, and some notes on making the best us
 
 Full **QuakeC** source is [included with the mod](/copper/download). You may, and are encouraged to, use it as a base for additional mods, adopting or adapting features, or merely to learn from. Compiling it requires [FTEQCC](http://fte.triptohell.info/) (any version from at least 2018), by Spike. Other compilers may work, provided they support a few syntax upgrades (such as field masking and not requiring the '**local**' keyword) as well as **#pragma autoproto**. If you're unsure if your compiler will work, try it and it should tell you. :)
 
+The QC files in this MOD are based on 1.06 source files by id Software, released under the terms of GNU General Public License v2 or later. Derivative works must be released under the same license with full source made available. See https://www.gnu.org/licenses/old-licenses/gpl-2.0.html for details.
+
 ## A Note On Extensions
 
 When extending Copper for your own mod, I strongly encourage you to use the complete corpus of Copper [gameplay tweaks](/copper/changes) if you use any, rather than sampling what may be your favorites. This will avoid fracturing for players the 'gameplay base' that Copper strives to provide. Copper touches many aspects of the game in small but significant ways. If every mod were to include a different subset of these, the play experience for each player would be muddled by a trepidatious series of accidental discoveries of which way the player should expect them all to function <i>this</i> time, rather than being able to take the entire package as a given <i>every</i> time.
