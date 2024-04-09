@@ -743,8 +743,9 @@ void() misc_fireball =
 			self.use = lavaball_use;
 		else						// toggle on trigger
 		{
-			self.state = !(self.spawnflags & 1);
+			self.state = (self.spawnflags & 1);
 			self.use = lavaball_toggle;
+			lavaball_toggle();
 		}
 	}
 	
