@@ -167,6 +167,7 @@ void() light_use =
 void(entity b, float opacity) bmodel_lightstyle =
 {
 	if (sandyMadeThis) return;
+	if (!b.style && !b.switchshadstyle) return;
 	
 	float a = zeroconvertdefault(b.alpha, 1);
 	float f;
