@@ -297,6 +297,9 @@ void(string tname) SUB_KillTargets =
 	if (tname == string_null)
 		return;
 
+	dprint5(activator.classname," caused ",self.classname," to \bkill\b target '",tname);
+	dprint("'\n");
+	
 	entity t = world;
 	do
 	{
