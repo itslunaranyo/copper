@@ -69,7 +69,7 @@ void() trigger_relay_use =
 		SUB_CountTargets();
 		SUB_UseRandomTarget();
 	}
-	else if (self.spawnflags & (SPAWN_RELAY_HOLD | SPAWN_ALT_TARG))
+	else if ((self.spawnflags & SPAWN_RELAY_HOLD) && (self.spawnflags & SPAWN_ALT_TARG))
 	{
 		SUB_PrintMessage();
 		SUB_UseTargetsAlt(target);
