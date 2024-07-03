@@ -1398,7 +1398,12 @@ void() target_fade_time =
 	
 	target_fade_find();
 	
-	if (!(self.spawnflags & 1))
+	if (self.spawnflags & 1)
+	{
+		self.state = 1;
+		target_fade_set(self.alpha);
+	}
+	else
 		self.state = 1 - self.state;
 	
 	if (self.state)
