@@ -138,14 +138,14 @@ float() particlefield_should_sleep =
 	if (self.distance <= 0) return FALSE;
 	if (clients > 4) return FALSE;	// probably dropping tons of particles anyway, don't bother
 	
-	entity client = world;
-	for (float i = 0; i < clients; i++)
+	entity client = nextent(world);
+	while (client.classname == "player")
 	{
-		client = nextent(client);
 		if (vlen(BoundsCenter(self.buddy) - client.origin) < self.distance)
 		{
 			return FALSE;
 		}
+		client = nextent(client);
 	}
 	return TRUE;
 }
