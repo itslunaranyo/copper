@@ -826,6 +826,12 @@ void() func_door_spawn =
 
 	// door_link can't be done until all of the doors have been spawned, so
 	// the sizes can be detected properly.
+	if (self.spawnflags & DOOR_DONT_LINK)
+	{
+		self.owner = self.enemy = self;
+		door_finalize(self.mins, self.maxs);
+		return;		// don't want to link this door
+	}
 	self.think = door_link;
 	self.nextthink = self.ltime + 0.1;
 }

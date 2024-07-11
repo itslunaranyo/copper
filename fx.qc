@@ -138,14 +138,14 @@ float() particlefield_should_sleep =
 	if (self.distance <= 0) return FALSE;
 	if (clients > 4) return FALSE;	// probably dropping tons of particles anyway, don't bother
 	
-	entity client = world;
-	for (float i = 0; i < clients; i++)
+	entity client = nextent(world);
+	while (client.classname == "player")
 	{
-		client = nextent(client);
 		if (vlen(BoundsCenter(self.buddy) - client.origin) < self.distance)
 		{
 			return FALSE;
 		}
+		client = nextent(client);
 	}
 	return TRUE;
 }
@@ -1309,7 +1309,7 @@ void() target_fade_cleanup =
 void(float f) target_fade_set =
 {
 	self.strength = f;
-
+	if (!self.enemy) return;
 	if (f == 0) f = -1;
 	entity t = self;
 	entity e;
@@ -1398,7 +1398,12 @@ void() target_fade_time =
 	
 	target_fade_find();
 	
-	if (!(self.spawnflags & 1))
+	if (self.spawnflags & 1)
+	{
+		self.state = 1;
+		target_fade_set(self.alpha);
+	}
+	else
 		self.state = 1 - self.state;
 	
 	if (self.state)
@@ -1438,7 +1443,7 @@ void() target_fade_dist =
 	if (time < self.attack_finished)
 		return;
 	
-	dprint("in target_fade_dist\n");
+	//dprint("in target_fade_dist\n");
 	self.attack_finished = time + self.speed;
 	
 	target_fade_find();
@@ -1535,10 +1540,10 @@ void() target_fade_hold_top =
 void() target_fade_hold =
 {
 	float t;
-	dprint("target_fade_hold?\n");
+	//dprint("target_fade_hold?\n");
 	if (self.state == STATE_BOTTOM)
 	{
-		dprint("   tfh bottom\n");
+		//dprint("   tfh bottom\n");
 		target_fade_find();
 		self.state = STATE_UP;
 		if (self.noise != string_null) sound (self, CHAN_VOICE, self.noise, self.volume, ATTN_NORM);
@@ -1547,25 +1552,31 @@ void() target_fade_hold =
 	}
 	else if (self.state == STATE_TOP)
 	{
-		dprint("   tfh top\n");
+		//dprint("   tfh top\n");
 		self.nextthink = time + self.wait;
 	}
 	else if (self.state == STATE_DOWN)
 	{
-		dprint("   tfh down\n");
+		//dprint("   tfh down\n");
 		self.state = STATE_UP;
 		t = (self.TIME_END - time) / self.speed2;
 		target_fade_to(self.alpha2, t * self.speed, target_fade_hold_top);
 	}
 	else if (self.state == STATE_UP)
 	{
-		dprint("   tfh up, noop\n");
+		//dprint("   tfh up, noop\n");
 	}
 }
 
 void() target_fade_init =
 {
 	target_fade_find();
+	if (!self.enemy)
+	{
+		dprint("\bERROR:\b target_fade has no targets\n");
+		remove(self);
+		return;
+	}
 	target_fade_set(self.alpha);
 	self.think = target_fade_cleanup;
 	self.nextthink = time + 1;

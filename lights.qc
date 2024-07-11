@@ -167,6 +167,7 @@ void() light_use =
 void(entity b, float opacity) bmodel_lightstyle =
 {
 	if (sandyMadeThis) return;
+	if (!b.style && !b.switchshadstyle) return;
 	
 	float a = zeroconvertdefault(b.alpha, 1);
 	float f;
@@ -952,15 +953,23 @@ Setting style to -1 will override lightstyle 0, which is all static lights in th
 "targetname" if unspecified, will auto-fire itself once at map start
 "count" limit number of uses, 0 = infinite
 "delay" pause between trigger and activation
+"noise/noise1-4" cycle to additional brightness patterns on subsequent activations
 
 START_ON: fire itself once when the map starts regardless of targetname
 */
 /*FGD
 @PointClass base(Appearflags, Targetname) color(128 210 128) = target_lightstyle : 
 "Target : Lightstyle
-Changes a global lightstyle when triggered. Will auto-fire at spawn if it has no targetname."
+Changes a global lightstyle when triggered. Will auto-fire at spawn if it has no targetname.
+
+Cycles through 'message' and then all the 'noise' keys if triggered repeatedly."
 [
 	message(string) : "Brightness pattern"
+	noise(string) : "Brightness pattern (2nd)"
+	noise1(string) : "Brightness pattern (3rd)"
+	noise2(string) : "Brightness pattern (4th)"
+	noise3(string) : "Brightness pattern (5th)"
+	noise4(string) : "Brightness pattern (6th)"
 	style(integer) : "Lightstyle to change (0-63)" : 0
 	count(integer) : "Limit uses" : 0
 	delay(string) : "Delay before activation" : "0"
