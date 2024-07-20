@@ -181,9 +181,10 @@ void() misc_model =
 	setsize(self, '-16 -16 -16', '16 16 16');
 	
 	self.solid = SOLID_NOT;
-	self.movetype = MOVETYPE_NONE;
+	if (self.avelocity != VEC_ORIGIN)
+		self.movetype = MOVETYPE_FLY;
 	
-	if (self.targetname == string_null && !self.impulse && !self.pos1)
+	if (self.targetname == string_null && !self.impulse && !self.pos1 && self.avelocity == VEC_ORIGIN)
 	{
 		makestatic(self); 
 		return;
