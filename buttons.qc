@@ -382,6 +382,8 @@ void() skillbutton_activate =
 
 void() skillbutton_touch =
 {
+	if (!CheckValidTouch()) return;
+	
 	if (self.state != STATE_BOTTOM) return;
 	self.enemy = other;
 	skill_set(self.netname);
