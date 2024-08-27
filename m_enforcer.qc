@@ -183,9 +183,10 @@ void()	enf_atk2	=[	$attack2,	enf_atk3	] {ai_face();}
 void()	enf_atk3	=[	$attack3,	enf_atk4	] {ai_face();}
 void()	enf_atk4	=[	$attack4,	enf_atk5	] {ai_face();}
 void()	enf_atk5	=[	$attack5,	enf_atk6	] {ai_face();}
-void()	enf_atk6	=[	$attack6,	enf_atk7	] {nmfast(); enforcer_fire(); }
-void()	enf_atk7	=[	$attack7,	enf_atk8	] {nmfast(); ai_face(); }
-void()	enf_atk8	=[	$attack8,	enf_atk9	] {nmfast(); ai_face(); }
+void()	enf_atk6	=[	$attack6,	enf_atk7	] {enforcer_fire(); if (skill==3) {self.nextthink = time + 0.05; self.think = enf_atk6nm;} }
+void()	enf_atk6nm	=[	$attack6,	enf_atk7	] {enforcer_fire(); }
+void()	enf_atk7	=[	$attack7,	enf_atk8	] {ai_face(); }
+void()	enf_atk8	=[	$attack8,	enf_atk9	] {ai_face(); }
 void()	enf_atk9	=[	$attack9,	enf_atk10	] {ai_face(); if (!enf_shouldbreak()) self.think = enf_atk6; }
 void()	enf_atk10	=[	$attack10,	enf_run1	] {self.yaw_speed = 20; ai_face();}
 
