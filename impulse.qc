@@ -45,6 +45,7 @@ void() Cheat_Items =
 
 	self.items = self.items | IT_LIGHTNING;
 
+	W_SetCurrentAmmo();
 	W_Select(IT_ROCKET_LAUNCHER);
 
 	stuffcmd(self,"bf\n");
