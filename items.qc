@@ -286,7 +286,7 @@ void() ItemDrop =
 	self.velocity = '0 0 0';
 	self.origin_z = self.origin_z + 6;
 	oldz = self.origin_z;
-	if (!droptofloor(0, 0))
+	if (!droptofloor())
 	{
 		dprint4(self.classname," fell out of level at ",vtos(self.origin),"\n");
 		// progression-critical items shouldn't just vanish

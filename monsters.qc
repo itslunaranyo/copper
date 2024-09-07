@@ -645,7 +645,7 @@ void() walkmonster_start_go =
 	if (self.movedir == VEC_ORIGIN && !(self.spawnflags & SPAWN_TRIGGERED) )	// always put telespawned monsters where the mapper wants
 	{
 		self.origin_z = self.origin_z + 1;	// raise off floor a bit
-		droptofloor(0,0);
+		droptofloor();
 	}
 	
 	if (!walkmove(0,0))
