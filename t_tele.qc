@@ -588,6 +588,9 @@ void() teleport_target_use =
 		teleport( activator, self, !(self.spawnflags & TELEPORT_NOFLASH), !(self.spawnflags & TELEPORT_PUSH) );
 		activator.jump_flag = 0;
 	}
+	
+	if (!self.count) 
+		remove(self);
 }
 
 
