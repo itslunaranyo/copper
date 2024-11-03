@@ -450,7 +450,7 @@ void(entity targ, entity inflictor, entity attacker, float damage, float dmgtype
 	
 	if (attacker.classname == targ.classname)
 	{
-		if (attacker.classname != "player" && attacker.classname != "monster_grunt")
+		if (attacker.classname != "player" && attacker.classname != "monster_army")
 			damage = damage * 0.5;
 	}
 
