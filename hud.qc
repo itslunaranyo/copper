@@ -380,7 +380,7 @@ void Hud_DrawSigils(vector pos)
 	{
 		if (time < itemtimes[24] + 1.5) pulse = 1.2 - 2 * ((time - itemtimes[24]) % 0.5);
 		else pulse = 1;
-		drawpic(pos + '9 0', "sb_sigil2", '8 16', '1 1 1', pulse, 0);
+		drawpic(pos + '8 0', "sb_sigil2", '8 16', '1 1 1', pulse, 0);
 	}
 	if (stat_items2 & 128)
 	{
