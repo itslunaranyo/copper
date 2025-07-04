@@ -5,6 +5,7 @@
 float SF_SHOOT_SUPERSPIKE	= 1;
 float SF_SHOOT_LASER		= 2;
 float SF_SHOOT_OGRENADE		= 4;
+float SF_SHOOT_ROCKET		= 8;
 float SF_SHOOT_ACTIVATOR	= 16;
 
 
@@ -16,6 +17,7 @@ float SF_SHOOT_ACTIVATOR	= 16;
 		1 : "Spike" : 0
 		2 : "Laser" : 0
 		4 : "Ogre Grenade" : 0
+		8 : "Player Rocket" : 0
 		16 : "Fire At Activator" : 0
 	]
 	movedir(string) : "Override launch vector (x y z)"
@@ -61,6 +63,11 @@ void() spikeshooter_fire =
 		e = launch_grenade(self.origin, dir * self.speed);
 		e.touch = OgreGrenadeTouch;
 		e.th_die = OgreGrenadeExplode;
+	}
+	else if (self.spawnflags & SF_SHOOT_ROCKET)
+	{
+		sound (self, CHAN_VOICE, "weapons/sgun1.wav", self.volume, ATTN_NORM);
+		e = launch_rocket(self.origin, dir * 1000);
 	}
 	else
 	{
@@ -119,7 +126,7 @@ void() shooter_use =
 	self.enemy = activator;
 }
 
-/*QUAKED trap_spikeshooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ? AT_ACTIVATOR
+/*QUAKED trap_spikeshooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ROCKET AT_ACTIVATOR
 When triggered, fires a spike in the direction set by "angle".
 
 "movedir" override angle with a launch vector of your choosing
@@ -137,7 +144,7 @@ void() trap_spikeshooter =
 	SetMovedir ();
 	self.volume = zeroconvertdefault(self.volume, 1);
 	self.use = shooter_once_think;
-	if (self.spawnflags & SF_SHOOT_OGRENADE)
+	if (self.spawnflags & (SF_SHOOT_OGRENADE | SF_SHOOT_ROCKET))
 	{
 		if (self.deathtype == string_null)
 			self.deathtype = "blew up";
@@ -160,7 +167,7 @@ void() trap_spikeshooter =
 	}
 }
 
-/*QUAKED trap_shooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ? AT_ACTIVATOR
+/*QUAKED trap_shooter (0 .5 .8) (-8 -8 -8) (8 8 8) SUPERSPIKE LASER OGRENADE ROCKET AT_ACTIVATOR
 Continuously fires spikes in the direction set by "angle". Trigger to turn on, trigger again to turn off.
 Laser is only for REGISTERED. YOU PAY FOR LASER
 "wait" time between shots (1.0 default)
