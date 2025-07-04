@@ -42,6 +42,8 @@ void() OgreGrenadeExplode =
 	T_ExplosiveTouch();
 }
 
+void() GrenadeHandlePhysics;
+
 void() OgreGrenadeTouch =
 {
 	if (other == self.owner) return;		// don't explode on owner
@@ -54,6 +56,9 @@ void() OgreGrenadeTouch =
 		OgreGrenadeExplode();
 		return;
 	}
+
+	GrenadeHandlePhysics();
+
 	sound (self, CHAN_VOICE, "weapons/bounce.wav", 1, ATTN_NORM);	// bounce sound
 	if (self.velocity == '0 0 0')
 		self.avelocity = '0 0 0';
