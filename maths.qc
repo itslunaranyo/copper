@@ -176,9 +176,9 @@ float(vector start, vector ctrl, vector end) bez_lenApprox =
 	float chord, peri;
 	
 	chord = vlen(start - end);
-	peri = vlen(start - ctrl) + vlen(ctrl - end) + chord;
+	peri = vlen(start - ctrl) + vlen(ctrl - end);
 	
-	return 2 * chord / 3 + peri / 3;
+	return (2 * chord + peri) / 3;
 }
 
 // rotates B around A

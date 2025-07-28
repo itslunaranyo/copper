@@ -456,7 +456,7 @@ void() train_sounds =
 	]
 ]
 @baseclass base(Appearflags, Targetname, TrainSounds, Func, AltTarget) = Train [
-	speed(integer) : "Speed (units per second)" : 64
+	speed(integer) : "Speed (units per second)" : 100
 	target(target_source) : "Target to start at"
 	dmg(integer) : "Damage on block" : 2
 	noise(string) : "Override stop sound"
@@ -881,8 +881,8 @@ void() train_next =	// departure for next pathcorner
 		if (ctrl.count)
 			segs = ctrl.count;
 		else
-			// chop the curve into roughly 200ms segments
-			segs = ceil(5 * bez_lenApprox(self.origin, ctrl.origin, corner.origin) / ((self.speed + dspeed) / 2));
+			// chop the curve into roughly 166ms segments
+			segs = ceil(6 * bez_lenApprox(self.origin + self.movedir, ctrl.origin, corner.origin) / ((self.speed + dspeed) / 2));
 
 		SUB_CalcMoveCurve(corner.origin - self.movedir, ctrl.origin - self.movedir, segs, self.speed, dspeed, self.th_stand);
 		return;
