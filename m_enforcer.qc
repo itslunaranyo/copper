@@ -162,17 +162,23 @@ float() enf_shouldbreak =
 	if (!alive(self.enemy) || self.enemy.customflags & CFL_LIMBO )
 		return TRUE;
 	
+	enemy_range = range(self.enemy);
+	if (enemy_range >= RANGE_TOOFAR)
+		return TRUE;
+	
 	if (angledif(self.ideal_yaw, self.angles_y) > 80)	// player got behind us
 		return TRUE;
 	
-	if (has_invis(self.enemy) && random() > 0.80)
+	// randomly break volley if player is being sneaky or backs out of attack range
+	if ((has_invis(self.enemy) || enemy_range >= RANGE_FAR) && random() > 0.80)
 	{
-		ai_attack_finished(0.25 + random()); // randomly break volley if player is being sneaky
+		ai_attack_finished(0.25 + random());
 		return TRUE;
 	}
+	// force a little maneuvering if LOS is broken
 	if (!enforcer_clear_attack())
 	{
-		ai_attack_finished(1 + random());	// force a little maneuvering if LOS is broken
+		ai_attack_finished(1 + random());
 		return TRUE;
 	}
 	return FALSE;
