@@ -57,6 +57,7 @@ void() ItemUse =
 		self.think = SUB_Remove;	// if nextthink is in the future, don't respawn again
 		return;
 	}
+	
 	self.alpha = 1;
 	ItemSpawn();
 }
@@ -89,6 +90,9 @@ ItemSpawn
 */
 void() ItemSpawn =
 {
+	if (self.solid == SOLID_TRIGGER)
+		return;	// already spawned
+	
 	// optimized away .mdl, recycled .wad as only the world uses it
 	self.model = self.wad;		// restore original model
 	self.solid = SOLID_TRIGGER;	// allow it to be touched again
@@ -181,7 +185,7 @@ void() ItemTouched =
 		self.nextthink = self.attack_finished - 2.45;
 	}
 	// wait -1 == respawn every time the item is triggered
-	else if (self.wait < 0 || self.use == SUB_regen)	// maintain old respawn hacks
+	else if (self.wait < 0 || self.use == ItemSpawn || self.use == SUB_regen)	// maintain old respawn hacks
 	{
 		self.model = string_null;
 		self.solid = SOLID_NOT;
