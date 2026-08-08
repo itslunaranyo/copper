@@ -1,79 +1,50 @@
-import os, sys
+from pathlib import Path
+import sys
 
-# gtkradiant doesn't add skill flags by default and I'd rather keep the source 
+# GtkRadiant doesn't add skill flags by default, and I'd rather keep the source
 # clean by adding them here instead, because what else is python for?
-def addSkillFlags(deftxt):
-	deflines = deftxt.split("\n")
-	init = deflines[0]
-	initbits = init.split()
-	
-	cname = initbits[1]
-	if (cname == "func_group" or cname.startswith("func_detail") or cname == "worldspawn" or cname == "misc_external_map"):
-		return deftxt
-		
-	if (initbits[5][0] == '('):
-		# point ent
-		while (len(initbits) < 19):
-			initbits.append("?")
-	else:
-		# brush ent
-		while (len(initbits) < 14):
-			initbits.append("?")
-	initbits += ["NotEasy", "NotNormal", "NotHard", "NotDeathmatch", "CoopOnly", "NotCoop"]
-	if (cname.startswith("monster") or ("Alt Target" in deftxt) or ("alt target" in deftxt)):
-		initbits += ["AltTarget"]
-	
-	deflines[0] = " ".join(initbits)
-	deftxt = "\n".join(deflines)
-	return deftxt.expandtabs(4)
+def add_skill_flags(def_txt):
+    def_lines = def_txt.splitlines()
+    init_bits = def_lines[0].split()
 
-def getQuakeds(qc):
-	deftxt = ""
-	defOut = ""
-	numDefs = 0
-	start = 0
-	end = 0
-	
-	while 1:
-		start = qc.find("/*QUAKED",start)
-		if start == -1:
-			return defOut, numDefs
-		#print( "adding ", qc[start + 9 : qc.find(" ",start + 9)] )
-		end = qc.find("*/",start) + 2
-		deftxt = addSkillFlags(qc[start : end])
-		defOut += "\n" + deftxt + "\n"
-		numDefs += 1
-		start = end
-		
+    cname = init_bits[1]
+    if cname in ('func_group', 'worldspawn', 'misc_external_map') or cname.startswith('func_detail'):
+        return def_txt
 
-def go():
-	cwd = os.path.dirname(os.path.realpath(__file__))
-	defDir = os.path.normpath(os.path.join(cwd, ".."))
-	defName = ""
-	if len(sys.argv) > 1:
-		defName = sys.argv[1]
-	else:
-		defName = os.path.basename(defDir)
-	defFile = defName + ".def"
+    # init_bits[5][0] == '(' - point ent
+    # otherwise brush ent
+    size = (19 if init_bits[5][0] == '(' else 14) - len(init_bits)
+    init_bits.extend(['?'] * size + ['NotEasy', 'NotNormal', 'NotHard', 'NotDeathmatch', 'CoopOnly', 'NotCoop'])
+    if cname.startswith('monster') or 'alt target' in def_txt.lower():
+        init_bits.append('AltTarget')
 
-	print("Scanning *.qc for def comments...")
-	defOut = ""
-	numDefs = 0
-	
-	for qcfn in os.listdir(cwd):
-		if not qcfn.endswith(".qc"):
-			continue
-		with open(os.path.join(cwd, qcfn), "r") as qcfile:
-			qc = qcfile.read()
-		defs, n = getQuakeds(qc)
-		defOut += defs
-		numDefs += n
-	
-	dfn = os.path.join(defDir, defFile)
-	print("Writing to",dfn)
-	with open(dfn, "w") as df:
-		df.write(defOut)
-	print("Completed, found",numDefs)
+    def_lines[0] = ' '.join(init_bits)
+    return '\n'.join(def_lines).expandtabs(4)
 
-if __name__ == "__main__":
-	go()
+def get_quake_defs(qc):
+    def_out = ['\n' + add_skill_flags('/*QUAKED' + p.split('*/', 1)[0] + '*/') + '\n' for p in qc.split('/*QUAKED')[1:]]
+    return def_out
+
+def main():
+    qcs_dir = Path(__file__).parent
+    def_dir = Path('exports')
+    def_name = (Path(sys.argv[1]) if len(sys.argv) > 1 else qcs_dir).with_suffix('.def').name.lower()
+
+    print('Scanning *.qc for def comments...')
+    def_out = []
+    num_defs = 0
+
+    # Not using progs.src order here?
+    for qc_file in qcs_dir.glob('*.qc'):
+        defs = get_quake_defs(qc_file.read_text())
+        def_out.extend(defs)
+        num_defs += len(defs)
+
+    def_file = def_dir / def_name
+    print(f'Exporting to {def_file}')
+    # Use '\n'.join() here instead of in the comprehension to avoid empty first line?
+    def_file.write_text(''.join(def_out))
+    print(f'Exported {num_defs} defs')
+
+if __name__ == '__main__':
+    main()

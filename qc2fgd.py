@@ -1,51 +1,28 @@
-import os, datetime, sys
+from datetime import datetime
+from pathlib import Path
+import sys
 
 # TODO: put all the baseclasses first
 
-def getQuakeds(qc):
-	defOut = ""
-	numDefs = 0
-	start = 0
-	end = 0
-	
-	while 1:
-		start = qc.find("/*FGD",start)
-		if start == -1:
-			return defOut, numDefs
-		#print( "adding ", qc[start + 9 : qc.find(" ",start + 9)] )
-		end = qc.find("*/",start)
-		defOut += qc[start + 5 : end].strip() + "\n"
-		numDefs += 1
-		start = end
+def get_fgd_defs(qc):
+    def_out = [p.split('*/', 1)[0].strip() + '\n' for p in qc.split('/*FGD')[1:]]
+    return def_out
 
-def getQCs():
-	# load every file listed in progs.src except the header
-	with open("progs.src",'r') as progsfile:
-		progslines = list(progsfile)[1:] # first line is output filename, skip it
+def get_qcs():
+    # load every file listed in progs.src except the header
+    prog_lines = Path('progs.src').read_text().splitlines()[1:]
+    return [qc_file
+            for line in prog_lines
+            if (qc_file := line.split('//', 1)[0].strip()) and not line.startswith('#')
+            ]
 
-	qcfiles = []
-	for line in progslines:
-		qcfilename = line.partition("//")[0].strip()
-		if (len(qcfilename) < 4):
-			continue
-		if qcfilename[-3:] != ".qc":
-			continue
-		qcfiles.append(qcfilename)
-	return qcfiles
+def main():
+    qcs_dir = Path(__file__).parent
+    fgd_dir = Path('exports')
+    fgd_name = (Path(sys.argv[1]) if len(sys.argv) > 1 else qcs_dir).with_suffix('.fgd').name.lower()
 
-
-def go():
-	cwd = os.path.dirname(os.path.realpath(__file__))
-	fgdDir = os.path.normpath(os.path.join(cwd, ".."))
-	fgdName = ""
-	if len(sys.argv) > 1:
-		fgdName = sys.argv[1]
-	else:
-		fgdName = os.path.basename(fgdDir)
-	fgdFile = fgdName + ".fgd"
-
-	print("Scanning *.qc for FGD comments...")
-	defOut = """// Copper Quake game definition file (.fgd)
+    print('Scanning *.qc for FGD comments...')
+    header = f'''// Copper Quake game definition file (.fgd)
 // for Worldcraft 1.6 and above
 
 // If something is wrong with this file, check
@@ -53,30 +30,24 @@ def go():
 // for the very latest version before anything else
 
 // Based heavily on quake.fgd by autolycus/czg/et al
-// Generated from Copper QuakeC source comments on """
-	numDefs = 0
-	defOut += datetime.datetime.now().strftime("%m.%d.%Y")
-	defOut += "\n"
-	
-	# TODO: open quakec in progs.src order for better fgd order control
-	qcfiles = getQCs()
-	for qcfn in qcfiles:
-		if not qcfn.endswith(".qc"):
-			continue
-		with open(os.path.join(cwd, qcfn), "r") as qcfile:
-			qc = qcfile.read()
-		defs, n = getQuakeds(qc)
-		if (n):
-			defOut += "\n//\n// " + qcfn + "\n//\n"
-			defOut += defs
-			numDefs += n
-			defOut += "\n"
-	
-	dfn = os.path.join(fgdDir, fgdFile)
-	print("Writing to", dfn)
-	with open(dfn, "w") as df:
-		df.write(defOut)
-	print("Completed, found",numDefs)
+// Generated from Copper QuakeC source comments on {datetime.now().strftime('%m.%d.%Y')}\n'''
+    def_out = []
+    num_defs = 0
 
-if __name__ == "__main__":
-	go()
+    # TODO: open quakeC in progs.src order for better fgd order control
+    for qc_file in get_qcs():
+        defs = get_fgd_defs(Path(qc_file).read_text())
+        if not defs:
+            continue
+        # Use '\n'.join() here instead of in get_fgd_defs() to avoid double new lines?
+        def_out.append(f'\n//\n// {qc_file}\n//\n{''.join(defs)}\n')
+        num_defs += len(defs)
+    def_out.insert(0, header)
+
+    fgd_file = fgd_dir / fgd_name
+    print(f'Exporting to {fgd_file}')
+    fgd_file.write_text(''.join(def_out))
+    print(f'Exported {num_defs} defs')
+
+if __name__ == '__main__':
+    main()
