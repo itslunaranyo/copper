@@ -1,5 +1,5 @@
 from pathlib import Path
-import sys
+import argparse
 
 # GtkRadiant doesn't add skill flags by default, and I'd rather keep the source
 # clean by adding them here instead, because what else is python for?
@@ -25,15 +25,22 @@ def get_quake_defs(qc):
     return ['\n/*QUAKED ' + add_skill_flags(p.split('*/', 1)[0] + '*/') + '\n' for p in qc.split('/*QUAKED')[1:]]
 
 def main():
-    qcs_dir = Path(__file__).parent
-    def_dir = qcs_dir / 'exports'
-    def_file = def_dir / (Path(sys.argv[1]) if len(sys.argv) > 1 else qcs_dir).with_suffix('.def').name.lower()
+    parser = argparse.ArgumentParser()
 
-    print('Scanning *.qc for def comments...')
+    parser.add_argument('name', nargs='?', type=str, metavar='DEF name', help='Name of DEF file')
+    parser.add_argument('-i', '--input', type=Path, metavar='DIR', help='Project directory', default=Path(__file__).parent)
+    parser.add_argument('-o', '--output', type=Path, metavar='DIR', help='Output directory')
+
+    args = parser.parse_args()
+    def_dir = args.output or args.input / 'exports'
+    def_name = args.name or args.input.name.lower()
+    def_file = (def_dir / def_name).with_suffix('.def')
+
     def_out = []
 
     # Not using progs.src order here?
-    for qc_file in qcs_dir.glob('*.qc'):
+    print('Scanning *.qc for def comments...')
+    for qc_file in args.input.glob('*.qc'):
         def_out.extend(get_quake_defs(qc_file.read_text()))
 
     print(f'Exporting to {def_file}')

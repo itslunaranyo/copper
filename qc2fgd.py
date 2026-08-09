@@ -1,25 +1,31 @@
 from datetime import datetime
 from pathlib import Path
-import sys
+import argparse
 
 # TODO: put all the baseclasses first
 
 def get_fgd_defs(qc):
     return [p.split('*/', 1)[0].strip()  + '\n' for p in qc.split('/*FGD')[1:]]
 
-def get_qcs(qcs_dir: Path):
+def get_qcs(progs_file: Path):
     # load every file listed in progs.src except the header
     return [qc_file
-            for line in (qcs_dir / 'progs.src').read_text().splitlines()[1:]
+            for line in progs_file.read_text().splitlines()[1:]
             if (qc_file := line.split('//', 1)[0].strip()) and not line.startswith('#')
             ]
 
 def main():
-    qcs_dir = Path(__file__).parent
-    fgd_dir = qcs_dir / 'exports'
-    fgd_file = fgd_dir / (Path(sys.argv[1]) if len(sys.argv) > 1 else qcs_dir).with_suffix('.fgd').name.lower()
+    parser = argparse.ArgumentParser()
 
-    print('Scanning *.qc for FGD comments...')
+    parser.add_argument('name', nargs='?', type=str, metavar='FGD name', help='Name of FGD file')
+    parser.add_argument('-i', '--input', type=Path, metavar='DIR', help='Project directory', default=Path(__file__).parent)
+    parser.add_argument('-o', '--output', type=Path, metavar='DIR', help='Output directory')
+
+    args = parser.parse_args()
+    fgd_dir = args.output or args.input / 'exports'
+    fgd_name = args.name or args.input.name.lower()
+    fgd_file = (fgd_dir / fgd_name).with_suffix('.fgd')
+
     header = f'''// Copper Quake game definition file (.fgd)
 // for Worldcraft 1.6 and above
 
@@ -32,7 +38,8 @@ def main():
     def_out = [header]
 
     # TODO: open quakeC in progs.src order for better fgd order control
-    for qc_file in get_qcs(qcs_dir):
+    print('Scanning *.qc for FGD comments...')
+    for qc_file in get_qcs(args.input / 'progs.src'):
         if defs := get_fgd_defs(Path(qc_file).read_text()):
             def_out.extend([f'\n//\n// {qc_file}\n//\n'] + defs + ['\n'])
 
