@@ -289,6 +289,7 @@ void(entity on, float _chan, string _noise, float _volume, float _distance, floa
 	snd.distance = _distance;
 	snd.style = _chan;
 	snd.think = target_sound_use;
+	snd.count = 1;	// remove after use
 	snd.nextthink = time + _delay;
 }
 
