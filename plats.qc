@@ -394,7 +394,13 @@ void() func_plat =
 			self.height = self.size_z - self.lip;
 		}
 	}	
-		
+	if (!self.height)
+	{
+		// this one's for tc_cement_mixer
+		dprint("\bwarning:\b func_plat had 0 height - are you using lip correctly?");
+		self.height = self.size_z;
+	}
+	
 	if (!self.pos1 && !self.pos2)
 	{
 		// pos1 is the top position, pos2 is the bottom
