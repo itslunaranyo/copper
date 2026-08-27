@@ -483,10 +483,10 @@ void() item_spikes =
 }
 
 /*QUAKED item_rockets (0 .5 .5) (0 0 0) (32 32 32) BIG ? SUSPENDED
-3 ammo points (rockets) for the Rocket/Grenade Launcher.
+4 ammo points (rockets) for the Rocket/Grenade Launcher.
 
 Flags:
-"big" gives 6 instead of 3
+"big" gives 8 instead of 4
     
 Keys:
 "target/2/3/4/k" - entity to trigger when picked up
