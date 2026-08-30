@@ -317,7 +317,7 @@ void() weapon_axe =
 	precache_model_safe ("progs/g_axe.mdl");
 	setmodel (self, "progs/g_axe.mdl");
 	self.items = IT_AXE;
-	self.netname = "Axe. Find some wood!";
+	self.netname = "Axe";
 	StartWeapon();
 }
 
