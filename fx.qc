@@ -247,9 +247,20 @@ void(float num) particlefield_burst =
 void() particlefield_think =
 {
 	if (self.finaldest == VEC_ORIGIN)
-		particlefield_burst(floor(0.5 + self.speed / 10));
+	{
+		float accum;
+		self.cnt += self.speed * self.wait;
+		accum = floor(self.cnt);
+		if (accum > 0)
+		{
+			particlefield_burst(accum);
+			self.cnt -= accum;
+		}
+	}
 	else
+	{
 		particlefield_sweep(self.speed);
+	}
 	
 	if (self.state)
 		self.nextthink = time + self.wait;
@@ -294,6 +305,7 @@ void() particlefield_use =
 	if (self.state)
 	{
 		particlefield_get_spot();
+		self.cnt = 0;
 		self.think = particlefield_think;
 		self.nextthink = time + self.wait;
 	}
@@ -409,7 +421,7 @@ void() misc_particlefield_box =
 		self.speed2 = 16;
 	if (!self.wait)
 		self.wait = 0.1;
-	
+		
 	if (self.size == '0 0 0')
 	{
 		if (self.mangle != '0 0 0')
@@ -462,6 +474,8 @@ void() misc_particlefield_box =
 	// innie and outie cancel
 	if (self.spawnflags & (PFIELD_INWARD | PFIELD_OUTWARD) == (PFIELD_INWARD | PFIELD_OUTWARD))
 		self.spawnflags -= 6;
+	
+	self.cnt = 0;
 }
 
 /*QUAKED misc_particlefield (0 .6 1) ? START_ON INWARD OUTWARD BURST
