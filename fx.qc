@@ -311,6 +311,7 @@ void() particlefield_use =
 	}
 	else
 	{
+		self.nextthink = 0;
 		self.buddy = world;
 	}
 }
