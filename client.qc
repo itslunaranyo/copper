@@ -928,8 +928,8 @@ void() PlayerDeathThink =
 		self.air_finished = time + 12;
 		self.dmg = 0;   		// initial water damage
 		
-		self.solid = SOLID_SLIDEBOX;
 		self.movetype = MOVETYPE_WALK;
+		self.solid = SOLID_SLIDEBOX;
 		setsize (self, VEC_HULL_MIN, VEC_HULL_MAX);
 		self.flags = FL_CLIENT;
 		self.customflags = 0;
