@@ -913,6 +913,10 @@ void() PlayerDeathThink =
 			self.velocity = forward * normalize(self.velocity);
 	}
 
+	// fix noclip cmd hard-coded setting the player back to WALK
+	if (self.movetype != MOVETYPE_NOCLIP && self.movetype != MOVETYPE_TOSS)
+		self.movetype = MOVETYPE_TOSS;
+
 	if (self.flags & FL_GODMODE && self.deadflag)
 	{
 		CopyToBodyQueue (self);
