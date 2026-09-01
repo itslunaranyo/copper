@@ -319,6 +319,11 @@ void() move_players_to_intermission =
 
 	while (other != world)
 	{
+		other.think = player_run;	// properly end all weapon firing states
+		other.nextthink = time;
+		// an extant lightning beam will briefly persist for its lifetime, and it
+		// doesn't seem clearable even by spamming TE_LIGHTNING events
+		
 		move_player_to_intermission(other,spot);		
 		other.lifetime_finished = time + 6;
 		other = find (other, classname, "player");		
