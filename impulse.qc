@@ -64,7 +64,7 @@ void() Cheat_Genocide =
 		// these monsters haven't spawned yet, turn them into relays so their 
 		// deathtargets fire as soon as they're triggered and their absence doesn't
 		// break the level
-		if(t.customflags & CFL_SPAWNER || t.spawnflags & SPAWN_TRIGGERED)
+		if(t.customflags & CFL_SPAWNER)
 		{
 			t.classname = "trigger_relay";
 			t.count = 0;
