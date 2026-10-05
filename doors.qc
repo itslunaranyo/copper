@@ -147,7 +147,7 @@ void() door_fire =
 	// trigger all paired doors
 	starte = self;
 	if ( !( self.spawnflags & DOOR_TOGGLE ) || 
-		( self.spawnflags & DOOR_TOGGLE && (self.state == STATE_BOTTOM || self.state == STATE_DOWN) ) )
+		( self.spawnflags & DOOR_TOGGLE && (self.state == STATE_BOTTOM || (self.state == STATE_DOWN && mapname != "udob4" ) ) ) )
 	do {
 		door_go_up ();
 		self = self.enemy;
