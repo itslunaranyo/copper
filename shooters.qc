@@ -371,8 +371,8 @@ void() trap_lightning_proxy =
 {
 	if (self.buddy.spawnflags & SF_LSHOOT_TRACKME)
 		self.buddy.enemy = self.enemy;
+	sound(self.buddy, CHAN_WEAPON, "weapons/lstart.wav", self.buddy.volume, ATTN_NORM);
 	SUB_CallAsSelf(trap_lightning_fire, self.buddy);
-	sound(self, CHAN_WEAPON, "weapons/lstart.wav", self.volume, ATTN_NORM);
 	remove(self);
 }
 
