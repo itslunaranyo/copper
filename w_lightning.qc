@@ -137,6 +137,7 @@ void(vector start, vector limit, entity from, float damage) LightningBeam =
 	}
 	else
 	{
+		if (targ != world)
 		sound (targ, CHAN_BODY, "weapons/lhit.wav", 1, ATTN_NORM);
 		WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 		WriteByte (MSG_BROADCAST, TE_LIGHTNING2);
