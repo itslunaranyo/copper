@@ -500,9 +500,9 @@ vector(entity e) BoundsBottom =
 }
 
 // for measuring how large an entity is along an arbitrary vector
-// FIXME: this is trash and it returns trash
 float(vector v, vector s) BoundsAngleSize =
 {
+	/*
 	v_x = fabs(v_x);
 	v_y = fabs(v_y);
 	v_z = fabs(v_z);
@@ -511,8 +511,19 @@ float(vector v, vector s) BoundsAngleSize =
 	s_x = fabs(s_x);
 	s_y = fabs(s_y);
 	s_z = fabs(s_z);
+	return v*s;
+	*/
 	
-	return v * s;
+	/*
+	oct 11 26: restoring old behavior even though it was just as broken. it was broken in a
+	different way that numerous vanilla maps were built to compensate for (iris doors in
+	sm190_newhouse, for example), and the fix broke those.
+	will this reverse-fix break copper maps that were built to compensate for the other
+	bad math? maybe? I hope not? this seems less likely since the .distance key solves the
+	need to pick random-seeming numbers to make a door move diagonally a certain amount, and
+	has existed since 1.0.
+	*/
+	return fabs(v * s);
 }
 
 float (vector e1mins, vector e1maxs, vector e2mins, vector e2maxs, float pad) BoundsTouching =
