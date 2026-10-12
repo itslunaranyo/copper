@@ -1,51 +1,32 @@
-import os, datetime, sys
+from datetime import datetime
+from pathlib import Path
+import argparse
 
 # TODO: put all the baseclasses first
 
-def getQuakeds(qc):
-	defOut = ""
-	numDefs = 0
-	start = 0
-	end = 0
-	
-	while 1:
-		start = qc.find("/*FGD",start)
-		if start == -1:
-			return defOut, numDefs
-		#print( "adding ", qc[start + 9 : qc.find(" ",start + 9)] )
-		end = qc.find("*/",start)
-		defOut += qc[start + 5 : end].strip() + "\n"
-		numDefs += 1
-		start = end
+def get_fgd_defs(qc):
+    return [p.split('*/', 1)[0].strip()  + '\n' for p in qc.split('/*FGD')[1:]]
 
-def getQCs():
-	# load every file listed in progs.src except the header
-	with open("progs.src",'r') as progsfile:
-		progslines = list(progsfile)[1:] # first line is output filename, skip it
+def get_qcs(progs_file: Path):
+    # load every file listed in progs.src except the header
+    return [qc_file
+            for line in progs_file.read_text().splitlines()[1:]
+            if (qc_file := line.split('//', 1)[0].strip()) and not line.startswith('#')
+            ]
 
-	qcfiles = []
-	for line in progslines:
-		qcfilename = line.partition("//")[0].strip()
-		if (len(qcfilename) < 4):
-			continue
-		if qcfilename[-3:] != ".qc":
-			continue
-		qcfiles.append(qcfilename)
-	return qcfiles
+def main():
+    parser = argparse.ArgumentParser()
 
+    parser.add_argument('name', nargs='?', type=str, metavar='FGD name', help='Name of FGD file')
+    parser.add_argument('-i', '--input', type=Path, metavar='DIR', help='Project directory', default=Path(__file__).parent)
+    parser.add_argument('-o', '--output', type=Path, metavar='DIR', help='Output directory')
 
-def go():
-	cwd = os.path.dirname(os.path.realpath(__file__))
-	fgdDir = os.path.normpath(os.path.join(cwd, ".."))
-	fgdName = ""
-	if len(sys.argv) > 1:
-		fgdName = sys.argv[1]
-	else:
-		fgdName = os.path.basename(fgdDir)
-	fgdFile = fgdName + ".fgd"
+    args = parser.parse_args()
+    fgd_dir = args.output or args.input / 'exports'
+    fgd_name = args.name or args.input.name.lower()
+    fgd_file = (fgd_dir / fgd_name).with_suffix('.fgd')
 
-	print("Scanning *.qc for FGD comments...")
-	defOut = """// Copper Quake game definition file (.fgd)
+    header = f'''// Copper Quake game definition file (.fgd)
 // for Worldcraft 1.6 and above
 
 // If something is wrong with this file, check
@@ -53,30 +34,18 @@ def go():
 // for the very latest version before anything else
 
 // Based heavily on quake.fgd by autolycus/czg/et al
-// Generated from Copper QuakeC source comments on """
-	numDefs = 0
-	defOut += datetime.datetime.now().strftime("%m.%d.%Y")
-	defOut += "\n"
-	
-	# TODO: open quakec in progs.src order for better fgd order control
-	qcfiles = getQCs()
-	for qcfn in qcfiles:
-		if not qcfn.endswith(".qc"):
-			continue
-		with open(os.path.join(cwd, qcfn), "r") as qcfile:
-			qc = qcfile.read()
-		defs, n = getQuakeds(qc)
-		if (n):
-			defOut += "\n//\n// " + qcfn + "\n//\n"
-			defOut += defs
-			numDefs += n
-			defOut += "\n"
-	
-	dfn = os.path.join(fgdDir, fgdFile)
-	print("Writing to", dfn)
-	with open(dfn, "w") as df:
-		df.write(defOut)
-	print("Completed, found",numDefs)
+// Generated from Copper QuakeC source comments on {datetime.now().strftime('%m.%d.%Y')}\n'''
+    def_out = [header]
 
-if __name__ == "__main__":
-	go()
+    # TODO: open quakeC in progs.src order for better fgd order control
+    print('Scanning *.qc for FGD comments...')
+    for qc_file in get_qcs(args.input / 'progs.src'):
+        if defs := get_fgd_defs(Path(qc_file).read_text()):
+            def_out.extend([f'\n//\n// {qc_file}\n//\n'] + defs + ['\n'])
+
+    print(f'Exporting to {fgd_file}')
+    fgd_file.write_text(''.join(def_out))
+    print(f'Exported {sum(s.count('@') for s in def_out)} defs')
+
+if __name__ == '__main__':
+    main()
