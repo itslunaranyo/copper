@@ -145,6 +145,8 @@ void() ShalMissileTouch =
 
 	if (other.type == "zombie")
 		T_Damage (other, self, self.trueowner, other.health + 25);
+	else if (other.type == "zombie")
+		T_Damage (other, self, self.trueowner, 24);
 	
 	ShalMissileExplode();
 }
