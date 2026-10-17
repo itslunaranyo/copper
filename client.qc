@@ -105,7 +105,6 @@ void() SetCoopParms =
 
 void() DecodeLevelParms =
 {
-	
 	if (world.model == "maps/start.bsp")
 		SetNewParms ();		// take away all stuff on starting new episode
 	
@@ -118,8 +117,12 @@ void() DecodeLevelParms =
 	self.ammo_cells = parm7;
 	self.armortype = parm9;
 	
-	//self.weapon = parm8;
-	W_Select(parm8);
+	if (!W_Select(parm8))
+		// your current weapon can be invalid if you fired your last shot but the
+		// animation/attack_finished aren't done yet, and if you exit the map in 
+		// this window, incoming parms have a bad .weapon
+		W_SelectBestWeapon();
+		
 	armor_set_type(self);
 }
 
