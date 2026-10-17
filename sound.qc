@@ -15,6 +15,9 @@ void(float vol) sound_setup =
 {
 	if (!self.volume)
 		self.volume = vol;
+	else
+		self.volume = saturate(self.volume);
+		
 	if (!self.distance)
 		self.distance = ATTN_STATIC;
 	else if (self.distance == 1) self.distance = ATTN_IDLE;

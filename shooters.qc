@@ -142,7 +142,9 @@ void() trap_spikeshooter =
 {
 	if (!SUB_ShouldSpawn()) return;
 	SetMovedir ();
-	self.volume = zeroconvertdefault(self.volume, 1);
+	
+	self.volume = zeroconvertdefault_saturate(self.volume, 1);
+	
 	self.use = shooter_once_think;
 	if (self.spawnflags & (SF_SHOOT_OGRENADE | SF_SHOOT_ROCKET))
 	{
@@ -477,7 +479,7 @@ void() trap_lightning =
 	precache_sound ("misc/power.wav");
 	precache_sound ("weapons/lhit.wav");
 	
-	self.volume = zeroconvertdefault(self.volume, 1);
+	self.volume = zeroconvertdefault_saturate(self.volume, 1);
 	
 	self.state = 0;
 	self.count = 0;

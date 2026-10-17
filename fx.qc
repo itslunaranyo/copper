@@ -1190,8 +1190,8 @@ void() target_debris =
 	self.count = zeroconvertdefault(self.count, 3);
 	self.use = target_debris_use;
 	
-	if (!self.volume)
-		self.volume = 1;
+	self.volume = zeroconvertdefault_saturate(self.volume, 1);
+		
 	if (!self.distance)
 		self.distance = 1;
 		
@@ -1613,6 +1613,7 @@ If this targets brushmodels with switchable shadows or lightstyles, the lighting
 "noise2"	sound to play on end fade
 "noise3"	sound to play on begin reverse fade
 "noise4"	sound to play on end reverse fade
+"volume"	volume for sounds (default 1.0)
 
 If BY_DISTANCE is checked, it will set alpha immediately based on how far the activator is from its origin. 
 "distance"	max distance beyond which alpha will be set to 'alpha'
@@ -1665,7 +1666,8 @@ void() target_fade =
 	self.alpha = zeroconvertdefault(self.alpha, 1);
 	self.alpha2 = zeroconvert(self.alpha2);
 	
-	if (!self.volume) self.volume = 1;
+	self.volume = zeroconvertdefault_saturate(self.volume, 1);
+
 	if (self.noise != string_null) precache_sound(self.noise);
 	if (self.noise2 != string_null) precache_sound(self.noise2);
 	if (self.noise3 != string_null) precache_sound(self.noise3);
