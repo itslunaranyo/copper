@@ -1224,11 +1224,7 @@ void() WaterMove =
 			{
 				// biosuit protects from lava if it's 16u deep or less
 				if (!(has_biosuit(self) && pointcontents(self.origin - '0 0 7') != CONTENT_LAVA))
-				{
-					bprint(ftos(self.waterlevel));
-					bprint("\n");
 					T_Damage (self, world, world, 10 * self.waterlevel, DMGTYPE_LAVA);
-				}
 			}
 		}
 	}
