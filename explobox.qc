@@ -179,7 +179,8 @@ void() explobox_setup =
 	if (self.health != -1)
 		self.takedamage = DAMAGE_AIM;
 	self.type = "explobox";
-	self.deathtype = "detonated";
+	if (self.deathtype == "")
+		self.deathtype = "detonated";
 	self.max_health = self.health;
 	
 	if (self.style < 0)
@@ -196,8 +197,17 @@ void() explobox_setup =
 	
 	// no droptofloor for mapper-built func
 	if (self.classname=="func_explobox")
+	{
+		self.movetype = MOVETYPE_PUSH;
 		return;
+	}
 		
+	self.think = explobox_drop;
+	self.nextthink = time + 0.1;
+}
+
+void() explobox_drop =
+{
 	/*
 	vector oldorg;
 	
@@ -210,7 +220,6 @@ void() explobox_setup =
 		remove(self);
 	}
 	*/
-	
 	vector bottom = self.origin + (self.mins + self.maxs) / 2;
 	//bprint(vtos(bottom));bprint("\n");
 	bottom_z = self.origin_z;
@@ -220,6 +229,8 @@ void() explobox_setup =
 	bottom = self.origin;
 	bottom_z = trace_endpos_z;
 	setorigin(self, bottom);
+	
+	self.movetype = MOVETYPE_PUSH;
 }
 
 /*QUAKED misc_explobox (.8 .2 0) (0 0 0) (32 32 64) - - - - - - - START_INVIS
@@ -243,7 +254,6 @@ void() misc_explobox =
 {
 	if (!SUB_ShouldSpawn()) return;
 	self.solid = SOLID_BSP;
-	self.movetype = MOVETYPE_PUSH;
 	precache_model_safe ("maps/b_explob.bsp");
 	setmodel (self, "maps/b_explob.bsp");
 	
@@ -272,7 +282,7 @@ void() misc_explobox2 =
 {
 	if (!SUB_ShouldSpawn()) return;
 	self.solid = SOLID_BSP;
-	self.movetype = MOVETYPE_PUSH;
+
 	precache_model2_safe ("maps/b_exbox2.bsp");
 	setmodel (self, "maps/b_exbox2.bsp");
 	self.dmg = zeroconvertdefault(self.dmg,100);
@@ -302,7 +312,7 @@ void() func_explobox =
 {
 	if (!SUB_ShouldSpawn()) return;
 	self.solid = SOLID_BSP;
-	self.movetype = MOVETYPE_PUSH;
+
 	setmodel(self,self.model);
 	self.dmg = zeroconvertdefault(self.dmg,150);
 	bmodel_lightstyle(self, 1);
