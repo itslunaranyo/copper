@@ -1193,32 +1193,6 @@ void() WaterMove =
 		return;
 	}
 
-	if (self.watertype == CONTENT_LAVA)
-	{	// do damage
-		if (self.dmgtime < time)
-		{
-			if (has_biosuit(self))
-				self.dmgtime = time + 1;
-			else
-				self.dmgtime = time + 0.2;
-
-			if (self.waterlevel)
-			{
-				// biosuit protects from lava if it's 16u deep or less
-				if (!(has_biosuit(self) && pointcontents(self.origin - '0 0 7') != CONTENT_LAVA))
-					T_Damage (self, world, world, 10 * self.waterlevel, DMGTYPE_LAVA);
-			}
-		}
-	}
-	else if (self.watertype == CONTENT_SLIME)
-	{	// do damage
-		if (self.dmgtime < time && self.radsuit_finished < time)
-		{
-			self.dmgtime = time + 1;
-			T_Damage (self, world, world, 4 * self.waterlevel, DMGTYPE_SLIME);
-		}
-	}
-	
 	if ( !(self.flags & FL_INWATER) )
 	{	// player enter water sound
 		if (self.watertype == CONTENT_LAVA)
@@ -1235,6 +1209,36 @@ void() WaterMove =
 
 		self.flags = self.flags + FL_INWATER;
 		self.dmgtime = 0;
+	}
+	
+	if (self.watertype == CONTENT_LAVA)
+	{	// do damage
+		if (self.dmgtime < time)
+		{
+			if (has_biosuit(self))
+				self.dmgtime = time + 1;
+			else
+				self.dmgtime = time + 0.2;
+
+			if (self.waterlevel)
+			{
+				// biosuit protects from lava if it's 16u deep or less
+				if (!(has_biosuit(self) && pointcontents(self.origin - '0 0 7') != CONTENT_LAVA))
+				{
+					bprint(ftos(self.waterlevel));
+					bprint("\n");
+					T_Damage (self, world, world, 10 * self.waterlevel, DMGTYPE_LAVA);
+				}
+			}
+		}
+	}
+	else if (self.watertype == CONTENT_SLIME)
+	{	// do damage
+		if (self.dmgtime < time && self.radsuit_finished < time)
+		{
+			self.dmgtime = time + 1;
+			T_Damage (self, world, world, 4 * self.waterlevel, DMGTYPE_SLIME);
+		}
 	}
 	
 	if ( !(self.flags & FL_WATERJUMP) )
@@ -1734,6 +1738,15 @@ void(float dmgtype) ClientObituary =
 		}
 	}
 	
+	if (self.dmg_inflictor.type == "explobox")
+	{
+		bprint(self.netname);
+		bprint(" ");
+		bprint(self.dmg_inflictor.deathtype);
+		bprint("\n");
+		
+		return;
+	}
 	if (attacker.deathtype != string_null && attacker.classname != "player" )
 	{
 		bprint(self.netname);
