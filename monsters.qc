@@ -292,7 +292,8 @@ entity( void() spawnthink ) mon_spawner_use =
 			mon.oldenemy = activator.oldenemy;
 		}
 		else
-			mon.enemy = activator;
+			//mon.enemy = activator;
+			mon.enemy = nextent(world);	// just blame player1
 	}	
 
 	if (self.count > 0)
@@ -348,7 +349,8 @@ void() monster_use =
 		self.oldenemy = activator.oldenemy;
 	}
 	else 
-		self.enemy = activator;
+		//mon.enemy = activator;
+		self.enemy = nextent(world);	// just blame player1
 
 	// delay reaction so the monster is still heard if it's teleported
 	self.nextthink = time + 0.1;

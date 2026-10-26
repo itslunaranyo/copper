@@ -320,6 +320,58 @@ T_ReactToDamage
 */
 void( entity attacker ) T_ReactToDamage =
 {
+	do {
+		// ignore doors and nailshooters and so on
+		if (!(attacker.flags & (FL_MONSTER|FL_CLIENT))) break;
+		// ignore self dmg
+		if ( attacker == self ) break;
+		// ignore bosses because we can't kill them anyway
+		if ( attacker.type == "boss" ) break;	
+		// don't get distracted instantly after switching targets
+		if (time < self.dmgtime) break;
+
+		if (attacker == self.enemy && (attacker.flags & FL_MONSTER))
+		{
+			self.frags = 0;	// .frags used on monsters as a 'give up on infighting' timer
+			break;
+		}
+
+		if (attacker.classname == "player")
+		{
+			if (self.enemy.classname != "player")
+			{
+				self.enemy = attacker;
+				FoundTarget();
+			}
+			else
+				self.enemy = attacker;
+
+			if (coop)
+				self.dmgtime = time + 2 + random();	// players pull guaranteed aggro for 2 seconds before infighting can distract
+			else
+				self.dmgtime = time + random();
+			break;
+		}
+
+		// ========
+		// all infighting cases follow:
+		
+		// fish should ignore monsters that aren't in the water with them
+		if (self.flags & FL_SWIM && pointcontents(attacker.origin) > CONTENT_WATER) break;
+		
+		// get mad unless of the same class (except for soldiers)
+		// classname check replaced with new "type" check
+		// .type defaults to classname anyway, or can be overwritten so monsters can be grouped into mutually not-infighting groups
+		if ( ( self.type != attacker.type ) || ( self.classname == "monster_army" ) )
+		{
+			if (self.enemy.classname == "player")
+				self.oldenemy = self.enemy;
+			self.enemy = attacker;
+			self.dmgtime = time + 1 + random();	// focus on infight for a minumum of 1 second
+			FoundTarget();
+		}
+	} while (FALSE);
+	
 	if (self.flags & FL_MONSTER)
 	{
 		monster_alt_use(
@@ -327,56 +379,6 @@ void( entity attacker ) T_ReactToDamage =
 			TRUE, 	// pain target obviously
 			(self.health <= floor(self.max_health * 0.5)), // half health threshold
 			FALSE);	// not dead yet
-	}
-	
-	// ignore doors and nailshooters and so on
-	if (!(attacker.flags & (FL_MONSTER|FL_CLIENT))) return;
-	// ignore self dmg
-	if ( attacker == self ) return;
-	// ignore bosses because we can't kill them anyway
-	if ( attacker.type == "boss" ) return;	
-	// don't get distracted instantly after switching targets
-	if (time < self.dmgtime) return;
-
-	if (attacker == self.enemy && (attacker.flags & FL_MONSTER))
-	{
-		self.frags = 0;	// .frags used on monsters as a 'give up on infighting' timer
-		return;
-	}
-
-	if (attacker.classname == "player")
-	{
-		if (self.enemy.classname != "player")
-		{
-			self.enemy = attacker;
-			FoundTarget();
-		}
-		else
-			self.enemy = attacker;
-
-		if (coop)
-			self.dmgtime = time + 2 + random();	// players pull guaranteed aggro for 2 seconds before infighting can distract
-		else
-			self.dmgtime = time + random();
-		return;
-	}
-
-	// ========
-	// all infighting cases follow:
-	
-	// fish should ignore monsters that aren't in the water with them
-	if (self.flags & FL_SWIM && pointcontents(attacker.origin) > CONTENT_WATER) return;
-	
-	// get mad unless of the same class (except for soldiers)
-	// classname check replaced with new "type" check
-	// .type defaults to classname anyway, or can be overwritten so monsters can be grouped into mutually not-infighting groups
-	if ( ( self.type != attacker.type ) || ( self.classname == "monster_army" ) )
-	{
-		if (self.enemy.classname == "player")
-			self.oldenemy = self.enemy;
-		self.enemy = attacker;
-		self.dmgtime = time + 1 + random();	// focus on infight for a minumum of 1 second
-		FoundTarget();
 	}
 }
 
