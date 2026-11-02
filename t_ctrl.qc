@@ -64,6 +64,7 @@ void() trigger_relay_use =
 	
 	self.enemy = activator;
 	
+	entity dly;
 	if (self.spawnflags & SPAWN_RELAY_RANDOM)
 	{
 		SUB_CountTargets();
@@ -75,7 +76,15 @@ void() trigger_relay_use =
 		SUB_UseTargetsAlt(target);
 		SUB_UseTargetsAlt(target2);
 	}
-	else SUB_UseTargets();
+	else
+	{
+		// dumb chain of hacks to fix a specific case:
+		// trigger_relay with sounds -1 still makes sound if it has a message and a delay
+		dly = SUB_UseTargets();
+		if (dly)
+			dly.sounds = self.sounds;
+		// will properly rewrite all this later
+	}
 
 	if (self.spawnflags & SPAWN_RELAY_MSGONCE)
 		self.message = string_null;

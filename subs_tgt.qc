@@ -6,6 +6,10 @@
 ================================================================
 */
 
+// TODO: this has all become a dreadful mess and needs to be a lot simpler
+// - delay, sound, and centerprint can all be paramterized
+// - cut down on all the shared ancillary functions like UseCheck
+// - anything that doesn't use .self isn't a SUB
 
 /*
 =============
@@ -133,7 +137,7 @@ void() DelayThinkRandom =
 SUB_UseTargetsDelay
 ===============
 */
-void( void() delayedthink ) SUB_UseTargetsDelay =
+entity( void() delayedthink ) SUB_UseTargetsDelay =
 {
 	entity t;
 	// create a temp object to fire at a later time
@@ -147,6 +151,8 @@ void( void() delayedthink ) SUB_UseTargetsDelay =
 	SUB_CopyTargets(t);
 
 	t.cnt = self.cnt;
+	
+	return t;
 }
 
 /*
@@ -332,7 +338,7 @@ call stack, but entities that trigger each other in sequence within one frame
 targets not to fire.
 ==============================
 */
-float(float hush) SUB_UseCheck =
+entity(float hush) SUB_UseCheck =
 {
 	if (activator == world)
 	{
@@ -342,15 +348,16 @@ float(float hush) SUB_UseCheck =
 		activator = nextent(world);
 	}
 	
+	entity dly;
+	
 	if (self.delay)
 	{
 		if (hush)
-			SUB_UseTargetsDelay(DelayThinkSilent);
+			dly = SUB_UseTargetsDelay(DelayThinkSilent);
 		else
-			SUB_UseTargetsDelay(DelayThink);
-		return FALSE;
+			dly = SUB_UseTargetsDelay(DelayThink);
 	}
-	return TRUE;
+	return dly;
 }
 
 void() SUB_UseTargetsGo =
@@ -383,17 +390,19 @@ void() SUB_UseTargetsGo =
 	SUB_UseTargetsByField(target4);
 }
 
-void() SUB_UseTargets =
+entity() SUB_UseTargets =
 {
-	if (!SUB_UseCheck(FALSE))
-		return;
+	entity dly = SUB_UseCheck(FALSE);
+	if (dly)
+		return dly;
 	SUB_PrintMessage();
 	SUB_UseTargetsGo();
+	return world;
 }
 
 void() SUB_UseTargetsSilent =
 {
-	if (SUB_UseCheck(TRUE))
+	if (!SUB_UseCheck(TRUE))
 		SUB_UseTargetsGo();
 }
 
