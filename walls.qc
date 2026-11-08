@@ -283,14 +283,14 @@ Keys:
 "targetname"	entity name
 */
 /*FGD
-@PointClass base(Wall, Angle) = func_wall_point : "Wall. Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
+@PointClass base(Wall, Angle, CustomModel) = func_wall_point : "Wall. Changes its texture(s) to alternate ones (e.g. basebtn), if triggered.
 Not static: Use a func_static for inconsequential bmodels.
 
 Select a .bsp or .mdl to show with 'model'. 
 
 If 'Illusionary' is set, wall will always be nonsolid. If you use a .mdl you MUST set this flag (or consider a misc_model instead?)
-If 'Toggle Visibility' is set, will disappear and reappear when triggered instead of flipping texture." [
-	model(string) : "External model"
+If 'Toggle Visibility' is set, will disappear and reappear when triggered instead of flipping texture."
+[
 	mangle(string) : "Orientation of external model"
 ]
 */
@@ -321,8 +321,8 @@ Like a func_wall but calls makestatic.  Static entities are always nonsolid.
 "model"		filename of model to stand in for this entity. can be bsp or mdl.
 */
 /*
-@PointClass base(Appearflags, Func, Angle) = func_static_point : "Static (untriggerable) nonsolid model (point)" [
-	model(string) : "External model"
+@PointClass base(Appearflags, Func, Angle, CustomModel) = func_static_point : "Static (untriggerable) nonsolid model (point)"
+[
 	mangle(string) : "Orientation of external model"
 ]
 */

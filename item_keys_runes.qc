@@ -400,7 +400,7 @@ Keys:
 	]
 ]
 
-@PointClass size(-16 -16 -24, 16 16 32) color(128 0 128) base(Item, svFlags) model({ "path": ":progs/end1.mdl" }) = 
+@PointClass size(-16 -16 -24, 16 16 32) color(128 0 128) base(Item, svFlags, CustomModel) model({ "path": ":progs/end1.mdl" }) = 
 	item_sigil : "End of episode rune.  Can be customized through keyvalue manipulation to serve as any generic cross-map inventory item."
 [
 	noise(string) : "Override pickup noise"

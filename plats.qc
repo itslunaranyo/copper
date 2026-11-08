@@ -681,13 +681,11 @@ Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional rando
 Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination
 */
 /*FGD
-@PointClass base(Flytrain) size(16 16 16) = func_flytrain_point : 
+@PointClass base(Flytrain, CustomModel) size(16 16 16) = func_flytrain_point : 
 "Acts as a func_train with PATH_SPEED and SMOOTH_SPEED set, with additional random motion and and gentle smoothing at stops, starts, and hard corners. Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
 
-Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination"
-[
-	model(string) : "Model to use"
-]
+Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination" 
+[]
 */
 void() func_flytrain_point =
 {	
@@ -1041,7 +1039,7 @@ PATH_SPEED: train will inherit 'speed' value from path_corners as it reaches the
 Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination
 */
 /*FGD
-@PointClass base(Train) = func_train_point : "Moving platform that players can ride. 
+@PointClass base(Train, CustomModel) = func_train_point : "Moving platform that players can ride. 
 The point entity is the origin, even if a model is specified.
 The train spawns at the first target it is pointing at. If the train is the target of a button or trigger, it will not begin moving until activated.
 Will fire all targets of a pathcorner on arrival, but does not normally fire its own targets.
@@ -1052,7 +1050,6 @@ The 'Toggle' spawnflag allows starting and stopping the motion anywhere on the t
 
 Alt Target Pattern: 'target' selects path start, 'target2' on each pathcorner arrival, 'target3' on each departure, 'target4' on termination"
 [
-	model(string) : "Model to use"
 	spawnflags(Flags) = [
 		1 : "Speed from path" : 0
 		2 : "Toggle" : 0
@@ -1352,13 +1349,12 @@ CRUSHER		don't reverse when blocked
 STOP_*		when triggered off, keep oscillating until reaching the low/high/midpoint and stop there. checking more than one adds eligible stopping places, and the bobber will stop at the first one reached.
 */
 /*FGD
-@PointClass size(16 16 16) base(Bob) = func_bobbing_point : "Bobbing platform.
+@PointClass size(16 16 16) base(Bob, CustomModel) = func_bobbing_point : "Bobbing platform.
 Moves in a smooth sine wave. Build at the center of motion, specify 'wait' for the wavelength in seconds and 'distance' for the amplitude (distance from end to end) in units. Use 'delay' to set a phase offset (0-1).
 Trigger to freeze in place or reactivate. If any 'don't stop until' spawnflags are checked, the bobber will keep oscillating until it reaches one of the designated positions and stop there.
 
-Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."  [
-	model(string) : "Model to use"
-]
+Set both 'pos1' & 'pos2' to override the two apex positions (ends of the bob) to build and light your plat wherever."
+[]
 */
 void() func_bobbing_point = {func_bobbing();}
 

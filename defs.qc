@@ -579,6 +579,15 @@ void(float num, float type, string name) globalstat = #233;
 		16384 : "Alt Target Pattern" : 0
 	]
 ]
+@baseclass model({
+    	"path" : model,
+    	"skin" : skin,
+    	"frame": frame
+	}) = CustomModel [
+	model(string) : "Path to custom model"
+	skin(integer) : "Skin index" : 0
+	frame(integer) : "Model frame" : 0
+]
 */
 
 #pragma noref 0
